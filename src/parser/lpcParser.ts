@@ -40,7 +40,7 @@ import {
   VariableDeclaratorNode,
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
-import { unary_ops_set } from "./defs";
+import { tt, unary_ops_set } from "./defs";
 import { Scanner } from "./lpcScanner";
 import {
   ClosureNode,
@@ -1024,6 +1024,7 @@ export class LPCParser {
           this.parseVariableDeclarator(decl);
           break;
         default:
+          decl.end = this.scanner.getTokenOffset();
           return decl;
       }
     }
@@ -1032,10 +1033,12 @@ export class LPCParser {
       throw "Expected semicolon after declaration";
     }
 
+    decl.end = this.scanner.getTokenOffset();
+
     this.tryParseComment(decl);
 
     this.scanner.eat(TokenType.BlankLines);
-
+    
     return decl;
   }
 
@@ -1203,11 +1206,12 @@ export class LPCParser {
     if (lh.type == "function") {
       return lh;
     }
-
+        
     this.eatWhitespaceAndNewlines();
-    let tt = this.scanner.peek();
 
-    if (tt == TokenType.IndexorStart) {
+    let t = this.scanner.peek();    
+
+    if (t == TokenType.IndexorStart) {
       // this can happen in the expression, and also after
       this.scanner.scan(); // consume [
 
@@ -1223,26 +1227,26 @@ export class LPCParser {
 
       this.eatWhitespace();
 
-      tt = this.scanner.peek();
-      if (tt == TokenType.IndexorEnd) throw Error("Unexpected ]");
+      t = this.scanner.peek();
+      if (t == TokenType.IndexorEnd) throw Error("Unexpected ]");
 
-      lh = me;
+      lh = me;      
     }
 
-    switch (tt) {
+    switch (t) {
       case TokenType.Comma:
         if (lh.type == "var-decl") {
           // multiple declarators in this variable declaration
           // otherwise let the comma go, its part of something else
           // (like an array of paren block)
           const decl = lh as VariableDeclarationNode;
-          while (tt == TokenType.Comma) {
+          while (t == TokenType.Comma) {
             this.scanner.scan(); // eat the comma
             this.eatWhitespace();
 
             const nextDecl = this.parseVariableDeclarator(decl);
             this.eatWhitespace();
-            tt = this.scanner.peek();
+            t = this.scanner.peek();
           }
 
           return decl;
@@ -1274,7 +1278,7 @@ export class LPCParser {
         parent.children.push(aExp);
         return this.parseAssignmentExpression(aExp, parent);
     }
-
+    
     return lh;
   }
 

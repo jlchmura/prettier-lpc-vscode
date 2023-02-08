@@ -62,6 +62,23 @@ export class Scanner implements IScanner {
     return skipWhiteSpace.test(this.input) ? skipWhiteSpace.lastIndex : pos;
   }
 
+  lookBackCharCode(): number {
+    let i = this.stream.pos() - 1;
+    let char: number = 0;
+    while ((char = this.stream.peekChar(i--))) {
+      if (
+        char != tt._NWL &&
+        char != tt._WSP &&
+        char != tt._TAB &&
+        char != tt._CAR &&
+        char != tt._LFD
+      ) {
+        return char;
+      }      
+    }
+    return 0;
+  }
+
   lookaheadCharCode(): number {
     return this.input.charCodeAt(this.nextTokenStart());
   }

@@ -1,4 +1,4 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { TypeCastExpressionNode } from "../../nodeTypes/typeCast";
 import {
@@ -56,10 +56,15 @@ export const printVarDecl: PrintNodeFunction<VariableDeclarationNode> = (
 
   if (shouldPrintSemi) {
     printed.push(";");
+    
+    if (util.isNextLineEmpty(options.originalText, node, n=>n.end)) {
+      printed.push(hardline);
+    }  
   }
 
   printed.push(printSuffixComments(node, path, options, printChildren));
 
+  
   return printed;
 };
 

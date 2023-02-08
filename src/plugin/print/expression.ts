@@ -1,4 +1,4 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { AssignmentExpressionNode } from "../../nodeTypes/assignmentExpression";
 import { BinaryExpressionNode } from "../../nodeTypes/binaryExpression";
@@ -42,7 +42,7 @@ export const printUnaryPrefixExpression: PrintNodeFunction<
 export const printCallExpression: PrintNodeFunction<
   CallExpressionNode,
   CallExpressionNode
-> = (node, path, options, printChildren) => {  
+> = (node, path, options, printChildren) => {
   const printed = [path.call(printChildren, "callee")];
   const sym = Symbol("argGroup");
   printed.push("(");
@@ -66,7 +66,14 @@ export const printCallExpression: PrintNodeFunction<
   printed.push(printSuffixComments(node, path, options, printChildren));
 
   const shouldPrintSemi = needsSemi(path);
-  if (shouldPrintSemi) printed.push(";");
+  if (shouldPrintSemi) {
+    printed.push(";");
+    if (
+      util.isNextLineEmpty(options.originalText, node, (n) => n?.end)
+    ) {
+      printed.push(hardline);
+    }
+  }
 
   return fill(printed);
 };
