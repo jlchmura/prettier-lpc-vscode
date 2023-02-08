@@ -19,7 +19,6 @@
     "cli": "npx tsc && node --enable-source-maps ./build/cli.js",
     "build": "npx tsc",
     "build:ext": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-    "postbuild": "cp package.json build/package.json && cd build && npm install --only=production",
     "vsce:package": "vsce package",
     "vsce:publish": "vsce publish"
   },
@@ -33,6 +32,8 @@
   "keywords": [
     "lpc",
     "mud",
+    "ldmud",
+    "lpmud",
     "prettier",
     "formatter",
     "Lars Pensjö C"
