@@ -42,7 +42,11 @@ import {
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
 import { unary_ops_set } from "./defs";
 import { Scanner } from "./lpcScanner";
-import { ClosureNode } from "../nodeTypes/closure";
+import {
+  ClosureNode,
+  InlineClosureArgumentNode,
+  InlineClosureNode,
+} from "../nodeTypes/closure";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -223,6 +227,14 @@ export class LPCParser {
         return this.parseSwitch(curr);
       case TokenType.Closure:
         return this.parseClosure(curr);
+      case TokenType.InlineClosureStart:
+        return this.parseInlineClosure(curr);
+      case TokenType.InlineClosureArgument:
+        return this.parseMaybeExpression(
+          token,
+          curr,
+          ParseExpressionFlag.StatementOnly
+        );
     }
 
     throw Error(
@@ -1170,6 +1182,8 @@ export class LPCParser {
       lh = this.parseMapping(parent);
     } else if (token == TokenType.ParenBlock) {
       lh = this.parseParenBlock(parent, flags);
+    } else if (token == TokenType.InlineClosureArgument) {
+      lh = this.parseInlineClosureArg(parent);
     } else {
       lh = this.parseExpression(token, parent, flags);
     }
@@ -1737,6 +1751,58 @@ export class LPCParser {
     nd.argument = arg;
 
     parent.children.push(nd);
+    return nd;
+  }
+
+  private parseInlineClosure(parent: LPCNode) {
+    const nd = new InlineClosureNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    const children: LPCNode[] = [];
+    let tt: TokenType;
+    while (
+      (tt = this.scanner.scan()) &&
+      tt != TokenType.EOS &&
+      tt != TokenType.InlineClosureEnd
+    ) {
+      if (tt == TokenType.BlankLines) {
+        this.eatWhitespaceAndNewlines();
+        continue;
+      }
+
+      if (tt == TokenType.LogicalOperator) {
+        const lo = this.parseLogicalExpression(
+          last(children)!,
+          ParseExpressionFlag.StatementOnly
+        );
+        children.pop();
+        children.push(lo);
+      } else {
+        const c = this.parseToken(tt, nd, ParseExpressionFlag.StatementOnly);
+        pushIfVal(children, c);
+      }
+
+      this.eatWhitespace();
+    }
+
+    nd.children = [...children];
+    parent.children.push(nd);
+    return nd;
+  }
+
+  private parseInlineClosureArg(parent: LPCNode) {
+    const nd = new InlineClosureArgumentNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    nd.name = this.scanner.getTokenText()?.trim();
     return nd;
   }
 }

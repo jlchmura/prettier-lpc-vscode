@@ -5,7 +5,7 @@ import {
   binary_ops,
   logical_ops,
   tt,
-  typesSet,
+  typesSet
 } from "./defs";
 import { ScannerState, TokenType } from "./lpcLanguageTypes";
 import { MultiLineStream } from "./MultiLineStream";
@@ -201,6 +201,8 @@ export class Scanner implements IScanner {
     let errorMessage;
     let comment: TokenType = TokenType.None;
 
+    const txt = this.stream.remaining_source;
+
     switch (this.state) {
       case ScannerState.WithinFile:
         if (this.stream.skipBlankLines()) {
@@ -339,6 +341,24 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.MappingEnd);
         }
 
+        // INLINE CLOSURES        
+        if (this.stream.advanceIfChars([tt._OPP, tt._COL])) {
+          // (:
+          this.stream.skipWhitespace();
+          this.parenStack.push(TokenType.InlineClosureStart);
+          return this.finishToken(offset, TokenType.InlineClosureStart);
+        }
+        if (this.testParenStack(TokenType.InlineClosureStart) && this.stream.advanceIfChars([tt._COL, tt._CLP])) {
+          // :)
+          this.parenStack.pop();
+          return this.finishToken(offset, TokenType.InlineClosureEnd);
+        }
+
+        // inline closure argument
+        if (this.stream.advanceIfRegExp(/^\$\d+/)) {
+          return this.finishToken(offset, TokenType.InlineClosureArgument);
+        }
+
         if (this.stream.advanceIfChar(tt._COM)) {
           this.stream.skipWhitespace();
           return this.finishToken(offset, TokenType.Comma);
@@ -363,7 +383,7 @@ export class Scanner implements IScanner {
               );
           }
 
-          // (
+          // (           
           this.parenStack.push(TokenType.ParenBlock);
           return this.finishToken(offset, TokenType.ParenBlock);
         }

@@ -44,6 +44,9 @@ export enum TokenType {
   Return,
 
   Closure,
+  InlineClosureStart,
+  InlineClosureEnd,
+  InlineClosureArgument,
 
   If,
   ElseIf,
