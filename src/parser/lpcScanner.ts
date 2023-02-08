@@ -207,12 +207,15 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.BlankLines);
         }
       // fall through to block
-      case ScannerState.WithinBlock:
-        const debugPos = this.stream.pos();
-        const debugText = this.stream.getSource().substring(debugPos);
+      case ScannerState.WithinBlock:        
         // directives must be at the start of a line
         if (this.stream.advanceIfChar(tt._HSH)) {
-          // #
+          // start of a closure
+          if (this.stream.advanceIfChar(tt._SQO)) {
+            return this.finishToken(offset, TokenType.Closure);
+          }
+          
+          // not a closure so it must be a directive
           if (this.stream.advanceIfDirective()) {
             this.state = ScannerState.StartDirective;
 
@@ -416,7 +419,7 @@ export class Scanner implements IScanner {
           this.stream.skipWhitespace();
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.Colon);
-        }
+        }        
 
         if (
           this.stream.peekChar() == tt._DQO ||

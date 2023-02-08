@@ -43,6 +43,8 @@ export enum TokenType {
   FunctionArgumentEnd,
   Return,
 
+  Closure,
+
   If,
   ElseIf,
   Else,

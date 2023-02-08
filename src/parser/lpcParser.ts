@@ -5,7 +5,7 @@ import { TokenType } from "./lpcLanguageTypes";
 
 import {
   ArrayExpressionNode,
-  IndexorExpressionNode
+  IndexorExpressionNode,
 } from "../nodeTypes/arrayExpression";
 import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
 import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
@@ -23,11 +23,11 @@ import { LiteralNode } from "../nodeTypes/literal";
 import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import {
   MappingExpressionNode,
-  MappingPair
+  MappingPair,
 } from "../nodeTypes/mappingExpression";
 import {
   MemberExpressionNode,
-  ParentExpressionNode
+  ParentExpressionNode,
 } from "../nodeTypes/memberExpression";
 import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
@@ -37,11 +37,12 @@ import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
 import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
 import {
   VariableDeclarationNode,
-  VariableDeclaratorNode
+  VariableDeclaratorNode,
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
 import { unary_ops_set } from "./defs";
 import { Scanner } from "./lpcScanner";
+import { ClosureNode } from "../nodeTypes/closure";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -220,6 +221,8 @@ export class LPCParser {
         return this.parseMaybeUnaryPrefixOperator(token, curr);
       case TokenType.Switch:
         return this.parseSwitch(curr);
+      case TokenType.Closure:
+        return this.parseClosure(curr);
     }
 
     throw Error(
@@ -341,7 +344,7 @@ export class LPCParser {
       (t = this.scanner.scan()) &&
       t != TokenType.ParenBlockEnd &&
       t != TokenType.EOS
-    ) {      
+    ) {
       if (
         t == TokenType.Comma ||
         t == TokenType.BlankLines ||
@@ -372,7 +375,6 @@ export class LPCParser {
     // this if block is probably not used anymore
     if (parent.type == "decl") {
       debugger;
-  
 
       parent.type = "call-exp";
     }
@@ -1271,7 +1273,7 @@ export class LPCParser {
     const typeNode = this.parseType();
     const hasStar = this.parseStar();
     const identNode = this.parseIdentifier(hasStar);
-  
+
     let t: TokenType = this.scanner.peek();
     if (
       t == TokenType.ParenBlockEnd ||
@@ -1552,7 +1554,7 @@ export class LPCParser {
 
     while ((t = this.scanner.scan()) && t != TokenType.ParenBlockEnd) {
       if (t == TokenType.EOS) throw Error("Unexpected EOS in for statement");
-      
+
       if (t == TokenType.BlankLines || t == TokenType.Whitespace) continue;
       else if (t == TokenType.Semicolon)
         if (lastToken == t) stack.push(undefined);
@@ -1607,7 +1609,7 @@ export class LPCParser {
     this.eatWhitespace();
     this.tryParseComment(nd);
     this.eatWhitespaceAndNewlines();
-  
+
     let t = this.scanner.scan();
     if (t == TokenType.CodeBlockStart) nd.codeblock = this.parseCodeBlock(nd);
     else {
@@ -1715,5 +1717,26 @@ export class LPCParser {
       cb.children.pop();
 
     return cb;
+  }
+
+  private parseClosure(parent: LPCNode) {
+    const nd = new ClosureNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    const tt = this.scanner.scan();
+    const arg = this.parseLiteralInternal(tt, nd);
+    if (!arg)
+      throw Error(
+        `Unespected token after closure start @ ${this.scanner.getTokenOffset()}`
+      );
+
+    nd.argument = arg;
+
+    parent.children.push(nd);
+    return nd;
   }
 }
