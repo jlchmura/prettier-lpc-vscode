@@ -1,3 +1,4 @@
+import { debug } from "console";
 import { last } from "../utils/arrays";
 import {
   arrith_ops,
@@ -366,13 +367,13 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._OPP)) {
           // first check if its a type cast
-          const nextWord = this.peekWord();
+          const nextWord = this.peekWord();          
           if (
             !!nextWord &&
             typesSet.has(nextWord) &&
             this.stream.peekChar(nextWord.length) == tt._CLP
           ) {
-            this.nextWord();
+            this.stream.advance(nextWord.length);            
             if (this.stream.advanceIfChar(tt._CLP))
               return this.finishToken(offset, TokenType.TypeCast);
             else
