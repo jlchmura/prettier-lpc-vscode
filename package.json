@@ -1,7 +1,7 @@
 { 
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -13,6 +13,7 @@
     "name": "jlchmura"
   },
   "publisher": "jlchmura",
+  "icon": "prettier-lpc-icon-light.png",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx tsc && node --enable-source-maps ./build/bin/print.js test.c",
