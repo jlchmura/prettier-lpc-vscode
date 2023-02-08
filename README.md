@@ -4,6 +4,9 @@ VSCode extension to format LPC (Lars Pensjö C) files with [Prettier](https://pr
 ### WARNING 
 This extension is a very early release. **It make break your code**. Use at your own risk.
 
+## Installation
+Install from the VS Code Marketplace: [prettier-lpc-vscode](https://marketplace.visualstudio.com/items?itemName=jlchmura.prettier-lpc-vscode)
+
 ## Known Limitations
 The folowing languages features are not supported yet:
 - Closures
