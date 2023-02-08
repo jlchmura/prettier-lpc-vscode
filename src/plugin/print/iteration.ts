@@ -66,6 +66,8 @@ export const printForStatement: PrintNodeFunction<
     const pbPrinted = path.call(printChildren, "codeblock");
     if (node.codeblock.type != "codeblock") {
       printed.push(group(indent([softline, pbPrinted, softline])));
+    } else {
+      printed.push(pbPrinted);
     }
   }
 

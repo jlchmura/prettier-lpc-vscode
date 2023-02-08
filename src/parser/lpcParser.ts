@@ -1599,7 +1599,7 @@ export class LPCParser {
 
     this.eatWhitespace();
     this.tryParseComment(nd);
-
+    
     this.scanner.eat(TokenType.BlankLines);
     this.scanner.eat(TokenType.Whitespace);
 
