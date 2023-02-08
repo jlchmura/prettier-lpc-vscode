@@ -47,6 +47,7 @@ export enum TokenType {
   InlineClosureStart,
   InlineClosureEnd,
   InlineClosureArgument,
+  LambdaEmptyArg,
 
   If,
   ElseIf,

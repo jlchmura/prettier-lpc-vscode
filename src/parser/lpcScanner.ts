@@ -442,6 +442,11 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Colon);
         }        
 
+        // 'o - lambda empty argument
+        if (this.stream.advanceIfChars([tt._SQO, 'o'.charCodeAt(0)])) {
+          return this.finishToken(offset, TokenType.LambdaEmptyArg);
+        }
+
         if (
           this.stream.peekChar() == tt._DQO ||
           this.stream.peekChar() == tt._SQO

@@ -9,6 +9,7 @@ Install from the VS Code Marketplace: [prettier-lpc-vscode](https://marketplace.
 
 ## Known Limitations
 The folowing languages features are not supported yet:
+- Certain closure syntax, e.g. #'[]
 - Structs
 - Coroutines 
 

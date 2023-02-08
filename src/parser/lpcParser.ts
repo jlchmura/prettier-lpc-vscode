@@ -46,6 +46,7 @@ import {
   ClosureNode,
   InlineClosureArgumentNode,
   InlineClosureNode,
+  LambdaEmptyArgNode,
 } from "../nodeTypes/closure";
 
 export interface LPCDocument {
@@ -235,6 +236,8 @@ export class LPCParser {
           curr,
           ParseExpressionFlag.StatementOnly
         );
+      case TokenType.LambdaEmptyArg: 
+        return this.parseLambdaEmptyArg(curr);
     }
 
     throw Error(
@@ -1741,7 +1744,7 @@ export class LPCParser {
       parent
     );
 
-    const tt = this.scanner.scan();
+    const tt = this.scanner.scan();    
     const arg = this.parseLiteralInternal(tt, nd);
     if (!arg)
       throw Error(
@@ -1803,6 +1806,19 @@ export class LPCParser {
     );
 
     nd.name = this.scanner.getTokenText()?.trim();
+    return nd;
+  }
+  
+  private parseLambdaEmptyArg(parent: LPCNode) {
+    const nd = new LambdaEmptyArgNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    this.eatWhitespace();
+
     return nd;
   }
 }

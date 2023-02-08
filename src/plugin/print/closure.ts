@@ -4,6 +4,7 @@ import {
   ClosureNode,
   InlineClosureArgumentNode,
   InlineClosureNode,
+  LambdaEmptyArgNode,
 } from "../../nodeTypes/closure";
 import { PrintNodeFunction } from "./shared";
 
@@ -53,4 +54,11 @@ export const printInlineClosureArg: PrintNodeFunction<
   InlineClosureArgumentNode
 > = (node, path, options, printChildren) => {
   return node.name;
+};
+
+export const printLambdaEmptyArg: PrintNodeFunction<
+  LambdaEmptyArgNode,
+  LambdaEmptyArgNode
+> = (node, path, options, printChildren) => {
+  return "'o";
 };

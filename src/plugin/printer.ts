@@ -9,7 +9,11 @@ import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
 import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
 import { CallExpressionNode } from "../nodeTypes/callExpression";
-import { ClosureNode, InlineClosureArgumentNode } from "../nodeTypes/closure";
+import {
+  ClosureNode,
+  InlineClosureArgumentNode,
+  LambdaEmptyArgNode,
+} from "../nodeTypes/closure";
 import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
@@ -49,6 +53,7 @@ import {
   printClosure,
   printInlineClosure,
   printInlineClosureArg,
+  printLambdaEmptyArg,
 } from "./print/closure";
 import { printCommentBlock, printInlineComment } from "./print/comment";
 import { printIf, printSwitch, printTernary } from "./print/conditional";
@@ -223,6 +228,11 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
     case "inline-closure-arg":
       return printInlineClosureArg(
         node as InlineClosureArgumentNode,
+        ...commonPrintArgs
+      );
+    case "lambda-empty-arg":
+      return printLambdaEmptyArg(
+        node as LambdaEmptyArgNode,
         ...commonPrintArgs
       );
   }
