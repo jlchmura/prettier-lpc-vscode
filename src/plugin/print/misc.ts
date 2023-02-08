@@ -23,6 +23,8 @@ const {
   indentIfBreak,
   ifBreak,
   lineSuffix,
+  dedentToRoot,
+  trim,
 } = builders;
 
 export const printInherit: PrintNodeFunction<InheritNode, InheritNode> = (
@@ -49,8 +51,8 @@ export const printIdentifier: PrintNodeFunction<IdentifierNode> = (
   printChildren
 ) => {
   const arr: Doc[] = [
-    node.attributes && node.attributes["isArray"] ? "*": "",
-    node.name || ""
+    node.attributes && node.attributes["isArray"] ? "*" : "",
+    node.name || "",
   ];
   if (node.property) {
     arr.push("[", printChildren(["property"]), "]");
@@ -73,11 +75,18 @@ export const printDirective: PrintNodeFunction<DirectiveNode, DirectiveNode> = (
 
   if (node.arguments) {
     arr.push(
-      indent(join([" \\", hardline], path.map(printChildren, "arguments")))
+      group([
+        indent([
+          ifBreak("\\"),
+          softline,
+          join([" \\", hardline], path.map(printChildren, "arguments")),
+        ]),
+        softline,
+      ])
     );
   }
 
-  return group(join(" ", arr));
+  return [trim, group(join(" ", arr))];
 };
 
 export const printBlankline: PrintNodeFunction<BlankLinkNode, BlankLinkNode> = (

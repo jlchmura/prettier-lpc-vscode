@@ -93,6 +93,7 @@ export enum ScannerState {
 
   StartDirective,
   WithinDirective,
+  WithinDirectiveArg,
 
   StartInherit,
   WithinInherit,

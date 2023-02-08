@@ -236,7 +236,7 @@ export class LPCParser {
           curr,
           ParseExpressionFlag.StatementOnly
         );
-      case TokenType.LambdaEmptyArg: 
+      case TokenType.LambdaEmptyArg:
         return this.parseLambdaEmptyArg(curr);
     }
 
@@ -763,9 +763,14 @@ export class LPCParser {
     nd.directiveType.name = this.scanner.getTokenText().trim();
 
     this.eatWhitespace();
+
     let t: TokenType,
       lastToken: TokenType = 0;
-    while ((t = this.scanner.scan()) && t != TokenType.DirectiveEnd) {
+    while (
+      (t = this.scanner.scan()) &&
+      t != TokenType.DirectiveEnd &&
+      t != TokenType.EOS
+    ) {
       if (t != TokenType.DirectiveLineBreak) {
         const arg = new LiteralNode(
           this.scanner.getTokenOffset(),
@@ -782,6 +787,8 @@ export class LPCParser {
         } else {
           nd.key = arg;
         }
+
+        this.eatWhitespace();
       }
 
       lastToken = t;
@@ -1744,7 +1751,7 @@ export class LPCParser {
       parent
     );
 
-    const tt = this.scanner.scan();    
+    const tt = this.scanner.scan();
     const arg = this.parseLiteralInternal(tt, nd);
     if (!arg)
       throw Error(
@@ -1808,7 +1815,7 @@ export class LPCParser {
     nd.name = this.scanner.getTokenText()?.trim();
     return nd;
   }
-  
+
   private parseLambdaEmptyArg(parent: LPCNode) {
     const nd = new LambdaEmptyArgNode(
       this.scanner.getTokenOffset(),

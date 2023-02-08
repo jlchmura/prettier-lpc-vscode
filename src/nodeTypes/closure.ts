@@ -16,5 +16,5 @@ export class InlineClosureArgumentNode extends LPCNode {
 }
 
 export class LambdaEmptyArgNode extends LPCNode {
-  public type = "lambda-empty-arg";  
+  public type = "lambda-empty-arg";
 }

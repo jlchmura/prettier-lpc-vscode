@@ -6,7 +6,7 @@ import {
   binary_ops,
   logical_ops,
   tt,
-  typesSet
+  typesSet,
 } from "./defs";
 import { ScannerState, TokenType } from "./lpcLanguageTypes";
 import { MultiLineStream } from "./MultiLineStream";
@@ -210,18 +210,17 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.BlankLines);
         }
       // fall through to block
-      case ScannerState.WithinBlock:        
+      case ScannerState.WithinBlock:
         // directives must be at the start of a line
         if (this.stream.advanceIfChar(tt._HSH)) {
           // start of a closure
           if (this.stream.advanceIfChar(tt._SQO)) {
             return this.finishToken(offset, TokenType.Closure);
           }
-          
+
           // not a closure so it must be a directive
           if (this.stream.advanceIfDirective()) {
             this.state = ScannerState.StartDirective;
-
             return this.finishToken(offset, TokenType.Directive);
           }
         }
@@ -342,14 +341,17 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.MappingEnd);
         }
 
-        // INLINE CLOSURES        
+        // INLINE CLOSURES
         if (this.stream.advanceIfChars([tt._OPP, tt._COL])) {
           // (:
           this.stream.skipWhitespace();
           this.parenStack.push(TokenType.InlineClosureStart);
           return this.finishToken(offset, TokenType.InlineClosureStart);
         }
-        if (this.testParenStack(TokenType.InlineClosureStart) && this.stream.advanceIfChars([tt._COL, tt._CLP])) {
+        if (
+          this.testParenStack(TokenType.InlineClosureStart) &&
+          this.stream.advanceIfChars([tt._COL, tt._CLP])
+        ) {
           // :)
           this.parenStack.pop();
           return this.finishToken(offset, TokenType.InlineClosureEnd);
@@ -367,13 +369,13 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._OPP)) {
           // first check if its a type cast
-          const nextWord = this.peekWord();          
+          const nextWord = this.peekWord();
           if (
             !!nextWord &&
             typesSet.has(nextWord) &&
             this.stream.peekChar(nextWord.length) == tt._CLP
           ) {
-            this.stream.advance(nextWord.length);            
+            this.stream.advance(nextWord.length);
             if (this.stream.advanceIfChar(tt._CLP))
               return this.finishToken(offset, TokenType.TypeCast);
             else
@@ -384,7 +386,7 @@ export class Scanner implements IScanner {
               );
           }
 
-          // (           
+          // (
           this.parenStack.push(TokenType.ParenBlock);
           return this.finishToken(offset, TokenType.ParenBlock);
         }
@@ -440,10 +442,10 @@ export class Scanner implements IScanner {
           this.stream.skipWhitespace();
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.Colon);
-        }        
+        }
 
         // 'o - lambda empty argument
-        if (this.stream.advanceIfChars([tt._SQO, 'o'.charCodeAt(0)])) {
+        if (this.stream.advanceIfChars([tt._SQO, "o".charCodeAt(0)])) {
           return this.finishToken(offset, TokenType.LambdaEmptyArg);
         }
 
@@ -534,12 +536,19 @@ export class Scanner implements IScanner {
           "Malformed string literal"
         );
       case ScannerState.StartDirective:
-        if (this.stream.advanceIfRegExp(/^[a-zA-Z\w]*/)) {
-          this.state = ScannerState.WithinDirective;
+        if (this.stream.advanceIfRegExp(/^\w+\s/)) {
+          this.state = ScannerState.WithinDirectiveArg;
           return this.finishToken(offset, TokenType.DirectiveArgument);
         }
       // fall through
-      case ScannerState.WithinDirective:
+      case ScannerState.WithinDirectiveArg:
+        this.stream.skipWhitespace(false);
+
+        if (this.stream.advanceIfWord()) {
+          this.state = ScannerState.WithinDirectiveArg;
+          return this.finishToken(offset, TokenType.DirectiveArgument);
+        }
+
         if (
           this.stream.advanceIfChar(tt._BSL) &&
           this.stream.advanceToEndOfLine()
