@@ -181,17 +181,11 @@ export class Scanner implements IScanner {
     const token = this.internalScan();
     if (token !== TokenType.EOS && offset === this.stream.pos()) {
       console.warn(
-        "Scanner.scan has not advanced at offset " +
-          offset +
-          ", state before: " +
-          oldState +
-          " after: " +
-          this.state
+        `Scanner.scan has not advanced at offset ${offset}, state before: ${oldState} after: ${this.state}`
       );
       this.stream.advance(1);
       return this.finishToken(offset, TokenType.Unknown);
     }
-    const steramRemain = this.stream.getSource().substring(offset);
     return token;
   }
 
