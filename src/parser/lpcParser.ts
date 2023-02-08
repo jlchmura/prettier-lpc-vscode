@@ -1,7 +1,7 @@
-import { TokenType } from "./lpcLanguageTypes";
 import { IfNode } from "../nodeTypes/if";
 import { LPCNode } from "../nodeTypes/lpcNode";
 import { last, pushIfVal } from "../utils/arrays";
+import { TokenType } from "./lpcLanguageTypes";
 
 import {
   ArrayExpressionNode,
@@ -332,8 +332,6 @@ export class LPCParser {
       [],
       parent
     );
-    const tt = this.scanner.getTokenText().trim();
-
     const children: LPCNode[] = [];
 
     let t: TokenType;
@@ -343,9 +341,7 @@ export class LPCParser {
       (t = this.scanner.scan()) &&
       t != TokenType.ParenBlockEnd &&
       t != TokenType.EOS
-    ) {
-      const tempText = this.scanner.getTokenText().trim();
-
+    ) {      
       if (
         t == TokenType.Comma ||
         t == TokenType.BlankLines ||
@@ -356,13 +352,13 @@ export class LPCParser {
         continue;
       }
 
-      let newNode: LPCNode;
+      let newNode: LPCNode | undefined;
       if (t == TokenType.LogicalOperator) {
         newNode = this.parseLogicalExpression(last(children)!, flags);
         children.pop();
         children.push(newNode);
       } else {
-        newNode = this.parseToken(t, tempParent, flags)!;
+        newNode = this.parseToken(t, tempParent, flags);
         if (!newNode)
           throw Error(`Unexpected token @ ${this.scanner.getTokenOffset()}`);
         children.push(newNode);
@@ -373,12 +369,11 @@ export class LPCParser {
 
     nd.closed = true;
 
-    // check if this implies something about the parent node
+    // this if block is probably not used anymore
     if (parent.type == "decl") {
       debugger;
-      // probably not used anymore?
+  
 
-      // this makes the decl a call expression
       parent.type = "call-exp";
     }
 
@@ -387,7 +382,7 @@ export class LPCParser {
     this.eatWhitespace();
     this.tryParseComment(nd);
 
-    // before finishing up, check for an arrow.. this paren block may actsually be a member-exp
+    // before finishing up, check for an arrow.. this paren block may actually be a member-exp
     if (this.scanner.peek() == TokenType.Arrow && parent?.type == "codeblock") {
       this.scanner.scan(); // consume the arrow
       return this.parseArrow(parent, nd);
@@ -527,7 +522,6 @@ export class LPCParser {
     let t: TokenType;
     // scan until we get a paren block end
     while ((t = this.scanner.scan()) && t != TokenType.CodeBlockEnd) {
-      const tempTxt = this.scanner.getTokenText();
       if (t == TokenType.EOS) {
         throw Error(`unexpected eos in codeblock starting at [${cb.start}]`);
       }
@@ -583,7 +577,6 @@ export class LPCParser {
     let t: TokenType;
     while (!nd.closed && (t = this.scanner.scan())) {
       if (t == TokenType.EOS) throw "could not find consequent";
-      const tempText = this.scanner.getTokenText();
       switch (t) {
         case TokenType.BlankLines:
         case TokenType.Whitespace:
@@ -924,7 +917,6 @@ export class LPCParser {
     id: IdentifierNode | LiteralNode | CallExpressionNode | ParenBlockNode
   ): CallExpressionNode {
     // an arrow is a member expression inside a call expression
-    let tempText = this.scanner.getTokenText();
     const nd = new MemberExpressionNode(
       this.scanner.getTokenOffset(),
       this.scanner.getTokenEnd(),
@@ -936,7 +928,6 @@ export class LPCParser {
     nd.object = id;
 
     const t = this.scanner.scan();
-    tempText = this.scanner.getTokenText();
     if (t != TokenType.DeclarationName)
       throw Error(
         `unexpected token after arrow @ ${this.scanner.getTokenOffset()}`
@@ -993,7 +984,6 @@ export class LPCParser {
     }
 
     while (this.scanner.peek() != TokenType.Semicolon) {
-      const tempText = this.scanner.getTokenText();
       switch (this.scanner.peek()) {
         case TokenType.Comma:
         case TokenType.Whitespace:
@@ -1188,9 +1178,7 @@ export class LPCParser {
       return lh;
     }
 
-    let tempTExt = this.scanner.getTokenText();
     this.eatWhitespaceAndNewlines();
-    tempTExt = this.scanner.getTokenText();
     let tt = this.scanner.peek();
 
     if (tt == TokenType.IndexorStart) {
@@ -1215,7 +1203,6 @@ export class LPCParser {
       lh = me;
     }
 
-    tempTExt = this.scanner.getTokenText();
     switch (tt) {
       case TokenType.Comma:
         if (lh.type == "var-decl") {
@@ -1284,9 +1271,7 @@ export class LPCParser {
     const typeNode = this.parseType();
     const hasStar = this.parseStar();
     const identNode = this.parseIdentifier(hasStar);
-
-    let tempTxt = this.scanner.getTokenText();
-
+  
     let t: TokenType = this.scanner.peek();
     if (
       t == TokenType.ParenBlockEnd ||
@@ -1454,7 +1439,6 @@ export class LPCParser {
     );
     const children = [];
     while (t !== TokenType.IndexorEnd) {
-      const tempText = this.scanner.getTokenText();
       if (t == TokenType.EOS)
         throw Error(
           `Unexpected EOS inside indexor [${this.scanner.getTokenOffset()}]`
@@ -1568,8 +1552,7 @@ export class LPCParser {
 
     while ((t = this.scanner.scan()) && t != TokenType.ParenBlockEnd) {
       if (t == TokenType.EOS) throw Error("Unexpected EOS in for statement");
-      const tempText = this.scanner.getTokenText();
-
+      
       if (t == TokenType.BlankLines || t == TokenType.Whitespace) continue;
       else if (t == TokenType.Semicolon)
         if (lastToken == t) stack.push(undefined);
@@ -1591,12 +1574,9 @@ export class LPCParser {
     this.eatWhitespace();
     this.tryParseComment(nd);
 
-    let tempText = this.scanner.getTokenText();
     this.scanner.eat(TokenType.BlankLines);
     this.scanner.eat(TokenType.Whitespace);
 
-    // this.scanner.peek();
-    // tempText = this.scanner.getTokenText();
     nd.codeblock = this.parseToken(this.scanner.scan(), nd);
     this.scanner.eat(TokenType.BlankLines);
 
@@ -1627,10 +1607,8 @@ export class LPCParser {
     this.eatWhitespace();
     this.tryParseComment(nd);
     this.eatWhitespaceAndNewlines();
-    //this.scanner.eat(TokenType.BlankLines);
-
+  
     let t = this.scanner.scan();
-    const tempText = this.scanner.getTokenText();
     if (t == TokenType.CodeBlockStart) nd.codeblock = this.parseCodeBlock(nd);
     else {
       nd.codeblock = this.parseToken(
