@@ -1,13 +1,8 @@
 import type { Plugin, SupportOption } from "prettier";
 import {
-  AstPath,
-  Doc,
-  Parser,
-  ParserOptions,
-  Printer,
-  RequiredOptions,
+  ParserOptions, RequiredOptions
 } from "prettier";
-import {  locEnd, locStart, parse } from "./parser";
+import { locEnd, locStart, parse } from "./parser";
 import { lpcPrinters } from "./printer";
 
 export interface LPCOptions extends RequiredOptions, ParserOptions {  

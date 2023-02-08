@@ -1,14 +1,13 @@
-import { ScannerState, TokenType } from "../lpcLanguageTypes";
 import { last } from "../utils/arrays";
 import {
   arrith_ops,
   assignment_ops,
   binary_ops,
-  modifiers,
-  typesSet,
+  logical_ops,
   tt,
-  logical_ops
+  typesSet,
 } from "./defs";
+import { ScannerState, TokenType } from "./lpcLanguageTypes";
 import { MultiLineStream } from "./MultiLineStream";
 
 export interface IScanner {
@@ -42,7 +41,7 @@ export class Scanner implements IScanner {
   lastVar: string | undefined;
   lastTypeValue: string | undefined;
 
-  parenStack: TokenType[] = [];  
+  parenStack: TokenType[] = [];
 
   constructor(
     public input: string,
@@ -66,24 +65,15 @@ export class Scanner implements IScanner {
     return this.input.charCodeAt(this.nextTokenStart());
   }
 
-  public nextWord(): string {    
+  public nextWord(): string {
     return this.stream.advanceIfWordNonReserved();
   }
-  
+
   public peekWord(): string | undefined {
     word.lastIndex = this.stream.pos();
     const match = word.exec(this.input);
     if (!!match) return match[0];
     else return undefined;
-  }
-
-  public nextFilename(): string {
-    return this.stream.advanceIfRegExp(/^\w[\.-\w]*/);
-  }
-
-  public nextAttributeName(): string {
-    throw "ntbla";
-    //return this.stream.advanceIfRegExp(/^[^\s"'></=\x00-\x0F\x7F\x80-\x9F]*/).toLowerCase();
   }
 
   public isAlpha(char: number) {
@@ -111,24 +101,24 @@ export class Scanner implements IScanner {
 
   public parseComments(): TokenType {
     const offset = this.stream.pos();
-    
-    if (this.stream.advanceIfChars([tt._FSL, tt._FSL])) {            
-        // single-line comment
-        if (this.stream.advanceUntilChar(tt._NWL)) {
-          this.stream.advance(1); // eat the \n char
-          return this.finishToken(offset, TokenType.Comment);
-        }
 
-        return this.finishToken(
-          offset,
-          TokenType.Comment,
-          "malformed single line comment"
-        );
+    if (this.stream.advanceIfChars([tt._FSL, tt._FSL])) {
+      // single-line comment
+      if (this.stream.advanceUntilChar(tt._NWL)) {
+        this.stream.advance(1); // eat the \n char
+        return this.finishToken(offset, TokenType.Comment);
+      }
+
+      return this.finishToken(
+        offset,
+        TokenType.Comment,
+        "malformed single line comment"
+      );
     } else if (this.stream.advanceIfChars([tt._FSL, tt._STR])) {
-        // multi-line comment
-        this.stateStack.push(this.state);
-        this.state = ScannerState.WithinCommentBlock;
-        return this.finishToken(offset, TokenType.StartCommentBlock);
+      // multi-line comment
+      this.stateStack.push(this.state);
+      this.state = ScannerState.WithinCommentBlock;
+      return this.finishToken(offset, TokenType.StartCommentBlock);
     }
 
     return TokenType.None;
@@ -145,7 +135,7 @@ export class Scanner implements IScanner {
       case tt._AMP:
       case tt._PLS:
       case tt._MNS:
-      case tt._FSL:           
+      case tt._FSL:
       case tt._STR:
         if (binary_ops.some((op) => this.stream.advanceIfChars(op))) {
           this.stream.skipWhitespace();
@@ -170,7 +160,7 @@ export class Scanner implements IScanner {
   /** peeks the next token and if it matches the token paren, will consume it
    * otherwise does nothing.
    */
-  public eat(token:TokenType): boolean {
+  public eat(token: TokenType): boolean {
     if (this.peek() == token) {
       this.scan();
       return true;
@@ -218,7 +208,7 @@ export class Scanner implements IScanner {
     let comment: TokenType = TokenType.None;
 
     switch (this.state) {
-      case ScannerState.WithinFile:        
+      case ScannerState.WithinFile:
         if (this.stream.skipBlankLines()) {
           return this.finishToken(offset, TokenType.BlankLines);
         }
@@ -245,11 +235,10 @@ export class Scanner implements IScanner {
           return comment;
         }
 
-       
-        if (this.stream.advanceIfChar(tt._STR)) {          
+        if (this.stream.advanceIfChar(tt._STR)) {
           this.stream.skipWhitespace();
           return this.finishToken(offset, TokenType.Star);
-        } 
+        }
 
         let wrd: string;
         if ((wrd = this.stream.advanceIfModifier())) {
@@ -257,11 +246,11 @@ export class Scanner implements IScanner {
         }
         if ((wrd = this.stream.advanceIfType())) {
           return this.finishToken(offset, TokenType.Type);
-        }        
-        if ((wrd = this.nextWord())) {                
-          return this.finishToken(offset, TokenType.DeclarationName);          
-        }   
-        
+        }
+        if ((wrd = this.nextWord())) {
+          return this.finishToken(offset, TokenType.DeclarationName);
+        }
+
         if (this.stream.advanceIfChars(tt._INHERIT)) {
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.Inherit);
@@ -311,23 +300,28 @@ export class Scanner implements IScanner {
           this.stream.skipWhitespace();
           return this.finishToken(offset, TokenType.Switch);
         }
-        if (this.stream.advanceIfChars(tt._CASE) || this.stream.advanceIfChars(tt._DEFAULT)) {
+        if (
+          this.stream.advanceIfChars(tt._CASE) ||
+          this.stream.advanceIfChars(tt._DEFAULT)
+        ) {
           this.stream.skipWhitespace();
-          
-          this.stream.advanceIfChar(tt._COL);
-          return this.finishToken(offset, TokenType.SwitchCase);          
-        }
 
+          this.stream.advanceIfChar(tt._COL);
+          return this.finishToken(offset, TokenType.SwitchCase);
+        }
 
         // ARRAY
         if (this.stream.advanceIfChars([tt._OPP, tt._OBK])) {
           // ({
           this.stream.skipWhitespace();
-          this.parenStack.push(TokenType.ArrayStart);          
+          this.parenStack.push(TokenType.ArrayStart);
           return this.finishToken(offset, TokenType.ArrayStart);
         }
-        if (this.testParenStack(TokenType.ArrayStart) && this.stream.advanceIfChars([tt._CBK, tt._CLP])) {
-          // })          
+        if (
+          this.testParenStack(TokenType.ArrayStart) &&
+          this.stream.advanceIfChars([tt._CBK, tt._CLP])
+        ) {
+          // })
           this.parenStack.pop();
           return this.finishToken(offset, TokenType.ArrayEnd);
         }
@@ -336,11 +330,14 @@ export class Scanner implements IScanner {
         if (this.stream.advanceIfChars([tt._OPP, tt._OSB])) {
           // ([
           this.stream.skipWhitespace();
-          this.parenStack.push(TokenType.MappingStart);          
+          this.parenStack.push(TokenType.MappingStart);
           return this.finishToken(offset, TokenType.MappingStart);
         }
-        if (this.testParenStack(TokenType.MappingStart) && this.stream.advanceIfChars([tt._CSB, tt._CLP])) {
-          // ])          
+        if (
+          this.testParenStack(TokenType.MappingStart) &&
+          this.stream.advanceIfChars([tt._CSB, tt._CLP])
+        ) {
+          // ])
           this.parenStack.pop();
           return this.finishToken(offset, TokenType.MappingEnd);
         }
@@ -352,44 +349,60 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._OPP)) {
           // first check if its a type cast
-          const nextWord = this.peekWord();          
-          if (!!nextWord && typesSet.has(nextWord) && this.stream.peekChar(nextWord.length) == tt._CLP) {
+          const nextWord = this.peekWord();
+          if (
+            !!nextWord &&
+            typesSet.has(nextWord) &&
+            this.stream.peekChar(nextWord.length) == tt._CLP
+          ) {
             this.nextWord();
-            if (this.stream.advanceIfChar(tt._CLP))               
+            if (this.stream.advanceIfChar(tt._CLP))
               return this.finishToken(offset, TokenType.TypeCast);
-            else 
-              return this.finishToken(offset, TokenType.Unknown, "Malfored type cast");
-          }          
+            else
+              return this.finishToken(
+                offset,
+                TokenType.Unknown,
+                "Malfored type cast"
+              );
+          }
 
-          // (          
+          // (
           this.parenStack.push(TokenType.ParenBlock);
           return this.finishToken(offset, TokenType.ParenBlock);
         }
-        if (this.testParenStack(TokenType.ParenBlock) && this.stream.advanceIfChar(tt._CLP)) {
-          // )          
+        if (
+          this.testParenStack(TokenType.ParenBlock) &&
+          this.stream.advanceIfChar(tt._CLP)
+        ) {
+          // )
           this.parenStack.pop();
           return this.finishToken(offset, TokenType.ParenBlockEnd);
         }
 
         if (this.stream.advanceIfChar(tt._OSB)) {
-          // [          
+          // [
           return this.finishToken(offset, TokenType.IndexorStart);
         }
         if (this.stream.advanceIfChar(tt._CSB)) {
           // ]
           return this.finishToken(offset, TokenType.IndexorEnd);
         }
-        if (this.stream.peekChar(-1)==tt._OSB && this.stream.advanceIfChar(tt._LAN)) {
+        if (
+          this.stream.peekChar(-1) == tt._OSB &&
+          this.stream.advanceIfChar(tt._LAN)
+        ) {
           return this.finishToken(offset, TokenType.IndexorFromEndPos);
         }
-        if (this.stream.peekChar(-1)==tt._DOT
-        && this.stream.peekChar(-2)==tt._DOT 
-            && this.stream.advanceIfChar(tt._LAN)) {
+        if (
+          this.stream.peekChar(-1) == tt._DOT &&
+          this.stream.peekChar(-2) == tt._DOT &&
+          this.stream.advanceIfChar(tt._LAN)
+        ) {
           return this.finishToken(offset, TokenType.IndexorFromEndPos);
         }
         if (this.stream.advanceIfChars([tt._DOT, tt._DOT])) {
           return this.finishToken(offset, TokenType.IndexorPosSep);
-        }        
+        }
 
         if (this.stream.advanceIfChars([tt._COL, tt._COL])) {
           // :: (inheritance)
@@ -411,7 +424,10 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Colon);
         }
 
-        if (this.stream.peekChar() == tt._DQO || this.stream.peekChar() == tt._SQO) {
+        if (
+          this.stream.peekChar() == tt._DQO ||
+          this.stream.peekChar() == tt._SQO
+        ) {
           // " or '
           this.state = ScannerState.WithinLiteral;
           return this.internalScan();
@@ -441,13 +457,13 @@ export class Scanner implements IScanner {
         }
 
         const opTkn = this.parseOperators();
-        if (opTkn) return this.finishToken(offset, opTkn);        
+        if (opTkn) return this.finishToken(offset, opTkn);
 
         if (this.stream.advanceIfChar(tt._QUE)) {
           return this.finishToken(offset, TokenType.Ternary);
         }
 
-        return this.finishToken(offset, TokenType.Unknown);             
+        return this.finishToken(offset, TokenType.Unknown);
       case ScannerState.StartInherit:
         this.stream.skipWhitespace();
 
@@ -483,7 +499,8 @@ export class Scanner implements IScanner {
         }
         if (this.stream.advanceIfChar(tt._SQO)) {
           this.stream.advance(1);
-          if (!this.stream.advanceIfChar(tt._SQO)) throw Error(`Expected single quote at [${this.stream.pos()}]`);
+          if (!this.stream.advanceIfChar(tt._SQO))
+            throw Error(`Expected single quote at [${this.stream.pos()}]`);
           this.stream.skipWhitespace();
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.LiteralChar);
@@ -515,7 +532,7 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceUntilRegExp(/[\\\n]/)) {
           return this.finishToken(offset, TokenType.DirectiveArgument);
-        }                
+        }
 
         return this.finishToken(offset, TokenType.Unknown, "Malformed literal");
       case ScannerState.WithinCommentBlock:
@@ -565,10 +582,10 @@ export class Scanner implements IScanner {
 
         if (this.stream.peekChar() == tt._OPP) {
           this.state = ScannerState.WithinFile;
-          return this.internalScan();          
+          return this.internalScan();
         } else if (this.stream.peekChar() == tt._CLP) {
           this.state = ScannerState.WithinFile;
-          return this.internalScan(); 
+          return this.internalScan();
         } else if (this.stream.advanceIfChars([tt._EQS, tt._EQS])) {
           return this.finishToken(offset, TokenType.Operator);
         } else {
@@ -580,7 +597,7 @@ export class Scanner implements IScanner {
           offset,
           TokenType.Unknown,
           "Expected expression."
-        );     
+        );
     }
 
     this.stream.advance(1);
@@ -627,6 +644,6 @@ export class Scanner implements IScanner {
   }
 
   private testParenStack(token: TokenType) {
-    return (last(this.parenStack) == token);    
+    return last(this.parenStack) == token;
   }
 }

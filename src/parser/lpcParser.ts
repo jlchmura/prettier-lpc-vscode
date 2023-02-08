@@ -1,48 +1,47 @@
-import { ScannerState, TextDocument, TokenType } from "../lpcLanguageTypes";
-import { findFirst, last, pushIfVal } from "../utils/arrays";
-import { LPCNode } from "../nodeTypes/lpcNode";
+import { TokenType } from "./lpcLanguageTypes";
 import { IfNode } from "../nodeTypes/if";
+import { LPCNode } from "../nodeTypes/lpcNode";
+import { last, pushIfVal } from "../utils/arrays";
 
-import { ParenBlockNode } from "../nodeTypes/parenBlock";
-import { LiteralNode } from "../nodeTypes/literal";
-import { CodeBlockNode } from "../nodeTypes/codeBlock";
-import { DirectiveNode } from "../nodeTypes/directive";
-import { InheritNode } from "../nodeTypes/inherit";
-import { BlankLinkNode } from "../nodeTypes/blankLine";
-import { CallExpressionNode } from "../nodeTypes/callExpression";
 import {
   ArrayExpressionNode,
-  IndexorExpressionNode,
+  IndexorExpressionNode
 } from "../nodeTypes/arrayExpression";
-import {
-  MemberExpressionNode,
-  ParentExpressionNode,
-} from "../nodeTypes/memberExpression";
-import { IdentifierNode } from "../nodeTypes/identifier";
-import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
 import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
-import {
-  VariableDeclarationNode,
-  VariableDeclaratorNode,
-} from "../nodeTypes/variableDeclaration";
+import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
+import { BlankLinkNode } from "../nodeTypes/blankLine";
+import { CallExpressionNode } from "../nodeTypes/callExpression";
+import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
+import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
+import { DirectiveNode } from "../nodeTypes/directive";
+import { ForStatementNode } from "../nodeTypes/forStatement";
 import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
+import { IdentifierNode } from "../nodeTypes/identifier";
+import { InheritNode } from "../nodeTypes/inherit";
+import { LiteralNode } from "../nodeTypes/literal";
+import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import {
   MappingExpressionNode,
-  MappingPair,
+  MappingPair
 } from "../nodeTypes/mappingExpression";
-import { modifiers, unary_ops_set } from "./defs";
-import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
-import { ForStatementNode } from "../nodeTypes/forStatement";
-import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
-import { Scanner } from "./lpcScanner";
-import { debug } from "console";
+import {
+  MemberExpressionNode,
+  ParentExpressionNode
+} from "../nodeTypes/memberExpression";
+import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
-import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
 import { SwitchCaseNode, SwitchNode } from "../nodeTypes/switch";
-import { WhileStatementNode } from "../nodeTypes/whileStatement";
-import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
+import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
+import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
+import {
+  VariableDeclarationNode,
+  VariableDeclaratorNode
+} from "../nodeTypes/variableDeclaration";
+import { WhileStatementNode } from "../nodeTypes/whileStatement";
+import { unary_ops_set } from "./defs";
+import { Scanner } from "./lpcScanner";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -60,11 +59,7 @@ export class LPCParser {
   private scanner!: Scanner;
   private text!: string;
 
-  constructor() {} //private dataManager: HTMLDataManager
-
-  public parseDocument(document: TextDocument): LPCDocument {
-    return this.parse(document.getText()); //this.dataManager.getVoidElements(document.languageId));
-  }
+  constructor() {}
 
   public parse(text: string): LPCDocument {
     this.scanner = new Scanner(text, undefined, undefined);
@@ -132,8 +127,11 @@ export class LPCParser {
       case TokenType.Whitespace:
         return undefined;
       case TokenType.ParenBlock:
-        return this.parseMaybeExpression(token, curr, ParseExpressionFlag.StatementOnly);
-        //return this.parseParenBlock(curr, flags);
+        return this.parseMaybeExpression(
+          token,
+          curr,
+          ParseExpressionFlag.StatementOnly
+        );
       case TokenType.Inherit:
         return this.parseInherit(curr);
       case TokenType.InheritanceAccessor:
@@ -176,9 +174,9 @@ export class LPCParser {
       case TokenType.MappingStart:
         return this.parseMaybeExpression(token, curr, flags);
       case TokenType.FunctionArgumentType:
-        throw Error("not handled");  // todo: remove this
+        throw Error("not handled"); // todo: remove this
       case TokenType.FunctionArgument:
-        throw Error("not handled");  // todo: remove this
+        throw Error("not handled"); // todo: remove this
       case TokenType.CodeBlockStart:
         return this.parseCodeBlock(curr);
       case TokenType.CodeBlockEnd:
@@ -365,7 +363,8 @@ export class LPCParser {
         children.push(newNode);
       } else {
         newNode = this.parseToken(t, tempParent, flags)!;
-        if (!newNode) throw Error(`Unexpected token @ ${this.scanner.getTokenOffset()}`);
+        if (!newNode)
+          throw Error(`Unexpected token @ ${this.scanner.getTokenOffset()}`);
         children.push(newNode);
       }
     }
@@ -399,11 +398,11 @@ export class LPCParser {
   }
 
   private parseLiteral(token: TokenType, parent: LPCNode) {
-    let lh :LPCNode = this.parseLiteralInternal(token, parent);
+    let lh: LPCNode = this.parseLiteralInternal(token, parent);
 
     this.eatWhitespace();
     let tt = this.scanner.peek();
-    
+
     if (tt == TokenType.Operator || tt == TokenType.Star) {
       //binary expr
       this.scanner.scan();
@@ -412,12 +411,15 @@ export class LPCParser {
       tt = this.scanner.peek();
     } else if (tt == TokenType.LogicalOperator) {
       this.scanner.scan();
-      const leNode = this.parseLogicalExpression(lh, ParseExpressionFlag.StatementOnly);      
+      const leNode = this.parseLogicalExpression(
+        lh,
+        ParseExpressionFlag.StatementOnly
+      );
       return leNode;
     } else if (tt == TokenType.Arrow) {
       // an arrow can come after a string literal
       // the string is interpreted as an object
-      this.scanner.scan();      
+      this.scanner.scan();
       const ln = lh as LiteralNode;
       if (ln.dataType != "string")
         throw Error(`Expected string before arrow but got ${ln.dataType}`);
@@ -481,7 +483,7 @@ export class LPCParser {
       parent
     );
     nd.operator = this.scanner.getTokenText().trim();
-    
+
     nd.left = left;
 
     const nextToken = this.scanner.scan();
@@ -612,7 +614,11 @@ export class LPCParser {
           }
         default:
           if (!nd.consequent) {
-            nd.consequent = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
+            nd.consequent = this.parseToken(
+              t,
+              nd,
+              ParseExpressionFlag.StatementOnly
+            );
           }
           nd.closed = true;
       }
@@ -830,7 +836,7 @@ export class LPCParser {
 
     // collapse multiple blank lines into 1
     this.eatWhitespaceAndNewlines();
-    
+
     this.tryParseComment(nd);
 
     return nd;
@@ -993,8 +999,8 @@ export class LPCParser {
         case TokenType.Whitespace:
         case TokenType.BlankLines:
           this.scanner.scan();
-          continue;     
-        case TokenType.Comment:   
+          continue;
+        case TokenType.Comment:
         case TokenType.StartCommentBlock:
           this.tryParseComment(last(decl.declarations)!);
           continue;
@@ -1027,14 +1033,14 @@ export class LPCParser {
       parent
     );
 
-    let hasStar =false;
+    let hasStar = false;
     if (this.scanner.getTokenType() == TokenType.Star) {
       this.scanner.scan();
-      hasStar=true;
+      hasStar = true;
     }
-    
+
     const i = this.parseIdentifier(hasStar);
-    
+
     d.id = i;
 
     this.eatWhitespace();
@@ -1103,9 +1109,9 @@ export class LPCParser {
   }
 
   private parseStar() {
-    if (this.scanner.getTokenType() == TokenType.Star) {      
-     this.scanner.scan(); 
-     return true;
+    if (this.scanner.getTokenType() == TokenType.Star) {
+      this.scanner.scan();
+      return true;
     } else {
       return false;
     }
@@ -1134,7 +1140,7 @@ export class LPCParser {
     return nd;
   }
 
-  private parseIdentifier(hasStar=false) {
+  private parseIdentifier(hasStar = false) {
     if (this.scanner.getTokenType() == TokenType.DeclarationName) {
       const identNode = new IdentifierNode(
         this.scanner.getTokenOffset(),
@@ -1174,14 +1180,14 @@ export class LPCParser {
       lh = this.parseParenBlock(parent, flags);
     } else {
       lh = this.parseExpression(token, parent, flags);
-    }    
+    }
 
     // certain expressions can't have anything after them
     // return immediately
-    if (lh.type == 'function') {
+    if (lh.type == "function") {
       return lh;
     }
-    
+
     let tempTExt = this.scanner.getTokenText();
     this.eatWhitespaceAndNewlines();
     tempTExt = this.scanner.getTokenText();
@@ -1276,7 +1282,7 @@ export class LPCParser {
 
     const modNodes = this.parseModifiers();
     const typeNode = this.parseType();
-    const hasStar = this.parseStar();    
+    const hasStar = this.parseStar();
     const identNode = this.parseIdentifier(hasStar);
 
     let tempTxt = this.scanner.getTokenText();

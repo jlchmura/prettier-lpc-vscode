@@ -39,37 +39,37 @@ import {
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
 
 import {
-  printMapping,
   printArray,
   printIndexorExpression,
+  printMapping,
 } from "./print/array";
 import { printCodeblock } from "./print/block";
 import { printCommentBlock, printInlineComment } from "./print/comment";
-import { printIf, printTernary, printSwitch } from "./print/conditional";
+import { printIf, printSwitch, printTernary } from "./print/conditional";
 import {
   printAssignmentExpression,
+  printBinaryExpression,
   printCallExpression,
+  printLogicalExpression,
   printMemberExpression,
   printUnaryPrefixExpression,
-  printLogicalExpression,
-  printBinaryExpression,
 } from "./print/expression";
 import {
-  printReturn,
   printFunction,
   printParentExpression,
+  printReturn,
 } from "./print/function";
 import {
+  printControlFlowStatement,
   printForStatement,
   printWhileStatement,
-  printControlFlowStatement,
 } from "./print/iteration";
 import { printLiteral } from "./print/literal";
 import {
-  printInherit,
-  printIdentifier,
-  printDirective,
   printBlankline,
+  printDirective,
+  printIdentifier,
+  printInherit,
   printParenBlock,
 } from "./print/misc";
 import { PrintChildrenFunction, PrintNodeFunction } from "./print/shared";
@@ -134,8 +134,7 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
     case "return":
       return printReturn(node as ReturnNode, ...commonPrintArgs);
     case "blankline":
-      return printBlankline(node as BlankLinkNode, ...commonPrintArgs);
-    //return hardline;
+      return printBlankline(node as BlankLinkNode, ...commonPrintArgs);    
     case "function":
       return printFunction(node as FunctionDeclarationNode, ...commonPrintArgs);
     case "codeblock":
