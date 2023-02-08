@@ -1,0 +1,9 @@
+node_modules
+build
+out
+test.c
+.DS_Store
+test-files
+.vscode-test/
+
+*.vsix
