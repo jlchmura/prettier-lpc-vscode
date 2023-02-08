@@ -1,0 +1,226 @@
+import { AstPath, Doc, Printer } from "prettier";
+import { builders } from "prettier/doc";
+import { LPCOptions } from ".";
+import {
+  ArrayExpressionNode,
+  IndexorExpressionNode,
+} from "../nodeTypes/arrayExpression";
+import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
+import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
+import { BlankLinkNode } from "../nodeTypes/blankLine";
+import { CallExpressionNode } from "../nodeTypes/callExpression";
+import { CodeBlockNode } from "../nodeTypes/codeBlock";
+import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
+import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
+import { DirectiveNode } from "../nodeTypes/directive";
+import { ForStatementNode } from "../nodeTypes/forStatement";
+import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
+import { IdentifierNode } from "../nodeTypes/identifier";
+import { IfNode } from "../nodeTypes/if";
+import { InheritNode } from "../nodeTypes/inherit";
+import { LiteralNode } from "../nodeTypes/literal";
+import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
+import { LPCNode } from "../nodeTypes/lpcNode";
+import { MappingExpressionNode } from "../nodeTypes/mappingExpression";
+import {
+  MemberExpressionNode,
+  ParentExpressionNode,
+} from "../nodeTypes/memberExpression";
+import { ParenBlockNode } from "../nodeTypes/parenBlock";
+import { ReturnNode } from "../nodeTypes/returnNode";
+import { SwitchNode } from "../nodeTypes/switch";
+import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
+import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
+import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
+import {
+  VariableDeclarationNode,
+  VariableDeclaratorNode,
+} from "../nodeTypes/variableDeclaration";
+import { WhileStatementNode } from "../nodeTypes/whileStatement";
+
+import {
+  printMapping,
+  printArray,
+  printIndexorExpression,
+} from "./print/array";
+import { printCodeblock } from "./print/block";
+import { printCommentBlock, printInlineComment } from "./print/comment";
+import { printIf, printTernary, printSwitch } from "./print/conditional";
+import {
+  printAssignmentExpression,
+  printCallExpression,
+  printMemberExpression,
+  printUnaryPrefixExpression,
+  printLogicalExpression,
+  printBinaryExpression,
+} from "./print/expression";
+import {
+  printReturn,
+  printFunction,
+  printParentExpression,
+} from "./print/function";
+import {
+  printForStatement,
+  printWhileStatement,
+  printControlFlowStatement,
+} from "./print/iteration";
+import { printLiteral } from "./print/literal";
+import {
+  printInherit,
+  printIdentifier,
+  printDirective,
+  printBlankline,
+  printParenBlock,
+} from "./print/misc";
+import { PrintChildrenFunction, PrintNodeFunction } from "./print/shared";
+import { printTypeCast, printVar, printVarDecl } from "./print/var";
+
+const {
+  group,
+  indent,
+  markAsRoot,
+  align,
+  dedent,
+  join,
+  line,
+  hardline,
+  breakParent,
+  softline,
+  fill,
+  indentIfBreak,
+  ifBreak,
+  lineSuffix,
+} = builders;
+
+export const lpcPrinters: { [name: string]: Printer } = {
+  lpc: {
+    print(
+      path: AstPath<LPCNode>,
+      options: LPCOptions,
+      printChildren: (path: AstPath<LPCNode>) => Doc
+    ) {
+      const node = path.getNode();
+      if (!node) {
+        throw Error("Ivalid root node");
+      }
+
+      const result = printNode(
+        node,
+        path,
+        options,
+        printChildren as PrintChildrenFunction
+      );
+      return result;
+    },
+  },
+};
+
+const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
+  switch (node.type) {
+    case "root":
+      return printRoot(node, ...commonPrintArgs);
+    case "comment-singleline":
+      return printInlineComment(node as InlineCommentNode, ...commonPrintArgs);
+    case "comment-block":
+      return printCommentBlock(node as CommentBlockNode, ...commonPrintArgs);
+    case "inherit":
+      return printInherit(node as InheritNode, ...commonPrintArgs);
+    case "literal":
+      return printLiteral(node as LiteralNode, ...commonPrintArgs);
+    case "identifier":
+      return printIdentifier(node as IdentifierNode, ...commonPrintArgs);
+    case "directive":
+      return printDirective(node as DirectiveNode, ...commonPrintArgs);
+    case "return":
+      return printReturn(node as ReturnNode, ...commonPrintArgs);
+    case "blankline":
+      return printBlankline(node as BlankLinkNode, ...commonPrintArgs);
+    //return hardline;
+    case "function":
+      return printFunction(node as FunctionDeclarationNode, ...commonPrintArgs);
+    case "codeblock":
+      return printCodeblock(node as CodeBlockNode, ...commonPrintArgs);
+    case "var-decl":
+      return printVarDecl(node as VariableDeclarationNode, ...commonPrintArgs);
+    case "var":
+      return printVar(node as VariableDeclaratorNode, ...commonPrintArgs);
+    case "type-cast":
+      return printTypeCast(node as TypeCastExpressionNode, ...commonPrintArgs);
+    case "assignment":
+    case "assignment-exp":
+      return printAssignmentExpression(
+        node as AssignmentExpressionNode,
+        ...commonPrintArgs
+      );
+    case "call-exp":
+      return printCallExpression(
+        node as CallExpressionNode,
+        ...commonPrintArgs
+      );
+    case "member-exp":
+      return printMemberExpression(
+        node as MemberExpressionNode,
+        ...commonPrintArgs
+      );
+    case "mapping":
+      return printMapping(node as MappingExpressionNode, ...commonPrintArgs);
+    case "array":
+      return printArray(node as ArrayExpressionNode, ...commonPrintArgs);
+    case "if":
+      return printIf(node as IfNode, ...commonPrintArgs);
+    case "ternary":
+      return printTernary(node as TernaryExpressionNode, ...commonPrintArgs);
+    case "parenblock":
+      return printParenBlock(node as ParenBlockNode, ...commonPrintArgs);
+    case "unary-prefix-exp":
+      return printUnaryPrefixExpression(
+        node as UnaryPrefixExpressionNode,
+        ...commonPrintArgs
+      );
+    case "logical-exp":
+      return printLogicalExpression(
+        node as LogicalExpressionNode,
+        ...commonPrintArgs
+      );
+    case "binary-exp":
+      return printBinaryExpression(
+        node as BinaryExpressionNode,
+        ...commonPrintArgs
+      );
+    case "parent-exp":
+      return printParentExpression(
+        node as ParentExpressionNode,
+        ...commonPrintArgs
+      );
+    case "for":
+      return printForStatement(node as ForStatementNode, ...commonPrintArgs);
+    case "while":
+      return printWhileStatement(
+        node as WhileStatementNode,
+        ...commonPrintArgs
+      );
+    case "control-flow":
+      return printControlFlowStatement(
+        node as ControlFlowStatementNode,
+        ...commonPrintArgs
+      );
+    case "indexor-exp":
+      return printIndexorExpression(
+        node as IndexorExpressionNode,
+        ...commonPrintArgs
+      );
+    case "switch":
+      return printSwitch(node as SwitchNode, ...commonPrintArgs);
+  }
+
+  return ["unknown node type " + node.type];
+};
+
+const printRoot: PrintNodeFunction<LPCNode> = (
+  node,
+  path,
+  options,
+  printChildren
+) => {
+  return markAsRoot(join(hardline, path.map(printChildren, "children")));
+};

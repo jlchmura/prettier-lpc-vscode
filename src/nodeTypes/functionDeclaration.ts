@@ -1,0 +1,12 @@
+import { CodeBlockNode } from "./codeBlock";
+import { IdentifierNode } from "./identifier";
+import { LPCNode } from "./lpcNode";
+import { BaseDeclarationNode } from "./variableDeclaration";
+
+export class FunctionDeclarationNode extends BaseDeclarationNode {
+  public override type: string | undefined = "function";
+  
+  public id: IdentifierNode | undefined;    
+  public params: LPCNode[] = [];
+  public codeBlock: CodeBlockNode|undefined;
+}

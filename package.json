@@ -1,0 +1,106 @@
+{ 
+  "license": "MIT",
+  "name": "prettier-lpc-vscode",
+  "version": "0.0.3",
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other"
+  ],  
+  "author": {
+    "name": "jlchmura"
+  },
+  "publisher": "jlchmura",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsc && node --enable-source-maps ./build/bin/print.js test.c",
+    "cli": "npx tsc && node --enable-source-maps ./build/cli.js",
+    "build": "npx tsc",
+    "build:ext": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "postbuild": "cp package.json build/package.json && cd build && npm install --only=production",
+    "vsce:package": "vsce package",
+    "vsce:publish": "vsce publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jlchmura/prettier-lpc-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/jlchmura/prettier-lpc-vscode/issues"
+  },
+  "keywords": [
+    "lpc",
+    "mud",
+    "prettier",
+    "formatter",
+    "Lars Pensjö C"
+  ],  
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:prettier-lpc-vscode.format-document"
+  ],
+  "main": "out/extension.js",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^18.11.17",
+    "@types/vscode": "^1.63.0",
+    "@types/prettier": "^2.4.3",
+    "esbuild": "^0.14.8",
+    "prettier": "^2.8.3",    
+    "typescript": "^4.9.4",
+    "vsce": "^2.11.0"
+  },
+  "peerDependencies": {
+    "prettier": "^2.5.1"
+  },  
+  "dependencies": {
+    "vscode-languageserver-textdocument": "^1.0.8",
+    "vscode-languageserver-types": "^3.17.2"
+  },
+  "prettier": {
+    "plugins": [
+      "./build/plugin/index.js"
+    ]
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "lpc",
+        "aliases": [
+          "LPC",
+          "lpc",
+          "Lars Pensjö C"
+        ],
+        "extensions": [
+          ".c",
+          ".h"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "title": "Format Document (Prettier-LPC)",
+        "shortTitle": "Format LPC",
+        "command": "prettier-lpc-vscode.format-document"
+      }
+    ],
+    "configuration": {
+      "title": "Prettier LPC",
+      "properties": {        
+        "Prettier-LPC.condenseSingleExpressionParams": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Put array or mapping opening brackets on the same line as call-exp parens"
+        },
+        "Prettier-LPC.tabWidth": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "markdownDescription": "Tab width"
+        }        
+      }
+    }
+  }
+}
