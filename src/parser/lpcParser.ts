@@ -46,8 +46,12 @@ import {
   ClosureNode,
   InlineClosureArgumentNode,
   InlineClosureNode,
-  LambdaEmptyArgNode,
 } from "../nodeTypes/closure";
+import {
+  LambdaEmptyArgNode,
+  LambdaIndexorNode,
+  LambdaNode,
+} from "../nodeTypes/lambda";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -236,6 +240,10 @@ export class LPCParser {
           curr,
           ParseExpressionFlag.StatementOnly
         );
+      case TokenType.LambdaStart:
+        return this.parseLambda(curr);
+      case TokenType.LambdaIndexor:
+        return this.parseLambdaIndexor(curr);
       case TokenType.LambdaEmptyArg:
         return this.parseLambdaEmptyArg(curr);
     }
@@ -1038,7 +1046,7 @@ export class LPCParser {
     this.tryParseComment(decl);
 
     this.scanner.eat(TokenType.BlankLines);
-    
+
     return decl;
   }
 
@@ -1206,10 +1214,10 @@ export class LPCParser {
     if (lh.type == "function") {
       return lh;
     }
-        
+
     this.eatWhitespaceAndNewlines();
 
-    let t = this.scanner.peek();    
+    let t = this.scanner.peek();
 
     if (t == TokenType.IndexorStart) {
       // this can happen in the expression, and also after
@@ -1230,7 +1238,7 @@ export class LPCParser {
       t = this.scanner.peek();
       if (t == TokenType.IndexorEnd) throw Error("Unexpected ]");
 
-      lh = me;      
+      lh = me;
     }
 
     switch (t) {
@@ -1278,7 +1286,7 @@ export class LPCParser {
         parent.children.push(aExp);
         return this.parseAssignmentExpression(aExp, parent);
     }
-    
+
     return lh;
   }
 
@@ -1603,7 +1611,7 @@ export class LPCParser {
 
     this.eatWhitespace();
     this.tryParseComment(nd);
-    
+
     this.scanner.eat(TokenType.BlankLines);
     this.scanner.eat(TokenType.Whitespace);
 
@@ -1820,6 +1828,46 @@ export class LPCParser {
     return nd;
   }
 
+  private parseLambda(parent: LPCNode) {
+    const nd = new LambdaNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+    this.eatWhitespaceAndNewlines();
+
+    let t = this.scanner.scan();
+    if (t != TokenType.ArrayStart) {
+      throw Error(
+        `Unepxected argument type passed to lambda @ ${this.scanner.getTokenOffset()}`
+      );
+    }
+    nd.arguments = this.parseArray(nd);
+
+    this.eatWhitespaceAndNewlines();
+    if (this.scanner.scan() != TokenType.Comma) {
+      throw Error(
+        `Expected comma after lambda arguments array @ ${this.scanner.getTokenOffset()}`
+      );
+    }
+    this.eatWhitespaceAndNewlines();
+    t = this.scanner.scan();
+    nd.code = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
+
+    this.eatWhitespaceAndNewlines();
+    if (this.scanner.scan() != TokenType.LabmdaEnd) {
+      throw Error(
+        `Unexpected token after lambda code @ ${this.scanner.getTokenOffset()}`
+      );
+    }
+
+    this.eatWhitespace();
+    this.tryParseComment(nd);
+
+    return nd;
+  }
+
   private parseLambdaEmptyArg(parent: LPCNode) {
     const nd = new LambdaEmptyArgNode(
       this.scanner.getTokenOffset(),
@@ -1829,6 +1877,20 @@ export class LPCParser {
     );
 
     this.eatWhitespace();
+
+    return nd;
+  }
+
+  private parseLambdaIndexor(parent: LPCNode) {
+    const nd = new LambdaIndexorNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    // lambda indexors can only have a set number of chars
+    // <..<,
 
     return nd;
   }

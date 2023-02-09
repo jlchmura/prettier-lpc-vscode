@@ -27,8 +27,9 @@ export const needsSemi = (path: AstPath<LPCNode>) => {
     if (n.type == "for") return false;
     if (n.type == "call-exp") return false;
     if (n.type == "mapping-pair") return false;
-    if (n.type == "indexor-exp") return false;    
+    if (n.type == "indexor-exp") return false;
     if (n.type == "assignment-exp") return false;
+    if (n.type == "array") return false;
     if (n.type == "codeblock") break;
   }
 
@@ -41,7 +42,8 @@ export const needsSemi = (path: AstPath<LPCNode>) => {
     // all other scenarios
     path.match(
       (n) =>
-        n.type === "var-decl" ||
+        n.type == "lambda" ||
+        n.type == "var-decl" ||
         n.type == "call-exp" ||
         n.type == "assignment-exp" ||
         n.type == "member-exp",
@@ -57,10 +59,10 @@ export const needsSemi = (path: AstPath<LPCNode>) => {
         n.type !== "assignment-exp" &&
         (n.type !== "binary-exp" || nm != "left") &&
         (n.type !== "for" || nm == "codeblock"), // for will print its own semis, but the for's codeblock is ok to have semi
-      (n) => n.type !== "parenblock" &&
+      (n) =>
+        n.type !== "parenblock" &&
         n.type !== "var" &&
         n.type !== "assignment-exp"
-
     )
   );
 };

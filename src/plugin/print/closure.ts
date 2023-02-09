@@ -3,9 +3,9 @@ import { builders } from "prettier/doc";
 import {
   ClosureNode,
   InlineClosureArgumentNode,
-  InlineClosureNode,
-  LambdaEmptyArgNode,
+  InlineClosureNode
 } from "../../nodeTypes/closure";
+import { LambdaEmptyArgNode } from "../../nodeTypes/lambda";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -54,11 +54,4 @@ export const printInlineClosureArg: PrintNodeFunction<
   InlineClosureArgumentNode
 > = (node, path, options, printChildren) => {
   return node.name;
-};
-
-export const printLambdaEmptyArg: PrintNodeFunction<
-  LambdaEmptyArgNode,
-  LambdaEmptyArgNode
-> = (node, path, options, printChildren) => {
-  return "'o";
 };

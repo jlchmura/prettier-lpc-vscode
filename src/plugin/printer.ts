@@ -9,11 +9,7 @@ import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
 import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
 import { CallExpressionNode } from "../nodeTypes/callExpression";
-import {
-  ClosureNode,
-  InlineClosureArgumentNode,
-  LambdaEmptyArgNode,
-} from "../nodeTypes/closure";
+import { ClosureNode, InlineClosureArgumentNode } from "../nodeTypes/closure";
 import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
@@ -23,6 +19,11 @@ import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
 import { IfNode } from "../nodeTypes/if";
 import { InheritNode } from "../nodeTypes/inherit";
+import {
+  LambdaEmptyArgNode,
+  LambdaIndexorNode,
+  LambdaNode,
+} from "../nodeTypes/lambda";
 import { LiteralNode } from "../nodeTypes/literal";
 import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import { LPCNode } from "../nodeTypes/lpcNode";
@@ -53,7 +54,6 @@ import {
   printClosure,
   printInlineClosure,
   printInlineClosureArg,
-  printLambdaEmptyArg,
 } from "./print/closure";
 import { printCommentBlock, printInlineComment } from "./print/comment";
 import { printIf, printSwitch, printTernary } from "./print/conditional";
@@ -75,6 +75,11 @@ import {
   printForStatement,
   printWhileStatement,
 } from "./print/iteration";
+import {
+  printLambda,
+  printLambdaEmptyArg,
+  printLambdaIndexor,
+} from "./print/lambda";
 import { printLiteral } from "./print/literal";
 import {
   printBlankline,
@@ -230,6 +235,10 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
         node as InlineClosureArgumentNode,
         ...commonPrintArgs
       );
+    case "lambda":
+      return printLambda(node as LambdaNode, ...commonPrintArgs);
+    case "lambda-indexor":
+      return printLambdaIndexor(node as LambdaIndexorNode, ...commonPrintArgs);
     case "lambda-empty-arg":
       return printLambdaEmptyArg(
         node as LambdaEmptyArgNode,
@@ -237,7 +246,7 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
       );
   }
 
-  return ["unknown node type " + node.type];
+  return ["###Printer Unknown Node Type: " + node.type];
 };
 
 const printRoot: PrintNodeFunction<LPCNode> = (

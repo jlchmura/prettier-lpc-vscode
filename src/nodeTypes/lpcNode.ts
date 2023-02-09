@@ -6,10 +6,9 @@ export class LPCNode {
   public closeAtSemi: boolean = false;
   public body: string | undefined;
   public closed: boolean = false;
-  public endsLine: boolean = false;  
+  public endsLine: boolean = false;
 
-  public suffixComments: InlineCommentNode|undefined;
-
+  public suffixComments: InlineCommentNode | undefined;
 
   // public startTagEnd: number | undefined;
   // public endTagStart: number | undefined;

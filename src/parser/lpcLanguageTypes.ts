@@ -47,7 +47,10 @@ export enum TokenType {
   InlineClosureStart,
   InlineClosureEnd,
   InlineClosureArgument,
+  LambdaStart,
+  LabmdaEnd,
   LambdaEmptyArg,
+  LambdaIndexor,  
 
   If,
   ElseIf,
@@ -108,6 +111,8 @@ export enum ScannerState {
   WithinBlock,
 
   WithinCommentBlock,
+
+  WithinLambda,
 
   IfExpression,
   ElseIfExpression,

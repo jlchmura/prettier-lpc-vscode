@@ -56,15 +56,14 @@ export const printVarDecl: PrintNodeFunction<VariableDeclarationNode> = (
 
   if (shouldPrintSemi) {
     printed.push(";");
-    
-    if (util.isNextLineEmpty(options.originalText, node, n=>n.end)) {
+
+    if (util.isNextLineEmpty(options.originalText, node, (n) => n.end)) {
       printed.push(hardline);
-    }  
+    }
   }
 
   printed.push(printSuffixComments(node, path, options, printChildren));
 
-  
   return printed;
 };
 
@@ -74,9 +73,7 @@ export const printVar: PrintNodeFunction<
 > = (node, path, options, printChildren) => {
   const { id, init } = node;
 
-  const arr = [    
-    path.call(printChildren, "id")
-  ];
+  const arr = [path.call(printChildren, "id")];
   if (node.suffixComments) {
     arr.push(lineSuffix([" ", path.call(printChildren, "suffixComments")]));
   }

@@ -74,7 +74,7 @@ export class Scanner implements IScanner {
         char != tt._LFD
       ) {
         return char;
-      }      
+      }
     }
     return 0;
   }
@@ -223,6 +223,7 @@ export class Scanner implements IScanner {
 
     switch (this.state) {
       case ScannerState.WithinFile:
+      case ScannerState.WithinLambda:
         if (this.stream.skipBlankLines()) {
           return this.finishToken(offset, TokenType.BlankLines);
         }
@@ -232,6 +233,20 @@ export class Scanner implements IScanner {
         if (this.stream.advanceIfChar(tt._HSH)) {
           // start of a closure
           if (this.stream.advanceIfChar(tt._SQO)) {
+            // '[ - lambda indexor
+            if (this.stream.advanceIfChar(tt._OSB)) {
+              // there are only a set number of chars at this point, so grab them all
+              this.stream.advanceIfChar(tt._LAN);
+              this.stream.advanceIfChars([tt._DOT, tt._DOT]);
+              this.stream.advanceIfChar(tt._LAN);
+              this.stream.advanceIfChars([tt._COM, tt._CSB]); // comma must have a closing bracket after it
+              this.stream.advanceIfChar(tt._CSB);
+
+              this.stream.skipWhitespace();
+
+              return this.finishToken(offset, TokenType.LambdaIndexor);
+            }
+
             return this.finishToken(offset, TokenType.Closure);
           }
 
@@ -249,6 +264,27 @@ export class Scanner implements IScanner {
 
         if ((comment = this.parseComments())) {
           return comment;
+        }
+
+        // LAMBDA
+        if (this.stream.advanceIfChars(tt._LAMBDA)) {
+          this.stream.skipWhitespace();
+          if (this.stream.advanceIfChar(tt._OPP)) {
+            // lambda(
+            this.parenStack.push(TokenType.LambdaStart);
+            this.state = ScannerState.WithinLambda;
+            return this.finishToken(offset, TokenType.LambdaStart);
+          } else {
+            throw Error(`Expected ( after lambda @ ${offset}`);
+          }
+        }
+        if (
+          this.testParenStack(TokenType.LambdaStart) &&
+          this.stream.advanceIfChar(tt._CLP)
+        ) {
+          this.parenStack.pop();
+          this.state = ScannerState.WithinFile;
+          return this.finishToken(offset, TokenType.LabmdaEnd);
         }
 
         if (this.stream.advanceIfChar(tt._STR)) {
@@ -540,12 +576,25 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Literal);
         }
         if (this.stream.advanceIfChar(tt._SQO)) {
-          this.stream.advance(1);
-          if (!this.stream.advanceIfChar(tt._SQO))
-            throw Error(`Expected single quote at [${this.stream.pos()}]`);
-          this.stream.skipWhitespace();
-          this.state = ScannerState.WithinFile;
-          return this.finishToken(offset, TokenType.LiteralChar);
+          // might be a char, might be a lambda func call
+          if (this.stream.peekChar(1) == tt._SQO) {
+            // literal char
+            this.stream.advance(1);
+            if (!this.stream.advanceIfChar(tt._SQO))
+              throw Error(`Expected single quote at [${this.stream.pos()}]`);
+            this.stream.skipWhitespace();
+            this.state = ScannerState.WithinFile;
+            return this.finishToken(offset, TokenType.LiteralChar);
+          } else {
+            // lambda call
+            const litWord = this.nextWord();
+            if (litWord) {
+              this.state = ScannerState.WithinLambda;
+              return this.finishToken(offset, TokenType.DeclarationName);
+            }
+
+            throw Error(`Unrecognized char after single quote @ ${offset}`);
+          }
         }
         return this.finishToken(
           offset,
@@ -694,5 +743,9 @@ export class Scanner implements IScanner {
 
   private testParenStack(token: TokenType) {
     return last(this.parenStack) == token;
+  }
+
+  private isInLambda() {
+    return this.parenStack.some((s) => s == TokenType.LambdaStart);
   }
 }
