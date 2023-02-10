@@ -1153,7 +1153,7 @@ export class LPCParser {
       );
       nd.name = this.scanner.getTokenText().trim();
 
-      this.eatWhitespace();
+      this.eatWhitespaceAndNewlines();
       this.scanner.scan();
 
       return nd;
