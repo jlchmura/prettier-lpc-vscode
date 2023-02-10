@@ -211,6 +211,7 @@ export const reserved_words = [
   "if",
   "while",
   "for",
+  "foreach",
   "else",
   "do",
   //"sizeof",
