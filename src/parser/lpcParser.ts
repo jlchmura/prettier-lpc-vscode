@@ -1482,11 +1482,7 @@ export class LPCParser {
       identNode.property = this.parseIndexorExpression();
       //identNode.property = this.parseToken(this.scanner.scan(), identNode);
       t = this.scanner.peek();
-    }
-    if (t == TokenType.IndexorEnd) {
-      // indexor end should have been handled by parseIndexor
-      throw Error(`unexpected ] symbol @ ${this.scanner.getTokenOffset()}`);
-    }
+    }    
     if (t == TokenType.Arrow) {
       this.scanner.scan();
       if (!identNode) throw "unexpected arrow w/o ident";
