@@ -392,8 +392,14 @@ export class LPCParser {
 
       let newNode: LPCNode | undefined;
       if (this.isBinaryOp(t)) {
-        newNode = this.parsePrecedenceClimber(last(children)!, parent, 0);
-        children.pop();
+        const op = this.scanner.getTokenText().trim();
+        if (unary_ops_set.has(op)) {
+          this.scanner.scan();
+          newNode = this.parseMaybeUnaryPrefixOperator(t, parent);
+        } else {
+          newNode = this.parsePrecedenceClimber(last(children)!, parent, 0);
+          children.pop();
+        }
         children.push(newNode);
       } else {
         t = this.scanner.scan();
