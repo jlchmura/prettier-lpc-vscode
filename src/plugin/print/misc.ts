@@ -50,10 +50,10 @@ export const printIdentifier: PrintNodeFunction<IdentifierNode> = (
   options,
   printChildren
 ) => {
-  const arr: Doc[] = [
-    node.attributes && node.attributes["isArray"] ? "*" : "",
-    node.name || "",
-  ];
+  const arr: Doc[] = [];
+  if (node.attributes && node.attributes["isArray"]) arr.push("*");
+  arr.push(node.name || "");
+
   if (node.property) {
     arr.push("[", printChildren(["property"]), "]");
   }

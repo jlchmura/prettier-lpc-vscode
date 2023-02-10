@@ -42,12 +42,11 @@ export const printVarDecl: PrintNodeFunction<VariableDeclarationNode> = (
   const declHasSuffixComments = node.declarations.some(
     (d) => !!d.suffixComments
   );
-  const joinType = declHasSuffixComments ? [",", hardline] : [", "];
+  const joinType = declHasSuffixComments ? [",", hardline] : [",", line];
   const pt1String = pt1.flat().join(" ") + " ";
   const printed: Doc[] = [];
-  let printedDecl: Doc = join(
-    joinType,
-    path.map(printChildren, "declarations")
+  let printedDecl: Doc = group(
+    join(joinType, path.map(printChildren, "declarations"))
   );
 
   if (declarations.length > 1) {

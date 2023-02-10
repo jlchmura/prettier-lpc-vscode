@@ -396,7 +396,7 @@ export class LPCParser {
         children.pop();
         children.push(newNode);
       } else {
-        t=this.scanner.scan();
+        t = this.scanner.scan();
         newNode = this.parseToken(t, tempParent, flags);
         if (!newNode)
           throw Error(`Unexpected token @ ${this.scanner.getTokenOffset()}`);
@@ -437,23 +437,26 @@ export class LPCParser {
     this.eatWhitespace();
     let tt = this.scanner.peek();
 
-    if (this.opParseLevel==0 &&
-      ( tt == TokenType.Operator || tt == TokenType.Star || tt == TokenType.LogicalOperator)) {
+    if (
+      this.opParseLevel == 0 &&
+      (tt == TokenType.Operator ||
+        tt == TokenType.Star ||
+        tt == TokenType.LogicalOperator)
+    ) {
       //binary expr
       lh = this.parsePrecedenceClimber(lh, parent, 0);
       // this.scanner.scan();
       // lh = this.parseBinaryExpression(lh, parent);
       this.eatWhitespaceAndNewlines();
       tt = this.scanner.peek();
-    // } else if (tt == TokenType.LogicalOperator) {
-    //   this.scanner.scan();
-    //   const leNode = this.parseLogicalExpression(
-    //     lh,
-    //     ParseExpressionFlag.StatementOnly
-    //   );
-    //   return leNode;
-    } else
-    if (tt == TokenType.Arrow) {
+      // } else if (tt == TokenType.LogicalOperator) {
+      //   this.scanner.scan();
+      //   const leNode = this.parseLogicalExpression(
+      //     lh,
+      //     ParseExpressionFlag.StatementOnly
+      //   );
+      //   return leNode;
+    } else if (tt == TokenType.Arrow) {
       // an arrow can come after a string literal
       // the string is interpreted as an object
       this.scanner.scan();
@@ -1089,6 +1092,13 @@ export class LPCParser {
 
     // see if there is an initializer
     if (this.scanner.peek() == TokenType.AssignmentOperator) {
+      this.scanner.scan(); // consume assignment op
+      if (this.scanner.getTokenText().trim() != "=") {
+        throw Error(
+          `Unexpected token in variable initializer @ ${this.scanner.getTokenOffset()}`
+        );
+      }
+
       const t = this.scanner.scan();
       d.init = this.parseToken(t, d);
     }
@@ -1104,7 +1114,7 @@ export class LPCParser {
   ) {
     // these two operators do not have a right side
     if (exp.operator == "++" || exp.operator == "--") return exp;
-    
+
     this.eatWhitespace();
     exp.right = this.parseToken(
       this.scanner.scan(),
@@ -1191,8 +1201,8 @@ export class LPCParser {
         void 0
       );
 
-      let varName = this.scanner.getTokenText().trim();      
-      
+      let varName = this.scanner.getTokenText().trim();
+
       if (varName.startsWith("*")) {
         varName = varName.substring(1).trim(); // drop the star
         identNode.setAttribute("isArray", "true");
@@ -1288,9 +1298,9 @@ export class LPCParser {
       case TokenType.Operator:
       case TokenType.LogicalOperator:
       case TokenType.Star: // if star shows up here, treat it as an operator
-        if (this.opParseLevel == 0) {  
-      // binary expr
-        return this.parsePrecedenceClimber(lh, parent, 0);
+        if (this.opParseLevel == 0) {
+          // binary expr
+          return this.parsePrecedenceClimber(lh, parent, 0);
         }
         break;
       // this.scanner.scan();
@@ -1312,7 +1322,7 @@ export class LPCParser {
         parent.children.push(aExp);
         return this.parseAssignmentExpression(aExp, parent);
     }
-        
+
     return lh;
   }
 
