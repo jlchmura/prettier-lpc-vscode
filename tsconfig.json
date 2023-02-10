@@ -15,5 +15,5 @@
     "noUncheckedIndexedAccess": false,
     "rootDir": "./src"
   },
-  "exclude": ["build", "dist", "node_modules", "lib", "test", "**/*.unit.ts"]
+  "exclude": ["build", "dist", "node_modules", "lib", "test", "**/*.unit.ts", "test-files"]
 }
