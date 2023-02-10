@@ -36,7 +36,7 @@ export const tt = {
   _ELSEIF: "else if".split("").map((c) => c.charCodeAt(0)),
   _ELSE: "else".split("").map((c) => c.charCodeAt(0)),
   _RETURN: "return".split("").map((c) => c.charCodeAt(0)),
-  _FOR: "for".split("").map((c) => c.charCodeAt(0)),  
+  _FOR: "for".split("").map((c) => c.charCodeAt(0)),
   _FOREACH: "foreach".split("").map((c) => c.charCodeAt(0)),
   _WHILE: "while".split("").map((c) => c.charCodeAt(0)),
   _BREAK: "break".split("").map((c) => c.charCodeAt(0)),
@@ -56,13 +56,14 @@ export const binary_ops = [
   ">=",
   ">",
   "<<",
-  ">>"  
+  ">>",
 ].map((o) => o.split("").map((c) => c.charCodeAt(0)));
 
-export const logical_ops = [
-  "||",
-  "&&"
-].map((o) => o.split("").map((c) => c.charCodeAt(0)));
+export const logical_ops_set = new Set(["||", "&&"]);
+
+export const logical_ops = ["||", "&&"].map((o) =>
+  o.split("").map((c) => c.charCodeAt(0))
+);
 
 export const assignment_ops = [
   "=",
@@ -93,6 +94,27 @@ export enum DeclType {
   Variable = 2,
   Inherit = 4,
 }
+
+export const op_precedence: { [op: string]: number } = {
+  "||": 1,
+  "&&": 2,
+  "|": 3,
+  "^": 4,
+  "&": 5,
+  "==": 6,
+  "!=": 6,
+  "<": 7,
+  "<=": 7,
+  ">": 7,
+  ">=": 7,
+  "<<": 8,
+  ">>": 8,
+  "+": 9,
+  "-": 9,
+  "%": 10,
+  "*": 10,
+  "/": 10,
+};
 
 export const modifiers: { [mod: string]: number } = {
   private: DeclType.Function | DeclType.Variable,
@@ -141,7 +163,9 @@ export const modifiers_variable = [
 ];
 export const modifiers_inherit = ["virtual"];
 
-export const modifiers_set = new Set(modifiers_function.concat(modifiers_variable).concat(modifiers_inherit));
+export const modifiers_set = new Set(
+  modifiers_function.concat(modifiers_variable).concat(modifiers_inherit)
+);
 
 export const directives = [
   "include",
@@ -190,5 +214,5 @@ export const reserved_words = [
   "else",
   "do",
   //"sizeof",
-]
+];
 export const reserved_words_set = new Set(reserved_words);

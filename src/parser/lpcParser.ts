@@ -8,7 +8,10 @@ import {
   IndexorExpressionNode,
 } from "../nodeTypes/arrayExpression";
 import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
-import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
+import {
+  BinaryExpressionNode,
+  BinaryishExpressionNode,
+} from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
 import { CallExpressionNode } from "../nodeTypes/callExpression";
 import { CodeBlockNode } from "../nodeTypes/codeBlock";
@@ -40,7 +43,14 @@ import {
   VariableDeclaratorNode,
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
-import { tt, unary_ops_set } from "./defs";
+import {
+  binary_ops,
+  logical_ops,
+  logical_ops_set,
+  op_precedence,
+  tt,
+  unary_ops_set,
+} from "./defs";
 import { Scanner } from "./lpcScanner";
 import {
   ClosureNode,
@@ -68,6 +78,7 @@ export const enum ParseExpressionFlag {
 export class LPCParser {
   private scanner!: Scanner;
   private text!: string;
+  private opParseLevel = 0;
 
   constructor() {}
 
@@ -364,7 +375,7 @@ export class LPCParser {
     // scan until we get a paren block end
     let tempParent: LPCNode = nd;
     while (
-      (t = this.scanner.scan()) &&
+      (t = this.scanner.peek()) &&
       t != TokenType.ParenBlockEnd &&
       t != TokenType.EOS
     ) {
@@ -373,17 +384,19 @@ export class LPCParser {
         t == TokenType.BlankLines ||
         t == TokenType.Whitespace
       ) {
+        this.scanner.scan();
         // a comma in this position is a separator
         // also skip blanklines
         continue;
       }
 
       let newNode: LPCNode | undefined;
-      if (t == TokenType.LogicalOperator) {
-        newNode = this.parseLogicalExpression(last(children)!, flags);
+      if (this.isBinaryOp(t)) {
+        newNode = this.parsePrecedenceClimber(last(children)!, parent, 0);
         children.pop();
         children.push(newNode);
       } else {
+        t=this.scanner.scan();
         newNode = this.parseToken(t, tempParent, flags);
         if (!newNode)
           throw Error(`Unexpected token @ ${this.scanner.getTokenOffset()}`);
@@ -391,6 +404,7 @@ export class LPCParser {
       }
     }
 
+    t = this.scanner.scan();
     if (t != TokenType.ParenBlockEnd) throw "expected parenblock end";
 
     nd.closed = true;
@@ -423,20 +437,23 @@ export class LPCParser {
     this.eatWhitespace();
     let tt = this.scanner.peek();
 
-    if (tt == TokenType.Operator || tt == TokenType.Star) {
+    if (this.opParseLevel==0 &&
+      ( tt == TokenType.Operator || tt == TokenType.Star || tt == TokenType.LogicalOperator)) {
       //binary expr
-      this.scanner.scan();
-      lh = this.parseBinaryExpression(lh, parent);
+      lh = this.parsePrecedenceClimber(lh, parent, 0);
+      // this.scanner.scan();
+      // lh = this.parseBinaryExpression(lh, parent);
       this.eatWhitespaceAndNewlines();
       tt = this.scanner.peek();
-    } else if (tt == TokenType.LogicalOperator) {
-      this.scanner.scan();
-      const leNode = this.parseLogicalExpression(
-        lh,
-        ParseExpressionFlag.StatementOnly
-      );
-      return leNode;
-    } else if (tt == TokenType.Arrow) {
+    // } else if (tt == TokenType.LogicalOperator) {
+    //   this.scanner.scan();
+    //   const leNode = this.parseLogicalExpression(
+    //     lh,
+    //     ParseExpressionFlag.StatementOnly
+    //   );
+    //   return leNode;
+    } else
+    if (tt == TokenType.Arrow) {
       // an arrow can come after a string literal
       // the string is interpreted as an object
       this.scanner.scan();
@@ -1087,7 +1104,7 @@ export class LPCParser {
   ) {
     // these two operators do not have a right side
     if (exp.operator == "++" || exp.operator == "--") return exp;
-    if (exp.left?.name == "averagedam") debugger;
+    
     this.eatWhitespace();
     exp.right = this.parseToken(
       this.scanner.scan(),
@@ -1174,7 +1191,8 @@ export class LPCParser {
         void 0
       );
 
-      let varName = this.scanner.getTokenText().trim();
+      let varName = this.scanner.getTokenText().trim();      
+      if (varName=="token_mapping") debugger;
       if (varName.startsWith("*")) {
         varName = varName.substring(1).trim(); // drop the star
         identNode.setAttribute("isArray", "true");
@@ -1268,10 +1286,18 @@ export class LPCParser {
         parent.children.push(tern);
         return tern;
       case TokenType.Operator:
+      case TokenType.LogicalOperator:
       case TokenType.Star: // if star shows up here, treat it as an operator
-        // binary expr
-        this.scanner.scan();
-        return this.parseBinaryExpression(lh, parent);
+        if (this.opParseLevel == 0) {  
+      // binary expr
+        return this.parsePrecedenceClimber(lh, parent, 0);
+        }
+        break;
+      // this.scanner.scan();
+      // return this.parseBinaryExpression(
+      //   lh,
+      //   parent
+      // ) as BinaryExpressionNode;
       case TokenType.AssignmentOperator:
         this.scanner.scan();
         const aExp = new AssignmentExpressionNode(
@@ -1286,7 +1312,69 @@ export class LPCParser {
         parent.children.push(aExp);
         return this.parseAssignmentExpression(aExp, parent);
     }
+        
+    return lh;
+  }
 
+  private isBinaryOp(t: TokenType) {
+    return (
+      t == TokenType.Operator ||
+      t == TokenType.Star ||
+      t == TokenType.LogicalOperator
+    );
+  }
+
+  private parsePrecedenceClimber(
+    last: LPCNode,
+    parent: LPCNode,
+    minPrec: number
+  ) {
+    this.opParseLevel++;
+
+    let t: TokenType;
+    let lh: LPCNode = last,
+      rh: LPCNode | undefined;
+    let op: string;
+
+    t = this.scanner.peek();
+    while (
+      this.isBinaryOp(t) &&
+      op_precedence[(op = this.scanner.getTokenText().trim())] > minPrec
+    ) {
+      t = this.scanner.scan(); // consume operator
+      const prec = op_precedence[op];
+
+      t = this.scanner.scan(); // consume next token
+      rh = this.parseToken(t, lh, ParseExpressionFlag.StatementOnly);
+      this.eatWhitespaceAndNewlines();
+      if (!rh) throw Error("Expected rh");
+
+      t = this.scanner.peek();
+      const rhPrec = op_precedence[(rh as BinaryExpressionNode).operator || ""];
+      while (
+        (this.isBinaryOp(t) &&
+          op_precedence[this.scanner.getTokenText().trim()] > prec) ||
+        rhPrec == prec
+      ) {
+        rh = this.parsePrecedenceClimber(
+          rh,
+          lh,
+          prec + (rhPrec == prec ? 0 : 1)
+        );
+        t = this.scanner.peek();
+      }
+
+      let opNode: BinaryishExpressionNode;
+      opNode = logical_ops_set.has(op.trim())
+        ? new LogicalExpressionNode(lh.start, rh.end, [], parent)
+        : new BinaryExpressionNode(lh.start, rh.end, [], parent);
+      opNode.left = lh;
+      opNode.right = rh;
+      opNode.operator = op;
+      lh = opNode;
+    }
+
+    this.opParseLevel--;
     return lh;
   }
 

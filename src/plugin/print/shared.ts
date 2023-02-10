@@ -15,6 +15,14 @@ export type PrintNodeFunction<
   printChildren: PrintChildrenFunction
 ) => Doc;
 
+export const isInParen = (path: AstPath<LPCNode>) => {
+  let n: LPCNode | null;
+  let i = 0;
+  while (!!(n = path.getParentNode(i++))) {
+    if (n.type == "parenblock") return true;
+  }
+  return false;
+};
 export const needsSemi = (path: AstPath<LPCNode>) => {
   // if we're within certain nodes, we know for sure
   // a semi is not needed

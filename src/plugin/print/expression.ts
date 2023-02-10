@@ -1,14 +1,14 @@
 import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { AssignmentExpressionNode } from "../../nodeTypes/assignmentExpression";
-import { BinaryExpressionNode } from "../../nodeTypes/binaryExpression";
+import { BinaryExpressionNode, BinaryishExpressionNode } from "../../nodeTypes/binaryExpression";
 import { CallExpressionNode } from "../../nodeTypes/callExpression";
 import { LogicalExpressionNode } from "../../nodeTypes/logicalExpression";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
 import { UnaryPrefixExpressionNode } from "../../nodeTypes/unaryPrefixExpression";
 import { pushIfVal } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
-import { PrintNodeFunction, needsSemi } from "./shared";
+import { PrintNodeFunction, needsSemi, isInParen } from "./shared";
 
 const {
   group,
@@ -109,59 +109,84 @@ export const printAssignmentExpression: PrintNodeFunction<
   return printed;
 };
 
+export const printBinaryishExpression: PrintNodeFunction<BinaryishExpressionNode,BinaryishExpressionNode>= (node, path, options, printChildren) => {
+
+  const printed: Doc = [];
+
+  printed.push(group(printChildren("left")));
+  
+  const op = node.operator?.trim() || "";
+  const right =[" ", op, line, printChildren("right")];
+  
+  const parent = path.getParentNode()!;
+  const inParen = isInParen(path);
+  const shouldGroup = (!(inParen && node.type=="logical-exp")
+    && parent.type != node.type
+    && node.left?.type != node.type
+    && node.right?.type != node.type)
+  
+  printed.push(
+    shouldGroup ? group(right) : right
+  )
+  
+  return ([printed]);
+}
+
 export const printBinaryExpression: PrintNodeFunction<
   BinaryExpressionNode,
   BinaryExpressionNode
 > = (node, path, options, printChildren) => {
-  const printed: Doc = [];
+  return printBinaryishExpression(node,path,options, printChildren);
+  // const printed: Doc = [];
 
-  if (node.left) printed.push(path.call(printChildren, "left"));
-  printed.push(" ", node.operator || "");
+  // if (node.left) printed.push(path.call(printChildren, "left"));
+  // printed.push(" ", node.operator || "");
 
-  const isNestedExp = path.match(
-    (n) => n.type == "binary-exp",
-    (n) => n.type == "binary-exp"
-  );
+  // const isNestedExp = path.match(
+  //   (n) => n.type == "binary-exp",
+  //   (n) => n.type == "binary-exp"
+  // );
 
-  // if this returns to an assignment-exp
-  // or if this is the only binary exp in an call-exp or array member
-  // then indentation is not needed
-  const skipIndent = path.match(
-    (n) => n.type == "binary-exp",
-    (n, nm, idx) =>
-      n.type == "assignment-exp" ||
-      (!!nm && Array.isArray(n[nm]) && n[nm].length == 1)
-  );
+  // // if this returns to an assignment-exp
+  // // or if this is the only binary exp in an call-exp or array member
+  // // then indentation is not needed
+  // const skipIndent = path.match(
+  //   (n) => n.type == "binary-exp",
+  //   (n, nm, idx) =>
+  //     n.type == "assignment-exp" ||
+  //     (!!nm && Array.isArray(n[nm]) && n[nm].length == 1)
+  // );
 
-  if (node.right) {
-    const rightPrinted = [line, path.call(printChildren, "right")];
-    if (isNestedExp || skipIndent) {
-      printed.push(rightPrinted);
-    } else {
-      printed.push(indent(rightPrinted));
-    }
-  }
+  // if (node.right) {
+  //   const rightPrinted = [line, path.call(printChildren, "right")];
+  //   if (isNestedExp || skipIndent) {
+  //     printed.push(rightPrinted);
+  //   } else {
+  //     printed.push(indent(rightPrinted));
+  //   }
+  // }
 
-  return printed;
+  // return group(printed);
 };
 
 export const printLogicalExpression: PrintNodeFunction<
   LogicalExpressionNode,
   LogicalExpressionNode
 > = (node, path, options, printChildren) => {
-  const printed: Doc = [];
-  const printedLeft: Doc[] = [];
+  return printBinaryishExpression(node,path,options, printChildren);
+  // const printed: Doc = [];
+  // const printedLeft: Doc[] = [];
 
-  if (node.left) printedLeft.push(path.call(printChildren, "left"));
-  printedLeft.push(" ", node.operator || "");
-  printed.push(group(printedLeft));
+  // if (node.left) printedLeft.push(path.call(printChildren, "left"));
+  // printedLeft.push(" ", node.operator || "");
+  // printed.push(group(printedLeft));
 
-  if (node.right) {
-    const rightPrinted = [line, group([path.call(printChildren, "right")])];
-    printed.push(rightPrinted);
-  }
+  // if (node.right) {
+  //   const rightPrinted = [line, group([path.call(printChildren, "right")])];
+  //   printed.push(rightPrinted);
+  // }
 
-  return group(printed);
+  // return group(printed);
 };
 
 export const printMemberExpression: PrintNodeFunction<
