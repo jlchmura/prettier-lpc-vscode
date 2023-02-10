@@ -45,15 +45,15 @@ export const printVarDecl: PrintNodeFunction<VariableDeclarationNode> = (
   const joinType = declHasSuffixComments ? [",", hardline] : [", "];
   const pt1String = pt1.flat().join(" ") + " ";
   const printed: Doc[] = [];
-  let printedDecl: Doc = join(joinType, path.map(printChildren, "declarations"));
+  let printedDecl: Doc = join(
+    joinType,
+    path.map(printChildren, "declarations")
+  );
 
   if (declarations.length > 1) {
-    printedDecl = align(pt1String.length, printedDecl);    
+    printedDecl = align(pt1String.length, printedDecl);
   }
-  printed.push(join(" ", [
-      ...pt1,
-      printedDecl
-    ]));      
+  printed.push(join(" ", [...pt1, printedDecl]));
 
   if (shouldPrintSemi) {
     printed.push(";");
@@ -81,12 +81,12 @@ export const printVar: PrintNodeFunction<
   if (init) {
     arr.push(" =");
     const shouldIndent = init.type != "array" && init.type != "mapping";
-    const printedInit = path.call(printChildren, "init")
+    const printedInit = path.call(printChildren, "init");
     if (shouldIndent) {
       arr.push(group(indent([line, printedInit])));
     } else {
       arr.push(" ", printedInit);
-    }    
+    }
   }
 
   return arr;

@@ -1,7 +1,10 @@
 import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { AssignmentExpressionNode } from "../../nodeTypes/assignmentExpression";
-import { BinaryExpressionNode, BinaryishExpressionNode } from "../../nodeTypes/binaryExpression";
+import {
+  BinaryExpressionNode,
+  BinaryishExpressionNode,
+} from "../../nodeTypes/binaryExpression";
 import { CallExpressionNode } from "../../nodeTypes/callExpression";
 import { LogicalExpressionNode } from "../../nodeTypes/logicalExpression";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
@@ -68,9 +71,7 @@ export const printCallExpression: PrintNodeFunction<
   const shouldPrintSemi = needsSemi(path);
   if (shouldPrintSemi) {
     printed.push(";");
-    if (
-      util.isNextLineEmpty(options.originalText, node, (n) => n?.end)
-    ) {
+    if (util.isNextLineEmpty(options.originalText, node, (n) => n?.end)) {
       printed.push(hardline);
     }
   }
@@ -109,34 +110,35 @@ export const printAssignmentExpression: PrintNodeFunction<
   return printed;
 };
 
-export const printBinaryishExpression: PrintNodeFunction<BinaryishExpressionNode,BinaryishExpressionNode>= (node, path, options, printChildren) => {
-
+export const printBinaryishExpression: PrintNodeFunction<
+  BinaryishExpressionNode,
+  BinaryishExpressionNode
+> = (node, path, options, printChildren) => {
   const printed: Doc = [];
 
   printed.push(group(printChildren("left")));
-  
+
   const op = node.operator?.trim() || "";
-  const right =[" ", op, line, printChildren("right")];
-  
+  const right = [" ", op, line, printChildren("right")];
+
   const parent = path.getParentNode()!;
   const inParen = isInParen(path);
-  const shouldGroup = (!(inParen && node.type=="logical-exp")
-    && parent.type != node.type
-    && node.left?.type != node.type
-    && node.right?.type != node.type)
-  
-  printed.push(
-    shouldGroup ? group(right) : right
-  )
-  
-  return ([printed]);
-}
+  const shouldGroup =
+    !(inParen && node.type == "logical-exp") &&
+    parent.type != node.type &&
+    node.left?.type != node.type &&
+    node.right?.type != node.type;
+
+  printed.push(shouldGroup ? group(right) : right);
+
+  return [printed];
+};
 
 export const printBinaryExpression: PrintNodeFunction<
   BinaryExpressionNode,
   BinaryExpressionNode
 > = (node, path, options, printChildren) => {
-  return printBinaryishExpression(node,path,options, printChildren);
+  return printBinaryishExpression(node, path, options, printChildren);
   // const printed: Doc = [];
 
   // if (node.left) printed.push(path.call(printChildren, "left"));
@@ -173,7 +175,7 @@ export const printLogicalExpression: PrintNodeFunction<
   LogicalExpressionNode,
   LogicalExpressionNode
 > = (node, path, options, printChildren) => {
-  return printBinaryishExpression(node,path,options, printChildren);
+  return printBinaryishExpression(node, path, options, printChildren);
   // const printed: Doc = [];
   // const printedLeft: Doc[] = [];
 
