@@ -30,6 +30,7 @@ export const tt = {
   _PIP: "|".charCodeAt(0),
   _AMP: "&".charCodeAt(0),
   _QUE: "?".charCodeAt(0),
+  _IN: "in".split("").map((c) => c.charCodeAt(0)),
   _CALLOTHER: "->".split("").map((c) => c.charCodeAt(0)),
   _INHERIT: "inherit".split("").map((c) => c.charCodeAt(0)),
   _IF: "if".split("").map((c) => c.charCodeAt(0)),

@@ -323,9 +323,35 @@ export class Scanner implements IScanner {
         }
 
         // LOOPS
+
+        // FOREACH
         if (this.stream.advanceIfChars(tt._FOREACH)) {
-          throw Error("FOREACH not handled yet");
+          this.stream.skipWhitespace();
+          if (this.stream.advanceIfChar(tt._OPP)) {
+            this.parenStack.push(TokenType.ForEach);
+            return this.finishToken(offset, TokenType.ForEach);
+          }
+          return this.finishToken(
+            offset,
+            TokenType.ForEach,
+            "Unexpected token after foreach"
+          );
         }
+        if (
+          (this.testParenStack(TokenType.ForEach) &&
+            this.stream.advanceIfChar(tt._COL)) ||
+          this.stream.advanceIfChars(tt._IN)
+        ) {
+          return this.finishToken(offset, TokenType.ForEachIn);
+        }
+        if (
+          this.testParenStack(TokenType.ForEach) &&
+          this.stream.advanceIfChar(tt._CLP)
+        ) {
+          this.parenStack.pop();
+          return this.finishToken(offset, TokenType.ParenBlockEnd);
+        }
+
         if (this.stream.advanceIfChars(tt._FOR)) {
           return this.finishToken(offset, TokenType.For);
         }

@@ -1,7 +1,7 @@
 import { Doc } from "prettier";
 import { builders } from "prettier/doc";
 import { ControlFlowStatementNode } from "../../nodeTypes/controlFlowStatement";
-import { ForStatementNode } from "../../nodeTypes/forStatement";
+import { ForEachStatementNode, ForStatementNode } from "../../nodeTypes/forStatement";
 import { WhileStatementNode } from "../../nodeTypes/whileStatement";
 import { PrintNodeFunction } from "./shared";
 
@@ -73,6 +73,34 @@ export const printForStatement: PrintNodeFunction<
 
   return printed;
 };
+
+export const printForEachStatement: PrintNodeFunction<ForEachStatementNode, ForEachStatementNode>
+= (node, path, options, printChildren) => {
+  const printed: Doc = [];
+  printed.push("foreach (");
+
+  const inner: Doc = [];  
+  if (node.vars) {
+  inner.push(join([",",line], path.map(printChildren, "vars")));
+  }
+  inner.push(" : ");  
+  inner.push(group(path.call(printChildren, "exp")));
+    
+  printed.push(group(indent([softline, ...inner, softline])));
+  printed.push(") ");
+
+  if (node.codeblock) {
+    const pbPrinted = path.call(printChildren, "codeblock");
+    if (node.codeblock.type != "codeblock") {
+      printed.push(group(indent([softline, pbPrinted, softline])));
+    } else {
+      printed.push(pbPrinted);
+    }
+  }
+
+  return printed;
+};
+
 
 export const printControlFlowStatement: PrintNodeFunction<
   ControlFlowStatementNode,

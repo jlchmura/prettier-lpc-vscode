@@ -14,7 +14,10 @@ import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
 import { DirectiveNode } from "../nodeTypes/directive";
-import { ForStatementNode } from "../nodeTypes/forStatement";
+import {
+  ForEachStatementNode,
+  ForStatementNode,
+} from "../nodeTypes/forStatement";
 import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
 import { IfNode } from "../nodeTypes/if";
@@ -72,6 +75,7 @@ import {
 } from "./print/function";
 import {
   printControlFlowStatement,
+  printForEachStatement,
   printForStatement,
   printWhileStatement,
 } from "./print/iteration";
@@ -205,6 +209,11 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
     case "parent-exp":
       return printParentExpression(
         node as ParentExpressionNode,
+        ...commonPrintArgs
+      );
+    case "foreach":
+      return printForEachStatement(
+        node as ForEachStatementNode,
         ...commonPrintArgs
       );
     case "for":

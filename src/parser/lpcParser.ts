@@ -18,7 +18,10 @@ import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
 import { DirectiveNode } from "../nodeTypes/directive";
-import { ForStatementNode } from "../nodeTypes/forStatement";
+import {
+  ForEachStatementNode,
+  ForStatementNode,
+} from "../nodeTypes/forStatement";
 import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
 import { InheritNode } from "../nodeTypes/inherit";
@@ -212,6 +215,8 @@ export class LPCParser {
         throw Error(
           `Unexpected ternary expression at ${this.scanner.getTokenOffset()}`
         );
+      case TokenType.ForEach:
+        return this.parseForEach(curr);
       case TokenType.For:
         return this.parseFor(curr);
       case TokenType.While:
@@ -1026,6 +1031,12 @@ export class LPCParser {
     return nd;
   }
 
+  private varDeclFromIdent(id: IdentifierNode, parent: LPCNode) {
+    const d = new VariableDeclaratorNode(id?.start, id?.end, [], parent);
+    d.id = id;
+    return d;
+  }
+
   private parseVariableDeclaration(
     decl: VariableDeclarationNode,
     parent: LPCNode,
@@ -1036,8 +1047,7 @@ export class LPCParser {
 
     // if we were passed an id/init node, then set that up as an initial declarator
     if (id) {
-      const d = new VariableDeclaratorNode(id?.start, id?.end, [], decl);
-      d.id = id;
+      const d = this.varDeclFromIdent(id, decl);
       d.init = init;
       decl.declarations.push(d);
     }
@@ -1661,6 +1671,64 @@ export class LPCParser {
 
     if (key) {
       nd.elements.push(new MappingPair(key, val));
+    }
+
+    return nd;
+  }
+
+  private parseForEach(parent: LPCNode) {
+    const nd = new ForEachStatementNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+    nd.vars = [];
+    parent.children.push(nd);
+
+    this.eatWhitespaceAndNewlines();
+
+    // keep parsing until we reach the "in" token
+    let t: TokenType;
+    while (
+      (t = this.scanner.scan()) &&
+      t != TokenType.EOS &&
+      t != TokenType.ForEachIn
+    ) {
+      const typeNode = this.parseType();
+      const hasStar = this.parseStar();
+      const identNode = this.parseIdentifier(hasStar);
+
+      if (!identNode)
+        throw Error(
+          `Expected var after foreach @ ${this.scanner.getTokenOffset()}`
+        );
+
+      const varDecl = new VariableDeclarationNode(nd.start, nd.end, [], parent);
+      varDecl.varType = typeNode;
+      varDecl.declarations.push(this.varDeclFromIdent(identNode, nd));
+      nd.vars?.push(varDecl);
+    }
+    this.eatWhitespaceAndNewlines();
+    nd.exp = this.parseToken(
+      this.scanner.scan(),
+      nd,
+      ParseExpressionFlag.StatementOnly
+    );
+
+    this.eatWhitespaceAndNewlines();
+    if (this.scanner.scan() != TokenType.ParenBlockEnd) {
+      throw Error(
+        `Expected closing paren after foreach expression @ ${this.scanner.getTokenOffset()}`
+      );
+    }
+    this.eatWhitespaceAndNewlines();
+
+    nd.codeblock = this.parseToken(this.scanner.scan(), nd);
+    this.scanner.eat(TokenType.BlankLines);
+
+    if (!nd.codeblock) {
+      throw Error(`Could not find codeblock for foreach @ ${this.scanner.getTokenOffset()}`);
     }
 
     return nd;
