@@ -985,6 +985,7 @@ export class LPCParser {
 
     nd.object = id;
 
+    this.eatWhitespaceAndNewlines();
     const t = this.scanner.scan();
     if (t != TokenType.DeclarationName)
       throw Error(
