@@ -1192,7 +1192,7 @@ export class LPCParser {
       );
 
       let varName = this.scanner.getTokenText().trim();      
-      if (varName=="token_mapping") debugger;
+      
       if (varName.startsWith("*")) {
         varName = varName.substring(1).trim(); // drop the star
         identNode.setAttribute("isArray", "true");

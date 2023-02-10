@@ -44,15 +44,16 @@ export const printVarDecl: PrintNodeFunction<VariableDeclarationNode> = (
   );
   const joinType = declHasSuffixComments ? [",", hardline] : [", "];
   const pt1String = pt1.flat().join(" ") + " ";
-  const printed: Doc[] = [
-    join(" ", [
+  const printed: Doc[] = [];
+  let printedDecl: Doc = join(joinType, path.map(printChildren, "declarations"));
+
+  if (declarations.length > 1) {
+    printedDecl = align(pt1String.length, printedDecl);    
+  }
+  printed.push(join(" ", [
       ...pt1,
-      align(
-        pt1String.length,
-        join(joinType, path.map(printChildren, "declarations"))
-      ),
-    ]),
-  ];
+      printedDecl
+    ]));      
 
   if (shouldPrintSemi) {
     printed.push(";");
@@ -78,8 +79,14 @@ export const printVar: PrintNodeFunction<
     arr.push(lineSuffix([" ", path.call(printChildren, "suffixComments")]));
   }
   if (init) {
-    arr.push(" = ");
-    arr.push(group([indent([softline, path.call(printChildren, "init")])]));
+    arr.push(" =");
+    const shouldIndent = init.type != "array" && init.type != "mapping";
+    const printedInit = path.call(printChildren, "init")
+    if (shouldIndent) {
+      arr.push(group(indent([line, printedInit])));
+    } else {
+      arr.push(" ", printedInit);
+    }    
   }
 
   return arr;
