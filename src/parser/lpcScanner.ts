@@ -488,14 +488,14 @@ export class Scanner implements IScanner {
         }
         if (
           this.stream.peekChar(-1) == tt._OSB &&
-          this.stream.advanceIfChar(tt._LAN)
+          (this.stream.advanceIfChar(tt._LAN) || this.stream.advanceIfChar(tt._RAN))
         ) {
           return this.finishToken(offset, TokenType.IndexorFromEndPos);
         }
         if (
           this.stream.peekChar(-1) == tt._DOT &&
           this.stream.peekChar(-2) == tt._DOT &&
-          this.stream.advanceIfChar(tt._LAN)
+          (this.stream.advanceIfChar(tt._LAN) || this.stream.advanceIfChar(tt._RAN))
         ) {
           return this.finishToken(offset, TokenType.IndexorFromEndPos);
         }
