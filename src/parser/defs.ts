@@ -88,7 +88,7 @@ export const arrith_ops = ["+", "-", "*", "/", "!", "&", "|"].map((o) =>
   o.split("").map((c) => c.charCodeAt(0))
 );
 
-export const unary_ops_set = new Set(["!", "-"]);
+export const unary_ops_set = new Set(["!", "-", "&"]);
 
 export enum DeclType {
   Function = 1,

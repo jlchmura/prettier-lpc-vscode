@@ -85,6 +85,7 @@ export enum TokenType {
   AssignmentOperator,
   Bang,
   Star,
+  CallByRef,
 
   Whitespace,
   BlankLines,

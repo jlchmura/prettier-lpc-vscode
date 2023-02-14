@@ -292,6 +292,11 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Star);
         }
 
+        // if (this.stream.advanceIfChar(tt._AMP)) {
+        //   this.stream.skipWhitespace();
+        //   return this.finishToken(offset, TokenType.CallByRef);
+        // }
+
         let wrd: string;
         if ((wrd = this.stream.advanceIfModifier())) {
           return this.finishToken(offset, TokenType.Modifier);
