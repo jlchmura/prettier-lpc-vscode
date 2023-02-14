@@ -15,6 +15,7 @@ import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
 import { DirectiveNode } from "../nodeTypes/directive";
 import {
+  ForEachRangeExpressionNode,
   ForEachStatementNode,
   ForStatementNode,
 } from "../nodeTypes/forStatement";
@@ -75,6 +76,7 @@ import {
 } from "./print/function";
 import {
   printControlFlowStatement,
+  printForEachRangeStatement,
   printForEachStatement,
   printForStatement,
   printWhileStatement,
@@ -216,6 +218,8 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
         node as ForEachStatementNode,
         ...commonPrintArgs
       );
+    case "foreach-range-exp":
+      return printForEachRangeStatement(node as ForEachRangeExpressionNode, ...commonPrintArgs);
     case "for":
       return printForStatement(node as ForStatementNode, ...commonPrintArgs);
     case "while":

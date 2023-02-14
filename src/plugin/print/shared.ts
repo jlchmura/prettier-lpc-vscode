@@ -32,7 +32,8 @@ export const needsSemi = (path: AstPath<LPCNode>) => {
     if (path.getName() == "codeblock" || path.getName() == "consequent") break;
     if (n.type == "ternary") return false;
     if (n.type == "parenblock") return false;
-    if (n.type == "for") return false;        
+    if (n.type == "for") return false;  
+    if (n.type == "foreach-range-exp") return false;      
     if (n.type == "call-exp") return false;
     if (n.type == "mapping-pair") return false;
     if (n.type == "indexor-exp") return false;

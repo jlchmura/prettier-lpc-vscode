@@ -64,6 +64,7 @@ export enum TokenType {
   For,
   ForEach,
   ForEachIn,
+  ForEachRange,
   While,
   ControlFlow,
 

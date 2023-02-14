@@ -1,7 +1,7 @@
 import { Doc } from "prettier";
 import { builders } from "prettier/doc";
 import { ControlFlowStatementNode } from "../../nodeTypes/controlFlowStatement";
-import { ForEachStatementNode, ForStatementNode } from "../../nodeTypes/forStatement";
+import { ForEachRangeExpressionNode, ForEachStatementNode, ForStatementNode } from "../../nodeTypes/forStatement";
 import { WhileStatementNode } from "../../nodeTypes/whileStatement";
 import { PrintNodeFunction } from "./shared";
 
@@ -84,7 +84,8 @@ export const printForEachStatement: PrintNodeFunction<ForEachStatementNode, ForE
   inner.push(join([",",line], path.map(printChildren, "vars")));
   }
   inner.push(" : ");  
-  inner.push(group(path.call(printChildren, "exp")));
+  
+    inner.push(group(path.call(printChildren, "exp")));
     
   printed.push(group(indent([softline, ...inner, softline])));
   printed.push(") ");
@@ -101,6 +102,12 @@ export const printForEachStatement: PrintNodeFunction<ForEachStatementNode, ForE
   return printed;
 };
 
+export const printForEachRangeStatement : PrintNodeFunction<ForEachRangeExpressionNode, ForEachRangeExpressionNode>
+= (node, path, options, printChildren) => {
+  const lh = path.call(printChildren, "left");
+  const rh = path.call(printChildren, "right");
+  return group([lh,line,"..",line,rh]);
+}
 
 export const printControlFlowStatement: PrintNodeFunction<
   ControlFlowStatementNode,

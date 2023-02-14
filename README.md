@@ -10,7 +10,6 @@ Install from the VS Code Marketplace: [prettier-lpc-vscode](https://marketplace.
 ## Known Limitations
 The folowing languages features are not supported yet:
 - Lambda parsing works, but is untested. Use extra caution.
-- foreach expression with integer range (i.e. `foreach(int i : 1..5) {}`)
 - Structs
 - Coroutines 
 

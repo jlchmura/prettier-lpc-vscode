@@ -1,3 +1,4 @@
+import { LiteralNode } from "./literal";
 import { LPCNode } from "./lpcNode";
 import { VariableDeclarationNode } from "./variableDeclaration";
 
@@ -15,4 +16,10 @@ export class ForEachStatementNode extends LPCNode {
   exp: LPCNode|undefined;
   codeblock:LPCNode | undefined;
   public type = "foreach";
+}
+
+export class ForEachRangeExpressionNode extends LPCNode {
+  left: LPCNode | undefined;
+  right: LPCNode | undefined;
+  public type = "foreach-range-exp";
 }

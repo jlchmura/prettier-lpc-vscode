@@ -19,6 +19,7 @@ import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
 import { DirectiveNode } from "../nodeTypes/directive";
 import {
+  ForEachRangeExpressionNode,
   ForEachStatementNode,
   ForStatementNode,
 } from "../nodeTypes/forStatement";
@@ -1710,13 +1711,43 @@ export class LPCParser {
       nd.vars?.push(varDecl);
     }
     this.eatWhitespaceAndNewlines();
+
+    // parse the expression, which might be a range
     nd.exp = this.parseToken(
       this.scanner.scan(),
       nd,
       ParseExpressionFlag.StatementOnly
     );
+    if (!nd.exp)
+      throw Error(
+        `Expected expression but did not get one @ ${this.scanner.getTokenOffset()}`
+      );
 
     this.eatWhitespaceAndNewlines();
+
+    if (this.scanner.peek() == TokenType.ForEachRange) {
+      this.scanner.scan(); // consume the range token
+
+      // get right-hand expression
+      const rh = this.parseToken(
+        this.scanner.scan(),
+        nd,
+        ParseExpressionFlag.StatementOnly
+      );
+      if (!rh)
+        throw Error(
+          `Expected rh expression but did not get one @ ${this.scanner.getTokenOffset()}`
+        );
+
+      // construct range expressions
+      const rExp = new ForEachRangeExpressionNode(nd.exp.start, rh.end, [], nd);
+      rExp.left = nd.exp;
+      rExp.right = rh;
+      nd.exp = rExp;
+
+      this.eatWhitespaceAndNewlines();
+    }
+
     if (this.scanner.scan() != TokenType.ParenBlockEnd) {
       throw Error(
         `Expected closing paren after foreach expression @ ${this.scanner.getTokenOffset()}`
@@ -1728,7 +1759,9 @@ export class LPCParser {
     this.scanner.eat(TokenType.BlankLines);
 
     if (!nd.codeblock) {
-      throw Error(`Could not find codeblock for foreach @ ${this.scanner.getTokenOffset()}`);
+      throw Error(
+        `Could not find codeblock for foreach @ ${this.scanner.getTokenOffset()}`
+      );
     }
 
     return nd;

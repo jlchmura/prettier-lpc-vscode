@@ -337,13 +337,25 @@ export class Scanner implements IScanner {
             "Unexpected token after foreach"
           );
         }
+        // foreach : or "in"
         if (
           (this.testParenStack(TokenType.ForEach) &&
             this.stream.advanceIfChar(tt._COL)) ||
           this.stream.advanceIfChars(tt._IN)
         ) {
+          this.stream.skipWhitespace();
           return this.finishToken(offset, TokenType.ForEachIn);
         }
+
+        // foreach range ".."
+        if (
+          this.testParenStack(TokenType.ForEach) &&
+          this.stream.advanceIfChars([tt._DOT, tt._DOT])
+        ) {
+          this.stream.skipWhitespace();
+          return this.finishToken(offset, TokenType.ForEachRange);
+        }
+
         if (
           this.testParenStack(TokenType.ForEach) &&
           this.stream.advanceIfChar(tt._CLP)
@@ -488,14 +500,16 @@ export class Scanner implements IScanner {
         }
         if (
           this.stream.peekChar(-1) == tt._OSB &&
-          (this.stream.advanceIfChar(tt._LAN) || this.stream.advanceIfChar(tt._RAN))
+          (this.stream.advanceIfChar(tt._LAN) ||
+            this.stream.advanceIfChar(tt._RAN))
         ) {
           return this.finishToken(offset, TokenType.IndexorFromEndPos);
         }
         if (
           this.stream.peekChar(-1) == tt._DOT &&
           this.stream.peekChar(-2) == tt._DOT &&
-          (this.stream.advanceIfChar(tt._LAN) || this.stream.advanceIfChar(tt._RAN))
+          (this.stream.advanceIfChar(tt._LAN) ||
+            this.stream.advanceIfChar(tt._RAN))
         ) {
           return this.finishToken(offset, TokenType.IndexorFromEndPos);
         }
