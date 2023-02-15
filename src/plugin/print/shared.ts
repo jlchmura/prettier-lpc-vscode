@@ -39,6 +39,7 @@ export const needsSemi = (path: AstPath<LPCNode>) => {
     if (n.type == "indexor-exp") return false;
     if (n.type == "assignment-exp") return false;
     if (n.type == "array") return false;
+    if (n.type == "inline-closure") return false;
     if (n.type == "codeblock") break;
   }
 

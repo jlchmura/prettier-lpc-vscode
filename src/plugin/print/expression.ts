@@ -156,6 +156,7 @@ export const printMemberExpression: PrintNodeFunction<
   const printed: Doc = [];
 
   if (object) printed.push(path.call(printChildren, "object"));
+  
   if (property?.type == "indexor-exp") {
     printed.push(
       "[",

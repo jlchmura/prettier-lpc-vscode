@@ -974,7 +974,12 @@ export class LPCParser {
 
   private parseArrow(
     parent: LPCNode,
-    id: IdentifierNode | LiteralNode | CallExpressionNode | ParenBlockNode
+    id:
+      | IdentifierNode
+      | LiteralNode
+      | CallExpressionNode
+      | ParenBlockNode
+      | InlineClosureArgumentNode
   ): CallExpressionNode | MemberExpressionNode {
     // an arrow is a member expression inside a call expression
     const nd = new MemberExpressionNode(
@@ -1387,6 +1392,10 @@ export class LPCParser {
         const tern = this.parseTernary(lh);
         parent.children.push(tern);
         return tern;
+      case TokenType.Arrow:
+        this.scanner.scan();
+        if (!lh) throw "unexpected arrow w/o lh expression";
+        return this.parseArrow(parent, lh as InlineClosureArgumentNode);
       case TokenType.Operator:
       case TokenType.LogicalOperator:
       case TokenType.Star: // if star shows up here, treat it as an operator
