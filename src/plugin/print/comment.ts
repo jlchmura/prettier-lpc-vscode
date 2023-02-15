@@ -46,7 +46,10 @@ export const printCommentBlock: PrintNodeFunction<
     let hasTextCnt = 0;
     lines.forEach((l, lIdx) => {
       l = l.trim();
-      while (l.startsWith("*")) l = l.substring(1).trim();
+      // anythign over 4 stars we'll consider a headline and leave
+      if (!l.startsWith("****")) {
+        while (l.startsWith("*")) l = l.substring(1).trim();
+      }
       if (l.length > 0) hasTextCnt++;
       extraLines.push(l);
     });
