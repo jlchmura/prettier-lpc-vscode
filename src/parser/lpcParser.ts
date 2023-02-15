@@ -1575,7 +1575,7 @@ export class LPCParser {
 
         // get next token & parse the init expression
         t = this.scanner.scan();
-        const initExp = this.parseToken(t, varDecl);
+        const initExp = this.parseToken(t, varDecl, ParseExpressionFlag.StatementOnly);
 
         return this.parseVariableDeclaration(
           varDecl,
