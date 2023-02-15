@@ -40,7 +40,7 @@ import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
 import { SwitchCaseNode, SwitchNode } from "../nodeTypes/switch";
 import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
-import { StructLiteralNode, TypeCastExpressionNode } from "../nodeTypes/typeCast";
+import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
 import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
 import {
   VariableDeclarationNode,
@@ -66,6 +66,7 @@ import {
   LambdaIndexorNode,
   LambdaNode,
 } from "../nodeTypes/lambda";
+import { StructDefinitionNode, StructLiteralNode } from "../nodeTypes/struct";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -1212,6 +1213,28 @@ export class LPCParser {
     return nd;
   }
 
+  private parseStructDefinition(structName: IdentifierNode, parent: LPCNode) {
+    if (this.scanner.scan() != TokenType.CodeBlockStart)
+      throw Error(
+        `Expected opening bracket in struct definition @ ${this.scanner.getTokenOffset()}`
+      );
+
+    const nd = new StructDefinitionNode(
+      structName.start,
+      structName.end,
+      [],
+      parent
+    );
+    const cb = this.parseCodeBlock(nd);
+
+    nd.structName = structName;
+    nd.definition = cb;
+    nd.end = cb.end;
+
+    parent.children.push(nd);
+
+    return nd;
+  }
 
   private parseStructLiteral(parent: LPCNode) {
     const nd = new StructLiteralNode(
@@ -1226,10 +1249,30 @@ export class LPCParser {
 
     nd.structName = new IdentifierNode(nd.start + 1, nd.end - 1, [], nd);
     nd.structName.name = structName;
-    
+
     parent.children.push(nd);
 
     return nd;
+  }
+
+  private parseStructIdentifier() {
+    if (this.scanner.getTokenType() == TokenType.DeclarationName) {
+      const identNode = new IdentifierNode(
+        this.scanner.getTokenOffset(),
+        this.scanner.getTokenEnd(),
+        [],
+        void 0
+      );
+
+      let varName = this.scanner.getTokenText().trim();
+
+      identNode.name = varName;
+
+      this.eatWhitespaceAndNewlines();
+      // codeblock means this is a struct def, which will be handled separately
+      if (this.scanner.peek() != TokenType.CodeBlockStart) this.scanner.scan();
+      return identNode;
+    }
   }
 
   private parseIdentifier(hasStar = false) {
@@ -1414,7 +1457,10 @@ export class LPCParser {
         t = this.scanner.peek();
       }
 
-      if (!lh) throw Error(`left-hand operator was undefined @ ${this.scanner.getTokenOffset()}`);
+      if (!lh)
+        throw Error(
+          `left-hand operator was undefined @ ${this.scanner.getTokenOffset()}`
+        );
 
       let opNode: BinaryishExpressionNode;
       opNode = logical_ops_set.has(op.trim())
@@ -1447,15 +1493,11 @@ export class LPCParser {
 
     const modNodes = this.parseModifiers();
     const typeNode = this.parseType();
-    const hasStar = this.parseStar();
-        
-    let structTypeNode: IdentifierNode|undefined=undefined;
-    if (typeNode?.name=="struct") {
-      structTypeNode = this.parseIdentifier(false);
-      this.scanner.scan();
-    }
+    let structTypeNode =
+      typeNode?.name == "struct" ? this.parseStructIdentifier() : undefined;
 
-    const identNode = this.parseIdentifier(hasStar);
+    const hasStar = this.parseStar();
+    let identNode = this.parseIdentifier(hasStar);
 
     let t: TokenType = this.scanner.peek();
     if (
@@ -1488,6 +1530,13 @@ export class LPCParser {
         return identNode;
       }
     }
+
+    // test for struct type definition
+    const txt = this.scanner.getTokenText();
+    if (t == TokenType.CodeBlockStart && structTypeNode && allowFn) {
+      return this.parseStructDefinition(structTypeNode, parent);
+    }
+
     if (t == TokenType.AssignmentOperator) {
       if (allowDecl && (typeNode || modNodes.length > 0)) {
         this.scanner.scan();

@@ -38,12 +38,10 @@ import {
 } from "../nodeTypes/memberExpression";
 import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
+import { StructDefinitionNode, StructLiteralNode } from "../nodeTypes/struct";
 import { SwitchNode } from "../nodeTypes/switch";
 import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
-import {
-  StructLiteralNode,
-  TypeCastExpressionNode,
-} from "../nodeTypes/typeCast";
+import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
 import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
 import {
   VariableDeclarationNode,
@@ -98,7 +96,7 @@ import {
   printParenBlock,
 } from "./print/misc";
 import { PrintChildrenFunction, PrintNodeFunction } from "./print/shared";
-import { printStructLiteral } from "./print/struct";
+import { printStructDefinition, printStructLiteral } from "./print/struct";
 import { printTypeCast, printVar, printVarDecl } from "./print/var";
 
 const {
@@ -262,6 +260,11 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
     case "lambda-empty-arg":
       return printLambdaEmptyArg(
         node as LambdaEmptyArgNode,
+        ...commonPrintArgs
+      );
+    case "struct":
+      return printStructDefinition(
+        node as StructDefinitionNode,
         ...commonPrintArgs
       );
     case "struct-literal":

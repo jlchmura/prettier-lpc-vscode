@@ -1,4 +1,3 @@
-import { debug } from "console";
 import { last } from "../utils/arrays";
 import {
   arrith_ops,
@@ -314,7 +313,10 @@ export class Scanner implements IScanner {
           this.isAlpha(this.stream.peekChar(1))
         ) {
           this.stream.advanceIfChar(tt._LAN);
-          if (this.stream.advanceUntilChar(tt._RAN) && this.stream.advanceIfChar(tt._RAN)) {
+          if (
+            this.stream.advanceUntilChar(tt._RAN) &&
+            this.stream.advanceIfChar(tt._RAN)
+          ) {
             return this.finishToken(offset, TokenType.StructLiteral);
           }
 
