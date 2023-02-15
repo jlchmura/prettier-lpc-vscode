@@ -46,7 +46,7 @@ export const printCommentBlock: PrintNodeFunction<
     let hasTextCnt = 0;
     lines.forEach((l, lIdx) => {
       l = l.trim();
-      if (l.startsWith("*")) l = l.substring(1).trim();
+      while (l.startsWith("*")) l = l.substring(1).trim();
       if (l.length > 0) hasTextCnt++;
       extraLines.push(l);
     });
