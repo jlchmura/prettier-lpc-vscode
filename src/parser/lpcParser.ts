@@ -855,6 +855,7 @@ export class LPCParser {
       case "binary-exp":
       case "literal":
       case "parenblock":
+      case "identifier":
         // ok
         break;
       default:
