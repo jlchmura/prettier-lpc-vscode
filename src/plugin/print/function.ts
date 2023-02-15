@@ -46,13 +46,14 @@ export const printFunction: PrintNodeFunction<FunctionDeclarationNode> = (
 
   if (node.isStub) {
     arr.push(";");
-    arr.push(printSuffixComments(node, path, options, printChildren));
-
-    if (util.isNextLineEmpty(options.originalText, node, (n) => n?.end)) {
-      arr.push(hardline);
-    }
   } else {
     arr.push(" ", path.call(printChildren, "codeBlock"));
+  }
+
+  arr.push(printSuffixComments(node, path, options, printChildren));
+
+  if (util.isNextLineEmpty(options.originalText, node, (n) => n?.end)) {
+    arr.push(hardline);
   }
 
   return arr;

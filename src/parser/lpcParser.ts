@@ -1638,6 +1638,10 @@ export class LPCParser {
         fd.codeBlock = this.parseCodeBlock(fd);
         fd.end = fd.codeBlock.end;
 
+        this.eatWhitespace();
+        this.tryParseComment(fd);
+        this.eatWhitespaceAndNewlines();
+
         return fd;
       }
       if (this.scanner.peek() == TokenType.Semicolon && allowFn) {
@@ -1698,7 +1702,7 @@ export class LPCParser {
         this.eatWhitespace();
         this.scanner.eat(TokenType.Comma);
         this.tryParseComment(elToken);
-        
+
         children.push(elToken);
       }
     }
