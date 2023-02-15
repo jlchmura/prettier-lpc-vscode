@@ -52,7 +52,7 @@ export const printVarDecl: PrintNodeFunction<
     printedDecl = align(pt1String.length, printedDecl);
   }
   printed.push(join(" ", [...pt1, printedDecl]));
-  
+
   printed.push(printSuffixComments(node, path, options, printChildren));
 
   if (shouldPrintSemi) {
@@ -62,7 +62,6 @@ export const printVarDecl: PrintNodeFunction<
       printed.push(hardline);
     }
   }
-
 
   return printed;
 };

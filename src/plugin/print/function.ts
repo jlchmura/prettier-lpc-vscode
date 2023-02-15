@@ -1,9 +1,10 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { CodeBlockNode } from "../../nodeTypes/codeBlock";
 import { FunctionDeclarationNode } from "../../nodeTypes/functionDeclaration";
 import { ParentExpressionNode } from "../../nodeTypes/memberExpression";
 import { ReturnNode } from "../../nodeTypes/returnNode";
+import { printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -43,7 +44,16 @@ export const printFunction: PrintNodeFunction<FunctionDeclarationNode> = (
     arr.push("()");
   }
 
-  arr.push(" ", path.call(printChildren, "codeBlock"));
+  if (node.isStub) {
+    arr.push(";");
+    arr.push(printSuffixComments(node, path, options, printChildren));
+
+    if (util.isNextLineEmpty(options.originalText, node, (n) => n?.end)) {
+      arr.push(hardline);
+    }
+  } else {
+    arr.push(" ", path.call(printChildren, "codeBlock"));
+  }
 
   return arr;
 };
