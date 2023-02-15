@@ -6,3 +6,8 @@ export class TypeCastExpressionNode extends LPCNode {
   public dataType: IdentifierNode | undefined;
   public exp: LPCNode | undefined;
 }
+
+export class StructLiteralNode extends LPCNode {
+  public type="struct-literal";
+  public structName: IdentifierNode|undefined;
+}

@@ -3,6 +3,7 @@ import { LPCNode } from "./lpcNode";
 
 export class BaseDeclarationNode extends LPCNode {
   public varType: IdentifierNode | undefined;
+  public structType: IdentifierNode | undefined;
   public modifiers: IdentifierNode[] = [];
 }
 

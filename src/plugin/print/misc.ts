@@ -110,9 +110,27 @@ export const printParenBlock: PrintNodeFunction<
 
   if (node.children.length > 0) {
     const printedChildren = path.map(printChildren, "children");
-    printed.push(
-      group([indent([softline, join([",", line], printedChildren)]), softline])
-    );
+
+    if (node.children[0].type == "struct-literal") {
+      // struct literals are a special case where we don't want a comma
+      // after the first child
+      const arr: Doc = [];
+      printedChildren.forEach((c, idx) => {
+        if (idx > 1) arr.push(",");
+        if (idx > 0) arr.push(line);
+
+        arr.push(c);
+      });
+
+      printed.push(group([indent([softline, arr]), softline]));
+    } else {
+      printed.push(
+        group([
+          indent([softline, join([",", line], printedChildren)]),
+          softline,
+        ])
+      );
+    }
   }
 
   printed.push(")");

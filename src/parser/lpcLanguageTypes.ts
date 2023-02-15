@@ -60,7 +60,7 @@ export enum TokenType {
 
   Switch,
   SwitchCase,
-
+  
   For,
   ForEach,
   ForEachIn,
@@ -79,6 +79,8 @@ export enum TokenType {
   IndexorEnd,
   IndexorFromEndPos,
   IndexorPosSep,
+
+  StructLiteral,
 
   Operator,
   LogicalOperator,

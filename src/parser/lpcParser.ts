@@ -40,7 +40,7 @@ import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
 import { SwitchCaseNode, SwitchNode } from "../nodeTypes/switch";
 import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
-import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
+import { StructLiteralNode, TypeCastExpressionNode } from "../nodeTypes/typeCast";
 import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
 import {
   VariableDeclarationNode,
@@ -192,6 +192,8 @@ export class LPCParser {
       case TokenType.DeclarationName:
       case TokenType.Variable:
         return this.parseMaybeExpression(token, curr, flags);
+      case TokenType.StructLiteral:
+        return this.parseStructLiteral(curr);
       case TokenType.TypeCast:
         return this.parseTypeCast(curr);
       case TokenType.ArrayStart:
@@ -1210,6 +1212,26 @@ export class LPCParser {
     return nd;
   }
 
+
+  private parseStructLiteral(parent: LPCNode) {
+    const nd = new StructLiteralNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    let structName = this.scanner.getTokenText();
+    structName = structName.substring(1, structName.length - 1);
+
+    nd.structName = new IdentifierNode(nd.start + 1, nd.end - 1, [], nd);
+    nd.structName.name = structName;
+    
+    parent.children.push(nd);
+
+    return nd;
+  }
+
   private parseIdentifier(hasStar = false) {
     if (this.scanner.getTokenType() == TokenType.DeclarationName) {
       const identNode = new IdentifierNode(
@@ -1392,6 +1414,8 @@ export class LPCParser {
         t = this.scanner.peek();
       }
 
+      if (!lh) throw Error(`left-hand operator was undefined @ ${this.scanner.getTokenOffset()}`);
+
       let opNode: BinaryishExpressionNode;
       opNode = logical_ops_set.has(op.trim())
         ? new LogicalExpressionNode(lh.start, rh.end, [], parent)
@@ -1424,6 +1448,13 @@ export class LPCParser {
     const modNodes = this.parseModifiers();
     const typeNode = this.parseType();
     const hasStar = this.parseStar();
+        
+    let structTypeNode: IdentifierNode|undefined=undefined;
+    if (typeNode?.name=="struct") {
+      structTypeNode = this.parseIdentifier(false);
+      this.scanner.scan();
+    }
+
     const identNode = this.parseIdentifier(hasStar);
 
     let t: TokenType = this.scanner.peek();
@@ -1444,6 +1475,8 @@ export class LPCParser {
         );
         varDecl.varType = typeNode;
         varDecl.modifiers = modNodes;
+        varDecl.structType = structTypeNode;
+
         parent.children.push(varDecl);
         return this.parseVariableDeclaration(varDecl, parent, identNode);
       } else {
@@ -1469,6 +1502,7 @@ export class LPCParser {
 
         varDecl.varType = typeNode;
         varDecl.modifiers = modNodes;
+        varDecl.structType = structTypeNode;
 
         parent.children.push(varDecl);
 

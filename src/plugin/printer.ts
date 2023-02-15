@@ -40,7 +40,10 @@ import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
 import { SwitchNode } from "../nodeTypes/switch";
 import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
-import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
+import {
+  StructLiteralNode,
+  TypeCastExpressionNode,
+} from "../nodeTypes/typeCast";
 import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
 import {
   VariableDeclarationNode,
@@ -95,6 +98,7 @@ import {
   printParenBlock,
 } from "./print/misc";
 import { PrintChildrenFunction, PrintNodeFunction } from "./print/shared";
+import { printStructLiteral } from "./print/struct";
 import { printTypeCast, printVar, printVarDecl } from "./print/var";
 
 const {
@@ -219,7 +223,10 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
         ...commonPrintArgs
       );
     case "foreach-range-exp":
-      return printForEachRangeStatement(node as ForEachRangeExpressionNode, ...commonPrintArgs);
+      return printForEachRangeStatement(
+        node as ForEachRangeExpressionNode,
+        ...commonPrintArgs
+      );
     case "for":
       return printForStatement(node as ForStatementNode, ...commonPrintArgs);
     case "while":
@@ -257,6 +264,8 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
         node as LambdaEmptyArgNode,
         ...commonPrintArgs
       );
+    case "struct-literal":
+      return printStructLiteral(node as StructLiteralNode, ...commonPrintArgs);
   }
 
   return ["###Printer Unknown Node Type: " + node.type];

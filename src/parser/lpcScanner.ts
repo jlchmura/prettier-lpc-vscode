@@ -292,11 +292,6 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Star);
         }
 
-        // if (this.stream.advanceIfChar(tt._AMP)) {
-        //   this.stream.skipWhitespace();
-        //   return this.finishToken(offset, TokenType.CallByRef);
-        // }
-
         let wrd: string;
         if ((wrd = this.stream.advanceIfModifier())) {
           return this.finishToken(offset, TokenType.Modifier);
@@ -311,6 +306,23 @@ export class Scanner implements IScanner {
         if (this.stream.advanceIfChars(tt._INHERIT)) {
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.Inherit);
+        }
+
+        // STRUCT
+        if (
+          this.stream.peekChar() == tt._LAN &&
+          this.isAlpha(this.stream.peekChar(1))
+        ) {
+          this.stream.advanceIfChar(tt._LAN);
+          if (this.stream.advanceUntilChar(tt._RAN) && this.stream.advanceIfChar(tt._RAN)) {
+            return this.finishToken(offset, TokenType.StructLiteral);
+          }
+
+          return this.finishToken(
+            offset,
+            TokenType.Unknown,
+            "Could not parse struct literal"
+          );
         }
 
         // IF BLOCKS
