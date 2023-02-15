@@ -79,7 +79,7 @@ export const printDirective: PrintNodeFunction<DirectiveNode, DirectiveNode> = (
         indent([
           ifBreak("\\"),
           softline,
-          join([" \\", hardline], path.map(printChildren, "arguments")),
+          join([ifBreak("\\"), line], path.map(printChildren, "arguments")),
         ]),
         softline,
       ])

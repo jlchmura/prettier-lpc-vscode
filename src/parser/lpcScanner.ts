@@ -647,7 +647,8 @@ export class Scanner implements IScanner {
           "Malformed string literal"
         );
       case ScannerState.StartDirective:
-        if (this.stream.advanceIfRegExp(/^\w+\s/)) {
+        const txt = this.stream.remaining_source;
+        if (this.stream.advanceIfRegExp(/^\w+(?:\(\w+\))?\s/)) {
           this.state = ScannerState.WithinDirectiveArg;
           return this.finishToken(offset, TokenType.DirectiveArgument);
         }
@@ -655,7 +656,7 @@ export class Scanner implements IScanner {
       case ScannerState.WithinDirectiveArg:
         this.stream.skipWhitespace(false);
 
-        if (this.stream.advanceIfWord()) {
+        if (this.stream.advanceWhileChar((c) => c != tt._NWL && c != tt._BSL)) {
           this.state = ScannerState.WithinDirectiveArg;
           return this.finishToken(offset, TokenType.DirectiveArgument);
         }

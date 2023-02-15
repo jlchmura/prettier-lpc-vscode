@@ -12,7 +12,7 @@ export class MultiLineStream {
   private len: number;
   private position: number;
   public get remaining_source() {
-    return this.source.substring(this.position - 1);
+    return this.source.substring(this.position);
   }
 
   constructor(source: string, position: number) {
@@ -86,6 +86,7 @@ export class MultiLineStream {
   public advanceIfDirective(): string {
     for (let i = 0; i < directive_chars.length; i++) {
       if (this.advanceIfChars(directive_chars[i])) {
+        this.advanceWhileChar((c) => c == tt._WSP);
         return directives[i] || "";
       }
     }
