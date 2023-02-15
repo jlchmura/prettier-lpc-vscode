@@ -2,6 +2,7 @@ import { Doc } from "prettier";
 import { builders } from "prettier/doc";
 import { InlineCommentNode, CommentBlockNode } from "../../nodeTypes/comment";
 import { LPCNode } from "../../nodeTypes/lpcNode";
+import { last } from "../../utils/arrays";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -34,7 +35,7 @@ export const printCommentBlock: PrintNodeFunction<
   CommentBlockNode
 > = (node, path, options, printChildren) => {
   const printed: Doc = [];
-  const extraLines: Doc = [];
+  const extraLines: string[] = [];
 
   if (node.body) {
     let comStr = (node.body || "").trim();
@@ -51,8 +52,12 @@ export const printCommentBlock: PrintNodeFunction<
         while (l.startsWith("*")) l = l.substring(1).trim();
       }
       if (l.length > 0) hasTextCnt++;
+
       extraLines.push(l);
     });
+
+    // trim blank lines from the end
+    while (last(extraLines)?.length == 0) extraLines.pop();
 
     if (hasTextCnt == 1) {
       // collapse to single line
