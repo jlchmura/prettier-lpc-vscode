@@ -1645,8 +1645,9 @@ export class LPCParser {
         this.scanner.scan();
         fd.end = this.scanner.getTokenOffset();
 
-        this.eatWhitespaceAndNewlines();
+        this.eatWhitespace();
         this.tryParseComment(fd);
+        this.eatWhitespaceAndNewlines();
 
         fd.isStub = true;
 
