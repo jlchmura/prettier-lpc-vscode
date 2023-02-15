@@ -5,6 +5,7 @@ import { ParenBlockNode } from "../../nodeTypes/parenBlock";
 import { SwitchNode } from "../../nodeTypes/switch";
 import { TernaryExpressionNode } from "../../nodeTypes/ternaryExpression";
 import { last } from "../../utils/arrays";
+import { printCommentBlock } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -42,7 +43,13 @@ export const printSwitch: PrintNodeFunction<SwitchNode, SwitchNode> = (
   const lastStatement = last(node.cases);
   path.each((casePath) => {
     const c = casePath.getNode();
+
     const isLast = c == lastStatement;
+    if (c?.type.startsWith("comment")) {
+      cases.push(printChildren(casePath), hardline);
+      return;
+    }
+
     cases.push("case ", casePath.call(printChildren, "expression"), ":");
 
     casePath.call((childPath) => {

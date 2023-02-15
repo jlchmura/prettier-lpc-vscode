@@ -1,7 +1,7 @@
 import { LPCNode } from "./lpcNode";
 
 export class CommentNode extends LPCNode {
-  public type = "comment";  
+  public type = "comment";
 }
 
 export class CommentBlockNode extends CommentNode {
@@ -9,5 +9,5 @@ export class CommentBlockNode extends CommentNode {
 }
 
 export class InlineCommentNode extends CommentNode {
-  public type = "comment-singleline";  
+  public type = "comment-singleline";
 }

@@ -453,17 +453,8 @@ export class LPCParser {
     ) {
       //binary expr
       lh = this.parsePrecedenceClimber(lh, parent, 0);
-      // this.scanner.scan();
-      // lh = this.parseBinaryExpression(lh, parent);
       this.eatWhitespaceAndNewlines();
       tt = this.scanner.peek();
-      // } else if (tt == TokenType.LogicalOperator) {
-      //   this.scanner.scan();
-      //   const leNode = this.parseLogicalExpression(
-      //     lh,
-      //     ParseExpressionFlag.StatementOnly
-      //   );
-      //   return leNode;
     } else if (tt == TokenType.Arrow) {
       // an arrow can come after a string literal
       // the string is interpreted as an object
@@ -2028,7 +2019,17 @@ export class LPCParser {
     while (this.scanner.scan() != TokenType.CodeBlockEnd) {
       const t = this.scanner.getTokenType();
       if (t == TokenType.EOS) throw Error("Unexpected EOS in switch case");
-      if (t == TokenType.SwitchCase) {
+      if (t == TokenType.Whitespace || t == TokenType.BlankLines) {
+        continue;
+      }
+      if (t == TokenType.Comment || t == TokenType.StartCommentBlock) {
+        const cmt = this.parseToken(
+          t,
+          switchNode,
+          ParseExpressionFlag.StatementOnly
+        ) as CommentBlockNode;
+        switchNode.cases.push(cmt);
+      } else if (t == TokenType.SwitchCase) {
         const caseNode = new SwitchCaseNode(
           this.scanner.getTokenOffset(),
           this.scanner.getTokenEnd(),
@@ -2046,8 +2047,32 @@ export class LPCParser {
             ParseExpressionFlag.StatementOnly
           );
           this.eatWhitespace();
-          if (this.scanner.scan() != TokenType.Colon)
+
+          if (this.scanner.scan() == TokenType.IndexorPosSep) {
+            const rng = new ForEachRangeExpressionNode(
+              caseNode.expression!.start,
+              this.scanner.getTokenOffset(),
+              [],
+              caseNode
+            );
+            rng.left = caseNode.expression;
+
+            this.eatWhitespace();
+            rng.right = this.parseToken(
+              this.scanner.scan(),
+              rng,
+              ParseExpressionFlag.StatementOnly
+            );
+
+            rng.end = rng.right!.end;
+            caseNode.expression = rng;
+
+            this.scanner.scan();
+          }
+
+          if (this.scanner.getTokenType() != TokenType.Colon)
             throw Error(`Expected colon at ${this.scanner.getTokenOffset()}`);
+
           this.eatWhitespace();
           this.tryParseComment(caseNode);
         }
