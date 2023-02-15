@@ -43,29 +43,45 @@ export const printCommentBlock: PrintNodeFunction<
     comStr = comStr.substring(0, comStr.length - 3); //remove closing */
     const lines = comStr.split("\n");
 
-    printed.push("/* ");
+    printed.push("/*");
     let hasTextCnt = 0;
+
+    let lineSep = "";
+    const isFormated = lines.every((l, lIdx) => {
+      return lIdx == 0 || lIdx == lines.length - 1 || l.startsWith(" *");
+    });
+
     lines.forEach((l, lIdx) => {
-      l = l.trim();
-      // anythign over 4 stars we'll consider a headline and leave
-      if (!l.startsWith("****")) {
-        while (l.startsWith("*")) l = l.substring(1).trim();
+      if (!isFormated) {
+        if (lIdx == 0) printed.push(" ");
+
+        lineSep = " * ";
+        l = l.trim();
+
+        // anythign over 4 stars we'll consider a headline and leave
+        if (!l.startsWith("****")) {
+          while (l.startsWith("*")) l = l.substring(1).trim();
+        }
       }
       if (l.length > 0) hasTextCnt++;
 
       extraLines.push(l);
     });
 
-    // trim blank lines from the end
-    while (last(extraLines)?.length == 0) extraLines.pop();
-
     if (hasTextCnt == 1) {
       // collapse to single line
       printed.push(...extraLines);
     } else {
       // use multi-line
-      printed.push(join([hardline, " * "], extraLines));
-      printed.push(hardline);
+      extraLines.forEach((el, idx) => {
+        if (idx == extraLines.length - 1 && el.trim().length == 0)
+          printed.push(hardline);
+        else if (idx > 0) {
+          printed.push([hardline, lineSep]);
+        }
+
+        printed.push(el);
+      });
     }
   }
 
