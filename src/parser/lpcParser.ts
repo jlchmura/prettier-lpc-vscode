@@ -1451,7 +1451,7 @@ export class LPCParser {
     t = this.scanner.peek();
     while (
       this.isBinaryOp(t) &&
-      op_precedence[(op = this.scanner.getTokenText().trim())] > minPrec
+      op_precedence[(op = this.scanner.getTokenText().trim())] >= minPrec
     ) {
       t = this.scanner.scan(); // consume operator
       const prec = op_precedence[op];
