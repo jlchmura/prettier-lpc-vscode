@@ -171,9 +171,10 @@ export const modifiers_set = new Set(
 export const directives = [
   "include",
   "define",
-  "if",
   "ifdef",
   "ifndef",
+  // must come after other if* directives
+  "if",
   "else",
   "elif",
   "endif",
