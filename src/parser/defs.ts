@@ -82,6 +82,7 @@ export const assignment_ops = [
   "&&=",
   "||=",
   "++",
+  "--"  
 ].map((o) => o.split("").map((c) => c.charCodeAt(0)));
 
 export const arrith_ops = ["+", "-", "*", "/", "!", "&", "|"].map((o) =>
