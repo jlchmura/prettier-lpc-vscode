@@ -5,15 +5,20 @@ import { TokenType } from "./lpcLanguageTypes";
 
 import {
   ArrayExpressionNode,
-  IndexorExpressionNode,
+  IndexorExpressionNode
 } from "../nodeTypes/arrayExpression";
 import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
 import {
   BinaryExpressionNode,
-  BinaryishExpressionNode,
+  BinaryishExpressionNode
 } from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
 import { CallExpressionNode } from "../nodeTypes/callExpression";
+import {
+  ClosureNode,
+  InlineClosureArgumentNode,
+  InlineClosureNode
+} from "../nodeTypes/closure";
 import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
 import { ControlFlowStatementNode } from "../nodeTypes/controlFlowStatement";
@@ -21,52 +26,43 @@ import { DirectiveNode } from "../nodeTypes/directive";
 import {
   ForEachRangeExpressionNode,
   ForEachStatementNode,
-  ForStatementNode,
+  ForStatementNode
 } from "../nodeTypes/forStatement";
 import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
 import { InheritNode } from "../nodeTypes/inherit";
+import {
+  LambdaEmptyArgNode,
+  LambdaIndexorNode,
+  LambdaNode
+} from "../nodeTypes/lambda";
 import { LiteralNode } from "../nodeTypes/literal";
 import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import {
   MappingExpressionNode,
-  MappingPair,
+  MappingPair
 } from "../nodeTypes/mappingExpression";
 import {
   MemberExpressionNode,
-  ParentExpressionNode,
+  ParentExpressionNode
 } from "../nodeTypes/memberExpression";
 import { ParenBlockNode } from "../nodeTypes/parenBlock";
 import { ReturnNode } from "../nodeTypes/returnNode";
+import { StructDefinitionNode, StructLiteralNode } from "../nodeTypes/struct";
 import { SwitchCaseNode, SwitchNode } from "../nodeTypes/switch";
 import { TernaryExpressionNode } from "../nodeTypes/ternaryExpression";
 import { TypeCastExpressionNode } from "../nodeTypes/typeCast";
 import { UnaryPrefixExpressionNode } from "../nodeTypes/unaryPrefixExpression";
 import {
   VariableDeclarationNode,
-  VariableDeclaratorNode,
+  VariableDeclaratorNode
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
 import {
-  binary_ops,
-  logical_ops,
   logical_ops_set,
-  op_precedence,
-  tt,
-  unary_ops_set,
+  op_precedence, unary_ops_set
 } from "./defs";
 import { Scanner } from "./lpcScanner";
-import {
-  ClosureNode,
-  InlineClosureArgumentNode,
-  InlineClosureNode,
-} from "../nodeTypes/closure";
-import {
-  LambdaEmptyArgNode,
-  LambdaIndexorNode,
-  LambdaNode,
-} from "../nodeTypes/lambda";
-import { StructDefinitionNode, StructLiteralNode } from "../nodeTypes/struct";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -1902,7 +1898,7 @@ export class LPCParser {
     }
 
     if (stack.length > 3)
-      throw Error("Unexpected stack size in for statement " + stack.length);
+      throw Error(`Unexpected stack size [${stack.length}] in for statement @ ${this.scanner.getTokenOffset()}`);
     while (stack.length < 3) stack.push(undefined);
 
     // assign stack to for
