@@ -982,7 +982,7 @@ export class LPCParser {
   private parseArrow(
     parent: LPCNode,
     id: IdentifierNode | LiteralNode | CallExpressionNode | ParenBlockNode
-  ): CallExpressionNode {
+  ): CallExpressionNode | MemberExpressionNode {
     // an arrow is a member expression inside a call expression
     const nd = new MemberExpressionNode(
       this.scanner.getTokenOffset(),
@@ -990,16 +990,30 @@ export class LPCParser {
       [],
       parent
     );
-    //parent.children.push(nd);
 
     nd.object = id;
 
     this.eatWhitespaceAndNewlines();
-    const t = this.scanner.scan();
+    let t = this.scanner.scan();
+
+    if (t == TokenType.ParenBlock) {
+      // next token should be an expression that is the property of a struct member
+      t = this.scanner.scan();
+      const exp = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
+      nd.property = exp;
+      nd.isStruct = true;
+      if (this.scanner.scan() != TokenType.ParenBlockEnd)
+        throw Error(
+          `Expected paren block end after struct member @ ${this.scanner.getTokenOffset()}`
+        );
+      return nd;
+    }
+
     if (t != TokenType.DeclarationName)
       throw Error(
         `unexpected token after arrow @ ${this.scanner.getTokenOffset()}`
       );
+
     const idNd = new IdentifierNode(
       this.scanner.getTokenOffset(),
       this.scanner.getTokenEnd(),
@@ -1010,10 +1024,12 @@ export class LPCParser {
     nd.property = idNd;
 
     this.eatWhitespace();
-    if (this.scanner.peek() != TokenType.ParenBlock)
-      throw Error(
-        `unexpected token after arrow property @ ${this.scanner.getTokenOffset()}`
-      );
+
+    // if next token is not a paren block, then this is a member expression from a struct
+    if (this.scanner.peek() != TokenType.ParenBlock) {
+      nd.isStruct = true;
+      return nd;
+    }
 
     // arguments (paren block) get parsed by call expression
     return this.parseCallExpression(parent, nd);

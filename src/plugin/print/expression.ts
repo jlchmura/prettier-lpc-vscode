@@ -3,7 +3,7 @@ import { builders } from "prettier/doc";
 import { AssignmentExpressionNode } from "../../nodeTypes/assignmentExpression";
 import {
   BinaryExpressionNode,
-  BinaryishExpressionNode,
+  BinaryishExpressionNode
 } from "../../nodeTypes/binaryExpression";
 import { CallExpressionNode } from "../../nodeTypes/callExpression";
 import { LogicalExpressionNode } from "../../nodeTypes/logicalExpression";
@@ -11,7 +11,7 @@ import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
 import { UnaryPrefixExpressionNode } from "../../nodeTypes/unaryPrefixExpression";
 import { pushIfVal } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
-import { PrintNodeFunction, needsSemi, isInParen } from "./shared";
+import { isInParen, needsSemi, PrintNodeFunction } from "./shared";
 
 const {
   group,
@@ -139,36 +139,6 @@ export const printBinaryExpression: PrintNodeFunction<
   BinaryExpressionNode
 > = (node, path, options, printChildren) => {
   return printBinaryishExpression(node, path, options, printChildren);
-  // const printed: Doc = [];
-
-  // if (node.left) printed.push(path.call(printChildren, "left"));
-  // printed.push(" ", node.operator || "");
-
-  // const isNestedExp = path.match(
-  //   (n) => n.type == "binary-exp",
-  //   (n) => n.type == "binary-exp"
-  // );
-
-  // // if this returns to an assignment-exp
-  // // or if this is the only binary exp in an call-exp or array member
-  // // then indentation is not needed
-  // const skipIndent = path.match(
-  //   (n) => n.type == "binary-exp",
-  //   (n, nm, idx) =>
-  //     n.type == "assignment-exp" ||
-  //     (!!nm && Array.isArray(n[nm]) && n[nm].length == 1)
-  // );
-
-  // if (node.right) {
-  //   const rightPrinted = [line, path.call(printChildren, "right")];
-  //   if (isNestedExp || skipIndent) {
-  //     printed.push(rightPrinted);
-  //   } else {
-  //     printed.push(indent(rightPrinted));
-  //   }
-  // }
-
-  // return group(printed);
 };
 
 export const printLogicalExpression: PrintNodeFunction<
@@ -176,37 +146,30 @@ export const printLogicalExpression: PrintNodeFunction<
   LogicalExpressionNode
 > = (node, path, options, printChildren) => {
   return printBinaryishExpression(node, path, options, printChildren);
-  // const printed: Doc = [];
-  // const printedLeft: Doc[] = [];
-
-  // if (node.left) printedLeft.push(path.call(printChildren, "left"));
-  // printedLeft.push(" ", node.operator || "");
-  // printed.push(group(printedLeft));
-
-  // if (node.right) {
-  //   const rightPrinted = [line, group([path.call(printChildren, "right")])];
-  //   printed.push(rightPrinted);
-  // }
-
-  // return group(printed);
 };
 
 export const printMemberExpression: PrintNodeFunction<
   MemberExpressionNode,
   MemberExpressionNode
 > = (node, path, options, printChildren) => {
+  const { object, property } = node;
   const printed: Doc = [];
 
-  if (node.object) printed.push(path.call(printChildren, "object"));
-  if (node.property?.type == "indexor-exp") {
+  if (object) printed.push(path.call(printChildren, "object"));
+  if (property?.type == "indexor-exp") {
     printed.push(
       "[",
       group([softline, path.call(printChildren, "property"), softline]),
       "]"
     );
   } else {
-    if (node.object) printed.push("->");
-    if (node.property) printed.push(path.call(printChildren, "property"));
+    if (object) printed.push("->");
+    if (property) {
+      const propPrinted = path.call(printChildren, "property");
+      if (property.type == "identifier" || property.type == "indexor-exp")
+        printed.push(propPrinted);
+      else printed.push("(", propPrinted, ")"); // struct member expression
+    }
   }
 
   if (node.arguments) {
