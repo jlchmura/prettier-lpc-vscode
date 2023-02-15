@@ -651,7 +651,7 @@ export class Scanner implements IScanner {
         );
       case ScannerState.StartDirective:
         const txt = this.stream.remaining_source;
-        if (this.stream.advanceIfRegExp(/^\w+(?:\(\w+\))?\s/)) {
+        if (this.stream.advanceIfRegExp(/^\w+(?:\(\w+\))?/)) {
           this.state = ScannerState.WithinDirectiveArg;
           return this.finishToken(offset, TokenType.DirectiveArgument);
         }

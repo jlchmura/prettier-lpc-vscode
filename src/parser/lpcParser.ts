@@ -798,6 +798,7 @@ export class LPCParser {
     nd.directiveType = new IdentifierNode(nd.start, nd.end, [], parent);
     nd.directiveType.name = this.scanner.getTokenText().trim();
 
+    if (nd.directiveType.name == "#if") debugger;
     this.eatWhitespace();
 
     let t: TokenType,
