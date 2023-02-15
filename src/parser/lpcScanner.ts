@@ -5,7 +5,7 @@ import {
   binary_ops,
   logical_ops,
   tt,
-  typesSet
+  typesSet,
 } from "./defs";
 import { ScannerState, TokenType } from "./lpcLanguageTypes";
 import { MultiLineStream } from "./MultiLineStream";
@@ -291,47 +291,6 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Star);
         }
 
-        let wrd: string;
-        if ((wrd = this.stream.advanceIfModifier())) {
-          return this.finishToken(offset, TokenType.Modifier);
-        }
-        if ((wrd = this.stream.advanceIfType())) {
-          return this.finishToken(offset, TokenType.Type);
-        }
-        if ((wrd = this.nextWord())) {
-          return this.finishToken(offset, TokenType.DeclarationName);
-        }
-
-        if (this.stream.advanceIfChars(tt._INHERIT)) {
-          this.state = ScannerState.WithinFile;
-          return this.finishToken(offset, TokenType.Inherit);
-        }
-
-        // STRUCT
-        if (
-          this.stream.peekChar() == tt._LAN &&
-          this.isAlpha(this.stream.peekChar(1)) && 
-          this.stream.advanceIfRegExp(/^\<\w+\>/)
-        ) {          
-            return this.finishToken(offset, TokenType.StructLiteral);          
-        }
-
-        // IF BLOCKS
-        if (this.stream.advanceIfChars(tt._IF)) {
-          this.state = ScannerState.IfExpression;
-          return this.finishToken(offset, TokenType.If);
-        }
-        if (this.stream.advanceIfChars(tt._ELSEIF)) {
-          this.state = ScannerState.ElseIfExpression;
-          return this.finishToken(offset, TokenType.ElseIf);
-        }
-        if (this.stream.advanceIfChars(tt._ELSE)) {
-          this.state = ScannerState.ElseExpression;
-          return this.finishToken(offset, TokenType.Else);
-        }
-
-        // LOOPS
-
         // FOREACH
         if (this.stream.advanceIfChars(tt._FOREACH)) {
           this.stream.skipWhitespace();
@@ -347,9 +306,9 @@ export class Scanner implements IScanner {
         }
         // foreach : or "in"
         if (
-          (this.testParenStack(TokenType.ForEach) &&
-            this.stream.advanceIfChar(tt._COL)) ||
-          this.stream.advanceIfChars(tt._IN)
+          this.testParenStack(TokenType.ForEach) &&
+          (this.stream.advanceIfChar(tt._COL) ||
+            this.stream.advanceIfChars(tt._IN))
         ) {
           this.stream.skipWhitespace();
           return this.finishToken(offset, TokenType.ForEachIn);
@@ -372,6 +331,47 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.ParenBlockEnd);
         }
 
+        // WORDS: MODIFIERS, TYPES, AND DECLARATIONS
+        let wrd: string;
+        if ((wrd = this.stream.advanceIfModifier())) {
+          return this.finishToken(offset, TokenType.Modifier);
+        }
+        if ((wrd = this.stream.advanceIfType())) {
+          return this.finishToken(offset, TokenType.Type);
+        }
+        if ((wrd = this.nextWord())) {
+          return this.finishToken(offset, TokenType.DeclarationName);
+        }
+
+        if (this.stream.advanceIfChars(tt._INHERIT)) {
+          this.state = ScannerState.WithinFile;
+          return this.finishToken(offset, TokenType.Inherit);
+        }
+
+        // STRUCT
+        if (
+          this.stream.peekChar() == tt._LAN &&
+          this.isAlpha(this.stream.peekChar(1)) &&
+          this.stream.advanceIfRegExp(/^\<\w+\>/)
+        ) {
+          return this.finishToken(offset, TokenType.StructLiteral);
+        }
+
+        // IF BLOCKS
+        if (this.stream.advanceIfChars(tt._IF)) {
+          this.state = ScannerState.IfExpression;
+          return this.finishToken(offset, TokenType.If);
+        }
+        if (this.stream.advanceIfChars(tt._ELSEIF)) {
+          this.state = ScannerState.ElseIfExpression;
+          return this.finishToken(offset, TokenType.ElseIf);
+        }
+        if (this.stream.advanceIfChars(tt._ELSE)) {
+          this.state = ScannerState.ElseExpression;
+          return this.finishToken(offset, TokenType.Else);
+        }
+
+        // LOOPS
         if (this.stream.advanceIfChars(tt._FOR)) {
           return this.finishToken(offset, TokenType.For);
         }
