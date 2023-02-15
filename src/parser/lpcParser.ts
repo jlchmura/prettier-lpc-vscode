@@ -1575,7 +1575,11 @@ export class LPCParser {
 
         // get next token & parse the init expression
         t = this.scanner.scan();
-        const initExp = this.parseToken(t, varDecl, ParseExpressionFlag.StatementOnly);
+        const initExp = this.parseToken(
+          t,
+          varDecl,
+          ParseExpressionFlag.StatementOnly
+        );
 
         return this.parseVariableDeclaration(
           varDecl,
@@ -1686,8 +1690,15 @@ export class LPCParser {
       )
         continue;
 
-      pushIfVal(children, this.parseToken(t, nd));
-      this.eatWhitespace();
+      const elToken = this.parseToken(t, nd);
+      if (elToken) {
+        // eat whitespace & comma in case there is a suffix comment
+        this.eatWhitespace();
+        this.scanner.eat(TokenType.Comma);
+        this.tryParseComment(elToken);
+        
+        children.push(elToken);
+      }
     }
 
     nd.elements = children;

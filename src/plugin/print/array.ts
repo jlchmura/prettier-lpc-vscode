@@ -64,7 +64,7 @@ export const printArray: PrintNodeFunction<
       ])
     );
   }
-  //printed.push(ifBreak(hardline, "", { groupId: groupId }), dedent("})"));
+  
   printed.push(ifBreak("", ""), dedent("})"));
 
   // fill will cause nested arrays to inline if possible
