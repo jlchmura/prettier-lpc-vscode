@@ -5,7 +5,7 @@ import {
   binary_ops,
   logical_ops,
   tt,
-  typesSet,
+  typesSet
 } from "./defs";
 import { ScannerState, TokenType } from "./lpcLanguageTypes";
 import { MultiLineStream } from "./MultiLineStream";
@@ -310,21 +310,10 @@ export class Scanner implements IScanner {
         // STRUCT
         if (
           this.stream.peekChar() == tt._LAN &&
-          this.isAlpha(this.stream.peekChar(1))
-        ) {
-          this.stream.advanceIfChar(tt._LAN);
-          if (
-            this.stream.advanceUntilChar(tt._RAN) &&
-            this.stream.advanceIfChar(tt._RAN)
-          ) {
-            return this.finishToken(offset, TokenType.StructLiteral);
-          }
-
-          return this.finishToken(
-            offset,
-            TokenType.Unknown,
-            "Could not parse struct literal"
-          );
+          this.isAlpha(this.stream.peekChar(1)) && 
+          this.stream.advanceIfRegExp(/^\<\w+\>/)
+        ) {          
+            return this.finishToken(offset, TokenType.StructLiteral);          
         }
 
         // IF BLOCKS
