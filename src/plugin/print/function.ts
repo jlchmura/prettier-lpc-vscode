@@ -58,7 +58,9 @@ export const printReturn: PrintNodeFunction<ReturnNode, ReturnNode> = (
 
   if (node.argument) {
     printed.push(" ");
-    printed.push(group([indent([softline,path.call(printChildren, "argument"),";"])]));
+    printed.push(
+      group([indent([softline, path.call(printChildren, "argument"), ";"])])
+    );
   } else {
     printed.push(";");
   }
