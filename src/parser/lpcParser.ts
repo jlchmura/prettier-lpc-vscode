@@ -1206,7 +1206,12 @@ export class LPCParser {
     );
 
     let typeName = this.scanner.getTokenText();
-    typeName = typeName.substring(1, typeName.length - 1);
+    typeName = typeName.substring(1, typeName.length - 1).trim();
+
+    if (typeName.endsWith("*")) {
+      typeName = typeName.replace("*", "").trim();
+      nd.isArray = true;
+    }
 
     nd.dataType = new IdentifierNode(nd.start + 1, nd.end - 1, [], nd);
     nd.dataType.name = typeName;
@@ -1214,6 +1219,7 @@ export class LPCParser {
     // get the next token and parse it as the type cast's expression
     this.eatWhitespace();
     nd.exp = this.parseToken(this.scanner.scan(), nd);
+    // ntbla: validate the expression type
 
     parent.children.push(nd);
 

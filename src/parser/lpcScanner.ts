@@ -25,6 +25,7 @@ export interface IScanner {
 
 export const skipWhiteSpace = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g;
 export const word = /[a-zA-Z][\w]*/g;
+export const typeCastWord = /[a-zA-Z][\w]*\s*\*?\s*\)/g;
 
 export class Scanner implements IScanner {
   readonly stateStack: ScannerState[] = [];
@@ -89,7 +90,14 @@ export class Scanner implements IScanner {
   public peekWord(): string | undefined {
     word.lastIndex = this.stream.pos();
     const match = word.exec(this.input);
-    if (!!match) return match[0];
+    if (!!match && match.index == this.stream.pos()) return match[0];
+    else return undefined;
+  }
+
+  public peekTypeCastWord(): string | undefined {
+    typeCastWord.lastIndex = this.stream.pos();
+    const match = typeCastWord.exec(this.input);
+    if (!!match && match.index == this.stream.pos()) return match[0];
     else return undefined;
   }
 
@@ -467,22 +475,16 @@ export class Scanner implements IScanner {
         }
 
         if (this.stream.advanceIfChar(tt._OPP)) {
-          // first check if its a type cast
-          const nextWord = this.peekWord();
-          if (
-            !!nextWord &&
-            typesSet.has(nextWord) &&
-            this.stream.peekChar(nextWord.length) == tt._CLP
-          ) {
+          this.stream.skipWhitespace();
+          // first check if its a type cast          
+          const nextWord = this.peekTypeCastWord();
+          word.lastIndex = 0;
+          const typeWord = nextWord ? word.exec(nextWord)?.[0] : undefined;
+
+          if (!!nextWord && !!typeWord && typesSet.has(typeWord)) {
             this.stream.advance(nextWord.length);
-            if (this.stream.advanceIfChar(tt._CLP))
-              return this.finishToken(offset, TokenType.TypeCast);
-            else
-              return this.finishToken(
-                offset,
-                TokenType.Unknown,
-                "Malfored type cast"
-              );
+
+            return this.finishToken(offset, TokenType.TypeCast);
           }
 
           // (
