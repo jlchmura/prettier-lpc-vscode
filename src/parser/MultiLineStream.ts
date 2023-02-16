@@ -80,7 +80,7 @@ export class MultiLineStream {
   }
 
   public advanceIfWord(): string {
-    return this.advanceIfRegExp(/^(?!return\s)[a-zA-Z][\w]*/);
+    return this.advanceIfRegExp(/^(?!return\s)[_a-zA-Z][\w]*/);
   }
 
   public advanceIfDirective(): string {
@@ -104,7 +104,7 @@ export class MultiLineStream {
   }
 
   public advanceIfWordWithTest(test: (matches: RegExpMatchArray) => boolean) {
-    const reg = /^[a-zA-Z][\w_]*\b/;
+    const reg = /^[_a-zA-Z][\w_]*\b/;
     const str = this.source.substring(this.position);
     const match = str.match(reg);
     if (match && test(match)) {

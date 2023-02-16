@@ -959,7 +959,7 @@ export class LPCParser {
 
     this.eatWhitespace();
     if (this.scanner.peek() != TokenType.ParenBlock)
-      throw "unexpected token after :: property";
+      throw Error(`unexpected token after :: property @ ${this.scanner.getTokenOffset()}`);
 
     // arguments (paren block) get parsed by call expression
     return this.parseCallExpression(parent, nd);
