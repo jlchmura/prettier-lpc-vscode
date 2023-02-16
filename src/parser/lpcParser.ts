@@ -140,6 +140,7 @@ export class LPCParser {
       case TokenType.EOS:
         return undefined;
       case TokenType.Semicolon:
+        this.eatWhitespaceAndNewlines();
         return undefined;
       case TokenType.BlankLines:
         return this.parseBlankLink(curr);
@@ -643,7 +644,7 @@ export class LPCParser {
               [],
               nd
             );
-            nd.consequent.body=";";
+            nd.consequent.body = ";";
             this.tryParseComment(nd.consequent);
           } else {
             // semi is part of consequent stmt so parse and add it there.
@@ -1163,6 +1164,9 @@ export class LPCParser {
       exp,
       ParseExpressionFlag.StatementOnly
     );
+
+    exp.start = exp.left!.start;
+    exp.end = exp.right!.end;
 
     return exp;
   }
@@ -1720,6 +1724,10 @@ export class LPCParser {
     }
 
     nd.elements = children;
+
+    nd.end = this.scanner.stream.pos();
+    //this.eatWhitespaceAndNewlines();
+
     return nd;
   }
 
@@ -2040,9 +2048,10 @@ export class LPCParser {
       const t = this.scanner.getTokenType();
       if (t == TokenType.EOS) throw Error("Unexpected EOS in switch case");
       if (t == TokenType.Whitespace || t == TokenType.BlankLines) {
+        // WHITESPACE/BLANKLINE
         continue;
-      }
-      if (t == TokenType.Comment || t == TokenType.StartCommentBlock) {
+      } else if (t == TokenType.Comment || t == TokenType.StartCommentBlock) {
+        // COMMENT
         const cmt = this.parseToken(
           t,
           switchNode,
@@ -2050,6 +2059,7 @@ export class LPCParser {
         ) as CommentBlockNode;
         switchNode.cases.push(cmt);
       } else if (t == TokenType.SwitchCase) {
+        // SWITCH CASE
         const caseNode = new SwitchCaseNode(
           this.scanner.getTokenOffset(),
           this.scanner.getTokenEnd(),
@@ -2117,6 +2127,23 @@ export class LPCParser {
     const children: LPCNode[] = [];
     while (this.scanner.peek()) {
       const t = this.scanner.getTokenType();
+      if (t == TokenType.Whitespace || t == TokenType.BlankLines) {
+        this.scanner.scan();
+        continue;
+      }
+      // if (t == TokenType.Semicolon) {
+      //   this.scanner.scan();
+      //   this.eatWhitespaceAndNewlines();
+      //   continue;
+      // }
+      // if (t == TokenType.BlankLines) {
+      //   this.scanner.scan();
+      //   const bl = new BlankLinkNode(this.scanner.getTokenOffset(), this.scanner.getTokenEnd(), [], cb);
+      //   this.tryParseComment(bl);
+
+      //   children.push(bl);
+      //   continue;
+      // }
       if (t == TokenType.CodeBlockEnd || t == TokenType.SwitchCase) {
         break; // this is handled by parent
       }

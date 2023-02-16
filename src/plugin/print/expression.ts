@@ -1,12 +1,13 @@
-import { Doc, util } from "prettier";
+import { AstPath, Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { AssignmentExpressionNode } from "../../nodeTypes/assignmentExpression";
 import {
   BinaryExpressionNode,
-  BinaryishExpressionNode
+  BinaryishExpressionNode,
 } from "../../nodeTypes/binaryExpression";
 import { CallExpressionNode } from "../../nodeTypes/callExpression";
 import { LogicalExpressionNode } from "../../nodeTypes/logicalExpression";
+import { LPCNode } from "../../nodeTypes/lpcNode";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
 import { UnaryPrefixExpressionNode } from "../../nodeTypes/unaryPrefixExpression";
 import { pushIfVal } from "../../utils/arrays";
@@ -103,7 +104,12 @@ export const printAssignmentExpression: PrintNodeFunction<
   }
 
   const printSemi = needsSemi(path);
-  if (printSemi) printed.push(";");
+  if (printSemi) {
+    printed.push(";");
+    if (util.isNextLineEmpty(options.originalText, node, (n) => n.end)) {
+      printed.push(hardline);
+    }
+  }
 
   pushIfVal(printed, printSuffixComments(node, path, options, printChildren));
 
@@ -156,7 +162,7 @@ export const printMemberExpression: PrintNodeFunction<
   const printed: Doc = [];
 
   if (object) printed.push(path.call(printChildren, "object"));
-  
+
   if (property?.type == "indexor-exp") {
     printed.push(
       "[",

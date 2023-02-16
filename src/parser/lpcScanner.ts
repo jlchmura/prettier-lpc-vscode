@@ -160,7 +160,7 @@ export class Scanner implements IScanner {
       case tt._AMP:
       case tt._PLS:
       case tt._MNS:
-      case tt._FSL:        
+      case tt._FSL:
       case tt._STR:
       case tt._PCT:
         if (binary_ops.some((op) => this.stream.advanceIfChars(op))) {
@@ -477,7 +477,7 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._OPP)) {
           this.stream.skipWhitespace();
-          // first check if its a type cast          
+          // first check if its a type cast
           const nextWord = this.peekTypeCastWord();
           word.lastIndex = 0;
           const typeWord = nextWord ? word.exec(nextWord)?.[0] : undefined;
@@ -537,7 +537,7 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._SEM)) {
           // ;
-          this.stream.skipWhitespace(false);
+          this.stream.skipWhitespace();
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.Semicolon);
         }

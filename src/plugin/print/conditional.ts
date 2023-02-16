@@ -72,7 +72,7 @@ export const printSwitch: PrintNodeFunction<SwitchNode, SwitchNode> = (
         indent([
           hardline,
           "default:",
-          indent([join(hardline, childrenPrinted)]),
+          indent([hardline, join(hardline, childrenPrinted)]),
         ]),
         hardline
       );
