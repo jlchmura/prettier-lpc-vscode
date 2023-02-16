@@ -620,7 +620,10 @@ export class LPCParser {
 
     let t: TokenType;
     while (!nd.closed && (t = this.scanner.scan())) {
-      if (t == TokenType.EOS) throw "could not find consequent";
+      if (t == TokenType.EOS)
+        throw Error(
+          `Could not find consequent @ ${this.scanner.getTokenOffset()}`
+        );
       switch (t) {
         case TokenType.BlankLines:
         case TokenType.Whitespace:
@@ -632,7 +635,10 @@ export class LPCParser {
           nd.closed = true;
           break;
         case TokenType.Semicolon:
-          if (!nd.consequent) throw "got semi without consequent";
+          if (!nd.consequent)
+            throw Error(
+              `got semi without consequent @ ${this.scanner.getTokenOffset()}`
+            );
           // semi is part of consequent stmt so parse and add it there.
           this.parseToken(t, nd.consequent);
           nd.closed = true;
@@ -2145,7 +2151,7 @@ export class LPCParser {
       arg.end = lit2.end;
       arg.body = this.scanner.stream.getSource().substring(arg.start, lit2.end);
     }
-    
+
     if (!arg)
       throw Error(
         `Unespected token after closure start @ ${this.scanner.getTokenOffset()}`
