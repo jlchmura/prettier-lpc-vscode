@@ -789,7 +789,6 @@ export class LPCParser {
     nd.directiveType = new IdentifierNode(nd.start, nd.end, [], parent);
     nd.directiveType.name = this.scanner.getTokenText().trim();
 
-    if (nd.directiveType.name == "#if") debugger;
     this.eatWhitespace();
 
     let t: TokenType,
@@ -958,11 +957,12 @@ export class LPCParser {
     nd.property = idNd;
 
     this.eatWhitespace();
-    if (this.scanner.peek() != TokenType.ParenBlock)
-      throw Error(`unexpected token after :: property @ ${this.scanner.getTokenOffset()}`);
-
-    // arguments (paren block) get parsed by call expression
-    return this.parseCallExpression(parent, nd);
+    if (this.scanner.peek() == TokenType.ParenBlock) {
+      // arguments (paren block) get parsed by call expression
+      return this.parseCallExpression(parent, nd);
+    } else {
+      return nd;
+    }
   }
 
   private parseArrow(
@@ -2133,8 +2133,19 @@ export class LPCParser {
       parent
     );
 
-    const tt = this.scanner.scan();
+    let tt = this.scanner.scan();
     const arg = this.parseLiteralInternal(tt, nd);
+
+    if (this.scanner.peek() == TokenType.InheritanceAccessor) {
+      this.scanner.scan(); //consume ::
+      tt = this.scanner.scan(); // get next token
+      const lit2 = this.parseLiteralInternal(tt, nd);
+
+      // combine the two literals
+      arg.end = lit2.end;
+      arg.body = this.scanner.stream.getSource().substring(arg.start, lit2.end);
+    }
+    
     if (!arg)
       throw Error(
         `Unespected token after closure start @ ${this.scanner.getTokenOffset()}`
