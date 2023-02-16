@@ -635,12 +635,18 @@ export class LPCParser {
           nd.closed = true;
           break;
         case TokenType.Semicolon:
-          if (!nd.consequent)
-            throw Error(
-              `got semi without consequent @ ${this.scanner.getTokenOffset()}`
+          if (!nd.consequent) {
+            nd.consequent = new BlankLinkNode(
+              this.scanner.getTokenOffset(),
+              this.scanner.getTokenEnd(),
+              [],
+              nd
             );
-          // semi is part of consequent stmt so parse and add it there.
-          this.parseToken(t, nd.consequent);
+            this.tryParseComment(nd.consequent);
+          } else {
+            // semi is part of consequent stmt so parse and add it there.
+            this.parseToken(t, nd.consequent);
+          }
           nd.closed = true;
           break;
         case TokenType.ParenBlock:
