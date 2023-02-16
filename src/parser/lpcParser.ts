@@ -636,12 +636,14 @@ export class LPCParser {
           break;
         case TokenType.Semicolon:
           if (!nd.consequent) {
-            nd.consequent = new BlankLinkNode(
+            // use a literal node to fake out the printer and get a single semi on this line
+            nd.consequent = new LiteralNode(
               this.scanner.getTokenOffset(),
               this.scanner.getTokenEnd(),
               [],
               nd
             );
+            nd.consequent.body=";";
             this.tryParseComment(nd.consequent);
           } else {
             // semi is part of consequent stmt so parse and add it there.
