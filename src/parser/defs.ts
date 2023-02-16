@@ -30,6 +30,7 @@ export const tt = {
   _PIP: "|".charCodeAt(0),
   _AMP: "&".charCodeAt(0),
   _QUE: "?".charCodeAt(0),
+  _PCT: "%".charCodeAt(0),
   _IN: "in".split("").map((c) => c.charCodeAt(0)),
   _CALLOTHER: "->".split("").map((c) => c.charCodeAt(0)),
   _INHERIT: "inherit".split("").map((c) => c.charCodeAt(0)),
@@ -85,7 +86,7 @@ export const assignment_ops = [
   "--"  
 ].map((o) => o.split("").map((c) => c.charCodeAt(0)));
 
-export const arrith_ops = ["+", "-", "*", "/", "!", "&", "|"].map((o) =>
+export const arrith_ops = ["+", "-", "*", "/", "!", "%", "&", "|"].map((o) =>
   o.split("").map((c) => c.charCodeAt(0))
 );
 

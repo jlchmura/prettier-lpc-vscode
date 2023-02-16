@@ -160,8 +160,9 @@ export class Scanner implements IScanner {
       case tt._AMP:
       case tt._PLS:
       case tt._MNS:
-      case tt._FSL:
+      case tt._FSL:        
       case tt._STR:
+      case tt._PCT:
         if (binary_ops.some((op) => this.stream.advanceIfChars(op))) {
           this.stream.skipWhitespace();
           return TokenType.Operator;
