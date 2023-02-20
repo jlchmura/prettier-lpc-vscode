@@ -1795,7 +1795,7 @@ export class LPCParser {
     let t: TokenType;
     while ((t = this.scanner.scan()) && t != TokenType.MappingEnd) {
       if (t == TokenType.EOS) throw "unexpected eos while parsing array";
-
+      const txt = this.scanner.getTokenText();
       switch (t) {
         case TokenType.Comma:
           // start a new mapping entry
@@ -1814,7 +1814,7 @@ export class LPCParser {
             key = this.parseToken(t, nd);
           } else {
             // new value
-            const newNode = this.parseToken(t, nd);
+            const newNode = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
             if (newNode) val.push(newNode);
           }
       }
