@@ -1636,9 +1636,7 @@ export class LPCParser {
 
       this.eatWhitespaceAndNewlines();
 
-      const fd = new FunctionDeclarationNode(nd.start, nd.end, [], parent);
-      parent.children.push(fd);
-
+      const fd = new FunctionDeclarationNode(nd.start, nd.end, [], parent);      
       fd.id = identNode;
       fd.varType = typeNode;
       fd.modifiers = modNodes;
@@ -1658,6 +1656,7 @@ export class LPCParser {
         this.tryParseComment(fd);
         this.eatWhitespaceAndNewlines();
 
+        parent.children.push(fd);
         return fd;
       }
       if (this.scanner.peek() == TokenType.Semicolon && allowFn) {
@@ -1671,6 +1670,7 @@ export class LPCParser {
 
         fd.isStub = true;
 
+        parent.children.push(fd);
         return fd;
       } else {
         return this.parseCallExpression(

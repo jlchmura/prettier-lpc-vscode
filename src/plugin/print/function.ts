@@ -32,11 +32,11 @@ export const printFunction: PrintNodeFunction<FunctionDeclarationNode> = (
 ) => {
   const arr: Doc = [];
   const { modifiers, varType, id } = node;
-
+  
   if (modifiers.length > 0)
     arr.push(join(" ", path.map(printChildren, "modifiers")), " ");
   if (varType) arr.push(path.call(printChildren, "varType"), " ");
-  arr.push(path.call(printChildren, "id"));
+  if (id) arr.push(path.call(printChildren, "id"));
 
   if (node.params.length > 0) {
     arr.push("(", group(join(", ", path.map(printChildren, "params"))), ")");
