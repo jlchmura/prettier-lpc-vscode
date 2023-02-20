@@ -32,7 +32,7 @@ export const printVarDecl: PrintNodeFunction<
   const { modifiers, varType, structType, declarations } = node;
 
   const pt1 = [];
-  if (modifiers.length > 0) pt1.push(path.map(printChildren, "modifiers"));
+  if (modifiers.length > 0) pt1.push(join(" ",path.map(printChildren, "modifiers")));
   if (varType) pt1.push(path.call(printChildren, "varType"));
   if (structType) pt1.push(path.call(printChildren, "structType"));
 
