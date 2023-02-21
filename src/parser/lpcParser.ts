@@ -2332,3 +2332,8 @@ export class LPCParser {
     return nd;
   }
 }
+
+export function ParseLPC(text: string) {
+  const parser = new LPCParser();
+  return parser.parse(text);  
+}

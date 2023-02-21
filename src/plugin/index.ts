@@ -3,6 +3,9 @@ import { ParserOptions, RequiredOptions } from "prettier";
 import { locEnd, locStart, parse } from "./parser";
 import { lpcPrinters } from "./printer";
 
+export const AST_PARSER_NAME = "lpc";
+export const AST_FORMAT_NAME = "lpc";
+
 export interface LPCOptions extends RequiredOptions, ParserOptions {
   condenseSingleExpressionParams?: boolean;
   condenseSingleStatementFunctions?: boolean;
@@ -36,14 +39,14 @@ export const defaultOptions: Partial<LPCOptions> = {
 export const languages: Plugin["languages"] = [
   {
     name: "lpc",
-    parsers: ["lpc"],
+    parsers: [AST_PARSER_NAME],
     extensions: ["c"],
   },
 ];
 
 export const parsers: Plugin["parsers"] = {
   lpc: {
-    astFormat: "lpc",
+    astFormat: AST_FORMAT_NAME,
     parse: parse,
     locStart: locStart,
     locEnd: locEnd,
