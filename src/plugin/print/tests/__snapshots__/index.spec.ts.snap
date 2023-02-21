@@ -42,6 +42,14 @@ exports[`prettier-lpc plugin format foreach loops: foreach-range-multiline 1`] =
 }"
 `;
 
+exports[`prettier-lpc plugin format functions: function-stubs 1`] = `
+"int level = 0;
+public int query_level();
+public void set_level(int level);
+public int query_next_level();
+public int query_level() { return level; }"
+`;
+
 exports[`prettier-lpc plugin format macros: define-macro-multiline 1`] = `
 "#define W2(s) \\
   trim("local/really really really long string really really really really long/util")->       wrap(({ a, s }))"

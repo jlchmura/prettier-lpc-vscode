@@ -153,6 +153,9 @@ describe("prettier-lpc plugin", () => {
       `test() { object *hash = ({}); hash = sort_array(hash, #'>); hash = filter(hash, #'this_player); }`
     );
     expect(formatted).toMatchSnapshot("closure-greaterthan-this_player");
+
+    formatted = format(`object *a = filter(all_inventory(room), (: $1->id("something") :));`)
+    expect(formatted).toMatchInlineSnapshot(`"object *a = filter(all_inventory(room), (: $1->id("something") :));"`);
   });
 
   test("format variable declarations", () => {
@@ -227,8 +230,15 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("foreach-range-multiline");
   });
 
-  test("general formatting", ()=>{
-    let formatted=format(spec_input_room);
+  test("general formatting", () => {
+    let formatted = format(spec_input_room);
     expect(formatted).toMatchSnapshot("spec_input_room");
+  });
+
+  test("format functions", () => {
+    let formatted = format(
+      `int level=0; public int query_level(); public void set_level(int level); public int query_next_level(); public int query_level() { return level ; }`
+    );
+    expect(formatted).toMatchSnapshot("function-stubs");
   });
 });
