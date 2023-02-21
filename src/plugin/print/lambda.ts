@@ -45,6 +45,8 @@ export const printLambda: PrintNodeFunction<LambdaNode, LambdaNode> = (
     group([indent([softline, printedArg, ",", line, printedCode]), softline])
   );
 
+  printed.push(")");
+  
   if (needsSemi(path)) {
     printed.push(";");
 
