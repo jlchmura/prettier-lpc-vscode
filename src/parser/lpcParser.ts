@@ -1215,6 +1215,17 @@ export class LPCParser {
     }
   }
 
+  private parseByRef() {
+    if (
+      this.scanner.getTokenType() == TokenType.Operator &&
+      this.scanner.getTokenText() == "&"
+    ) {
+      this.scanner.scan();
+      return true;
+    }
+    return false;
+  }
+
   private parseTypeCast(parent: LPCNode) {
     const nd = new TypeCastExpressionNode(
       this.scanner.getTokenOffset(),
@@ -1306,7 +1317,7 @@ export class LPCParser {
     }
   }
 
-  private parseIdentifier(hasStar = false) {
+  private parseIdentifier(hasStar = false, byRef = false) {
     if (this.scanner.getTokenType() == TokenType.DeclarationName) {
       const identNode = new IdentifierNode(
         this.scanner.getTokenOffset(),
@@ -1322,6 +1333,10 @@ export class LPCParser {
         identNode.setAttribute("isArray", "true");
       } else if (hasStar) {
         identNode.setAttribute("isArray", "true");
+      }
+
+      if (byRef) {
+        varName = "&" + varName;
       }
 
       identNode.name = varName;
@@ -1540,7 +1555,8 @@ export class LPCParser {
       typeNode?.name == "struct" ? this.parseStructIdentifier() : undefined;
 
     const hasStar = this.parseStar();
-    let identNode = this.parseIdentifier(hasStar);
+    const byRef = this.parseByRef();
+    let identNode = this.parseIdentifier(hasStar, byRef);
 
     let t: TokenType = this.scanner.peek();
     if (
@@ -2335,5 +2351,5 @@ export class LPCParser {
 
 export function ParseLPC(text: string) {
   const parser = new LPCParser();
-  return parser.parse(text);  
+  return parser.parse(text);
 }
