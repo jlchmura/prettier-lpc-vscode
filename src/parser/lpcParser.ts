@@ -467,19 +467,9 @@ export class LPCParser {
     } else if (tt == TokenType.Literal) {
       // consequetive literals can be treated like a binary expression
       this.scanner.scan();
-      const be = new BinaryExpressionNode(
-        this.scanner.getTokenOffset(),
-        this.scanner.getTokenEnd(),
-        [],
-        parent
-      );
 
-      const rh = this.parseLiteralInternal(tt, be);
-
-      be.left = lh;
-      be.right = rh;
-      be.operator = "+";
-      return be;
+      const rh = this.parseLiteralInternal(tt, lh);
+      return this.parseBinaryExpression(lh, parent, rh, "+");
     }
 
     return lh;
@@ -515,23 +505,32 @@ export class LPCParser {
     return nd;
   }
 
-  private parseBinaryExpression(left: LPCNode, parent: LPCNode) {
+  private parseBinaryExpression(
+    left: LPCNode,
+    parent: LPCNode,
+    right?: LPCNode,
+    operator?: string
+  ) {
     const nd = new BinaryExpressionNode(
       this.scanner.getTokenOffset(),
       this.scanner.getTokenEnd(),
       [],
       parent
     );
-    nd.operator = this.scanner.getTokenText().trim();
+    nd.operator = !!operator ? operator : this.scanner.getTokenText().trim();
 
     nd.left = left;
 
-    const nextToken = this.scanner.scan();
-    nd.right = this.parseToken(
-      nextToken,
-      nd,
-      ParseExpressionFlag.StatementOnly
-    );
+    if (!!right) {
+      nd.right = right;
+    } else {
+      const nextToken = this.scanner.scan();
+      nd.right = this.parseToken(
+        nextToken,
+        nd,
+        ParseExpressionFlag.StatementOnly
+      );
+    }
 
     // check if this is a ternary exp
     this.eatWhitespace();
@@ -1523,7 +1522,7 @@ export class LPCParser {
       let opNode: BinaryishExpressionNode;
       opNode = logical_ops_set.has(op.trim())
         ? new LogicalExpressionNode(lh.start, rh.end, [], parent)
-        : new BinaryExpressionNode(lh.start, rh.end, [], parent);
+        : this.parseBinaryExpression(lh, parent, rh, op) as BinaryExpressionNode;// new BinaryExpressionNode(lh.start, rh.end, [], parent);
       opNode.left = lh;
       opNode.right = rh;
       opNode.operator = op;
