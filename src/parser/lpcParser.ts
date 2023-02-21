@@ -2028,6 +2028,7 @@ export class LPCParser {
       );
     }
 
+    nd.end = nd.codeblock!.end;
     return nd;
   }
 

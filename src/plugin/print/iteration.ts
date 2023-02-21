@@ -1,7 +1,11 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { ControlFlowStatementNode } from "../../nodeTypes/controlFlowStatement";
-import { ForEachRangeExpressionNode, ForEachStatementNode, ForStatementNode } from "../../nodeTypes/forStatement";
+import {
+  ForEachRangeExpressionNode,
+  ForEachStatementNode,
+  ForStatementNode,
+} from "../../nodeTypes/forStatement";
 import { WhileStatementNode } from "../../nodeTypes/whileStatement";
 import { PrintNodeFunction } from "./shared";
 
@@ -39,6 +43,10 @@ export const printWhileStatement: PrintNodeFunction<
     else printed.push([" ", printedCodeblock]);
   }
 
+  if (util.isNextLineEmpty(options.originalText, node, (n) => n.end)) {
+    printed.push(hardline);
+  }
+
   return printed;
 };
 
@@ -73,19 +81,21 @@ export const printForStatement: PrintNodeFunction<
   return printed;
 };
 
-export const printForEachStatement: PrintNodeFunction<ForEachStatementNode, ForEachStatementNode>
-= (node, path, options, printChildren) => {
+export const printForEachStatement: PrintNodeFunction<
+  ForEachStatementNode,
+  ForEachStatementNode
+> = (node, path, options, printChildren) => {
   const printed: Doc = [];
   printed.push("foreach (");
 
-  const inner: Doc = [];  
+  const inner: Doc = [];
   if (node.vars) {
-  inner.push(join([",",line], path.map(printChildren, "vars")));
+    inner.push(join([",", line], path.map(printChildren, "vars")));
   }
-  inner.push(" : ");  
-  
-    inner.push(group(path.call(printChildren, "exp")));
-    
+  inner.push(" : ");
+
+  inner.push(group(path.call(printChildren, "exp")));
+
   printed.push(group(indent([softline, ...inner, softline])));
   printed.push(") ");
 
@@ -101,12 +111,14 @@ export const printForEachStatement: PrintNodeFunction<ForEachStatementNode, ForE
   return printed;
 };
 
-export const printForEachRangeStatement : PrintNodeFunction<ForEachRangeExpressionNode, ForEachRangeExpressionNode>
-= (node, path, options, printChildren) => {
+export const printForEachRangeStatement: PrintNodeFunction<
+  ForEachRangeExpressionNode,
+  ForEachRangeExpressionNode
+> = (node, path, options, printChildren) => {
   const lh = path.call(printChildren, "left");
   const rh = path.call(printChildren, "right");
-  return group([lh,line,"..",line,rh]);
-}
+  return group([lh, line, "..", line, rh]);
+};
 
 export const printControlFlowStatement: PrintNodeFunction<
   ControlFlowStatementNode,
