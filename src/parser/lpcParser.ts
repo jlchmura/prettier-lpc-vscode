@@ -2017,8 +2017,10 @@ export class LPCParser {
     this.eatWhitespaceAndNewlines();
 
     let t = this.scanner.scan();
-    if (t == TokenType.CodeBlockStart) nd.codeblock = this.parseCodeBlock(nd);
-    else {
+    if (t == TokenType.CodeBlockStart) {
+      nd.codeblock = this.parseCodeBlock(nd);
+      this.eatWhitespaceAndNewlines();
+    } else {
       nd.codeblock = this.parseToken(
         t,
         nd,
