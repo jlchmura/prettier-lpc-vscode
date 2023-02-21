@@ -55,6 +55,7 @@ exports[`prettier-lpc plugin format macros: define-macro-with-wrap 1`] = `
 exports[`prettier-lpc plugin general formatting: spec_input_room 1`] = `
 "#include "../globals.h"
 inherit "/room/room";
+
 object monster;
 
 reset(arg) {

@@ -1,4 +1,4 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { BlankLinkNode } from "../../nodeTypes/blankLine";
 import { DirectiveNode } from "../../nodeTypes/directive";
@@ -37,9 +37,13 @@ export const printInherit: PrintNodeFunction<InheritNode, InheritNode> = (
 
   printed.push("inherit ");
   if (node.argument) printed.push(fill([path.call(printChildren, "argument")]));
-  printed.push(";");
-
+  
   printed.push(printSuffixComments(node, path, options, printChildren));
+  
+  printed.push(";");
+  if (util.isNextLineEmpty(options.originalText, node, (n) => n.end)) {
+    printed.push(hardline);
+  }
 
   return printed;
 };

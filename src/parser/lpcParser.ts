@@ -872,8 +872,11 @@ export class LPCParser {
     }
 
     // there should be a semicolon left
+
     if (this.scanner.scan() != TokenType.Semicolon)
       throw Error(`Expected semicolon at ${this.scanner.getTokenOffset()}`);
+
+    inh.end = this.scanner.getTokenOffset();
 
     this.eatWhitespace();
     this.tryParseComment(inh);
@@ -1522,7 +1525,12 @@ export class LPCParser {
       let opNode: BinaryishExpressionNode;
       opNode = logical_ops_set.has(op.trim())
         ? new LogicalExpressionNode(lh.start, rh.end, [], parent)
-        : this.parseBinaryExpression(lh, parent, rh, op) as BinaryExpressionNode;// new BinaryExpressionNode(lh.start, rh.end, [], parent);
+        : (this.parseBinaryExpression(
+            lh,
+            parent,
+            rh,
+            op
+          ) as BinaryExpressionNode); // new BinaryExpressionNode(lh.start, rh.end, [], parent);
       opNode.left = lh;
       opNode.right = rh;
       opNode.operator = op;
