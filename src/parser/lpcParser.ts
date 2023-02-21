@@ -1452,6 +1452,14 @@ export class LPCParser {
     );
   }
 
+  /**
+   * Operator-precedence parser
+   * See https://en.wikipedia.org/wiki/Operator-precedence_parser#Pseudocode
+   * @param last
+   * @param parent
+   * @param minPrec
+   * @returns
+   */
   private parsePrecedenceClimber(
     last: LPCNode,
     parent: LPCNode,
@@ -1480,9 +1488,9 @@ export class LPCParser {
       t = this.scanner.peek();
       const rhPrec = op_precedence[(rh as BinaryExpressionNode).operator || ""];
       while (
-        (this.isBinaryOp(t) &&
-          op_precedence[this.scanner.getTokenText().trim()] > prec) ||
-        rhPrec == prec
+        this.isBinaryOp(t) &&
+        (op_precedence[this.scanner.getTokenText().trim()] > prec ||
+          rhPrec == prec)
       ) {
         rh = this.parsePrecedenceClimber(
           rh,
@@ -1636,7 +1644,7 @@ export class LPCParser {
 
       this.eatWhitespaceAndNewlines();
 
-      const fd = new FunctionDeclarationNode(nd.start, nd.end, [], parent);      
+      const fd = new FunctionDeclarationNode(nd.start, nd.end, [], parent);
       fd.id = identNode;
       fd.varType = typeNode;
       fd.modifiers = modNodes;
@@ -1814,7 +1822,11 @@ export class LPCParser {
             key = this.parseToken(t, nd);
           } else {
             // new value
-            const newNode = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
+            const newNode = this.parseToken(
+              t,
+              nd,
+              ParseExpressionFlag.StatementOnly
+            );
             if (newNode) val.push(newNode);
           }
       }
