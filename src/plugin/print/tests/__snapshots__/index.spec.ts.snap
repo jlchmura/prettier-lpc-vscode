@@ -1,0 +1,89 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prettier-lpc plugin format arrow operators: arrow-newline-after 1`] = `"test() { "/obj/master"->query_player_exists(); }"`;
+
+exports[`prettier-lpc plugin format closures: closure-greaterthan-this_player 1`] = `
+"test() {
+  object *hash = ({});
+  hash = sort_array(hash, #'>);
+  hash = filter(hash, #'this_player);
+}"
+`;
+
+exports[`prettier-lpc plugin format foreach loops: foreach-collapsed 1`] = `
+"test() {
+  string exitKey;
+  foreach (exitKey : all_exits) { write(exitKey); }
+}"
+`;
+
+exports[`prettier-lpc plugin format foreach loops: foreach-multiline 1`] = `
+"test() {
+  string exitKey;
+  foreach (exitKey : all_exits) {
+    write(exitKey);
+    i++;
+  }
+}"
+`;
+
+exports[`prettier-lpc plugin format foreach loops: foreach-range-collapsed 1`] = `
+"test() { foreach (i : 1 .. 6) printf("%d
+", i); }"
+`;
+
+exports[`prettier-lpc plugin format foreach loops: foreach-range-multiline 1`] = `
+"test() {
+  foreach (i : 1 .. 6) {
+    printf("%d
+", i);
+    j++;
+  }
+}"
+`;
+
+exports[`prettier-lpc plugin format macros: define-macro-multiline 1`] = `
+"#define W2(s) \\
+  trim("local/really really really long string really really really really long/util")->       wrap(({ a, s }))"
+`;
+
+exports[`prettier-lpc plugin format macros: define-macro-with-wrap 1`] = `
+"#define WRAP(str) \\
+  trim("really really really really long string"->word_wrap(str), 2)"
+`;
+
+exports[`prettier-lpc plugin general formatting: spec_input_room 1`] = `
+"#include "../globals.h"
+inherit "/room/room";
+object monster;
+
+reset(arg) {
+  if (!arg) {
+    set_light(1);
+    set_realm("something");
+    short_desc = "Room";
+    long_desc =
+      "This is a long
+" + "Room description that goes
+" +
+      "on for several lines
+";
+    items = ({
+      ({"table", "small table", "wood table"}),
+      "A table made of wood",
+      ({"bench", "wood bench"}),
+      "A bench made of wood",
+    });
+
+    dest_dir = ({BASE + "/northroom", "north"});
+  }
+
+  if (!present("monster")) {
+    monster = clone_object("obj/monster");
+    monster->set_name("monster");
+    monster->set_alias(({"monster"}));
+    monster->set_hp(200);
+    move_object(monster, this_object());
+  }
+}"
+`;

@@ -81,7 +81,7 @@ export const printDirective: PrintNodeFunction<DirectiveNode, DirectiveNode> = (
           softline,
           join([ifBreak("\\"), line], path.map(printChildren, "arguments")),
         ]),
-        softline,
+        
       ])
     );
   }

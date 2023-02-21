@@ -1,6 +1,7 @@
 import * as prettierPlugin from "../..";
 import * as prettier from "prettier";
 import { LPCParser, ParseLPC } from "../../../parser/lpcParser";
+import { spec_input_room } from "./inputs";
 
 describe("prettier-lpc plugin", () => {
   const format = (input: string, options?: prettier.Options) => {
@@ -147,6 +148,13 @@ describe("prettier-lpc plugin", () => {
     `);
   });
 
+  test("format closures", () => {
+    let formatted = format(
+      `test() { object *hash = ({}); hash = sort_array(hash, #'>); hash = filter(hash, #'this_player); }`
+    );
+    expect(formatted).toMatchSnapshot("closure-greaterthan-this_player");
+  });
+
   test("format variable declarations", () => {
     let formatted = format(`string 
       *arr,		/* OPTIONAL: Array of stuff */
@@ -167,5 +175,60 @@ describe("prettier-lpc plugin", () => {
     "// this struct should be on a single line
     struct coords { int x; int y; };"
     `);
+  });
+
+  test("format macros", () => {
+    let formatted = format(
+      `#define WRAP(str)  trim("test"->word_wrap(str), 2)`
+    );
+    expect(formatted).toMatchInlineSnapshot(
+      `"#define WRAP(str) trim("test"->word_wrap(str), 2)"`
+    );
+
+    formatted = format(
+      `#define WRAP(str)  trim("really really really really long string"->word_wrap(str), 2)`,
+      { printWidth: 20 }
+    );
+    expect(formatted).toMatchSnapshot("define-macro-with-wrap");
+
+    formatted = format(`#define W2(s) \
+      trim("local/really really really long string really really really really long/util")-> \
+      wrap(({ a, s }))
+    `);
+    expect(formatted).toMatchSnapshot("define-macro-multiline");
+  });
+
+  test("format arrow operators", () => {
+    let formatted = format(`test() {
+      "/obj/master"->
+        query_player_exists();
+    }`);
+
+    expect(formatted).toMatchSnapshot("arrow-newline-after");
+  });
+
+  test("format foreach loops", () => {
+    let formatted = format(
+      `test() { string exitKey; foreach(exitKey : all_exits) { write(exitKey); } }`
+    );
+    expect(formatted).toMatchSnapshot("foreach-collapsed");
+
+    formatted = format(
+      `test() { string exitKey; foreach(exitKey : all_exits) { write(exitKey); i++; } }`
+    );
+    expect(formatted).toMatchSnapshot(`foreach-multiline`);
+
+    formatted = format(`test() { foreach(i : 1 .. 6) printf("%d\n", i); }`);
+    expect(formatted).toMatchSnapshot("foreach-range-collapsed");
+
+    formatted = format(
+      `test() { foreach(i : 1 .. 6) { printf("%d\n", i); j++; } }`
+    );
+    expect(formatted).toMatchSnapshot("foreach-range-multiline");
+  });
+
+  test("general formatting", ()=>{
+    let formatted=format(spec_input_room);
+    expect(formatted).toMatchSnapshot("spec_input_room");
   });
 });
