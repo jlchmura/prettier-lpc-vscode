@@ -119,7 +119,7 @@ export const printIf: PrintNodeFunction<IfNode, IfNode> = (
   if (node.consequent) {
     const printedCons: Doc = path.call(printChildren, "consequent");
     if (node.consequent.type != "codeblock") {
-      printed.push(indent([line, printedCons]));
+      printed.push(fill([indent([ifBreak(line, " "), printedCons])]));
     } else {
       printed.push([" ", printedCons]);
     }

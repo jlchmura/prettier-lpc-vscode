@@ -21,14 +21,20 @@ const {
   lineSuffix,
 } = builders;
 
-export const printCodeblock: PrintNodeFunction<CodeBlockNode> = (
+export const printCodeblock: PrintNodeFunction<CodeBlockNode, CodeBlockNode> = (
   node,
   path,
   options,
   printChildren
 ) => {
   const sep =
-    options.condenseSingleStatementFunctions && node.children.length <= 1
+    options.condenseSingleStatementFunctions &&
+    node.children.length <= 1 &&
+    // don't collapse single-line if consequents
+    path.match(
+      () => true,
+      (n) => n.type != "if"
+    )
       ? line
       : hardline;
   const printed: Doc = [
