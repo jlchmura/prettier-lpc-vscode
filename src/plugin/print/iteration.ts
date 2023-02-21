@@ -27,12 +27,11 @@ export const printWhileStatement: PrintNodeFunction<
   WhileStatementNode
 > = (node, path, options, printChildren) => {
   const printed: Doc = [];
-  printed.push("while (");
+  printed.push("while ");
 
   const inner = [path.call(printChildren, "test")];
   printed.push(group(indent([softline, ...inner, softline])));
 
-  printed.push(") ");
   if (node.codeblock) {
     const printedCodeblock = path.call(printChildren, "codeblock");
     if (node.codeblock.type != "codeblock")
