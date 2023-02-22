@@ -571,7 +571,7 @@ export class LPCParser {
       }
       if (t == TokenType.Semicolon) {
         // leftover semi, consume it
-        this.scanner.eat(TokenType.BlankLines);
+        this.eatWhitespaceAndNewlines();        
         continue;
       }
 
@@ -881,7 +881,8 @@ export class LPCParser {
     this.eatWhitespace();
     this.tryParseComment(inh);
 
-    this.scanner.eat(TokenType.BlankLines);
+    this.eatWhitespaceAndNewlines();
+    //this.scanner.eat(TokenType.BlankLines);
 
     parent.children.push(inh);
     return inh;
@@ -1695,7 +1696,9 @@ export class LPCParser {
         this.scanner.scan();
         fd.end = this.scanner.getTokenOffset();
 
+        let tt = this.scanner.getTokenText();
         this.eatWhitespace();
+        tt = this.scanner.getTokenText();
         this.tryParseComment(fd);
         this.eatWhitespaceAndNewlines();
 

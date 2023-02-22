@@ -42,6 +42,13 @@ exports[`prettier-lpc plugin format foreach loops: foreach-range-multiline 1`] =
 }"
 `;
 
+exports[`prettier-lpc plugin format functions: function-stub-with-newline-comments 1`] = `
+"int gmcp_send_map();
+int gmcp_send_map_config();
+
+/* Should not move the coment up after the semi */"
+`;
+
 exports[`prettier-lpc plugin format functions: function-stubs 1`] = `
 "int level = 0;
 public int query_level();

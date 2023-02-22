@@ -240,5 +240,13 @@ describe("prettier-lpc plugin", () => {
       `int level=0; public int query_level(); public void set_level(int level); public int query_next_level(); public int query_level() { return level ; }`
     );
     expect(formatted).toMatchSnapshot("function-stubs");
+
+    formatted = format(`int gmcp_send_map();
+    int gmcp_send_map_config(); 
+    
+    /**
+     * Should not move the coment up after the semi
+     */`);
+     expect(formatted).toMatchSnapshot("function-stub-with-newline-comments");
   });
 });

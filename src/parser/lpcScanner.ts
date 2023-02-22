@@ -537,7 +537,7 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._SEM)) {
           // ;
-          this.stream.skipWhitespace();
+          this.stream.skipWhitespace(false);
           this.state = ScannerState.WithinFile;
           return this.finishToken(offset, TokenType.Semicolon);
         }
