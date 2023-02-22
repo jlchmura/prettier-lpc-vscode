@@ -77,6 +77,7 @@ export class LPCParser {
   private scanner!: Scanner;
   private text!: string;
   private opParseLevel = 0;
+  private lastPrecLevel = 0;
 
   constructor() {}
 
@@ -447,13 +448,12 @@ export class LPCParser {
     let tt = this.scanner.peek();
 
     if (
-      this.opParseLevel == 0 &&
-      (tt == TokenType.Operator ||
-        tt == TokenType.Star ||
-        tt == TokenType.LogicalOperator)
+      tt == TokenType.Operator ||
+      tt == TokenType.Star ||
+      tt == TokenType.LogicalOperator
     ) {
       //binary expr
-      lh = this.parsePrecedenceClimber(lh, parent, 0);
+      lh = this.parsePrecedenceClimber(lh, parent, this.lastPrecLevel);
       this.eatWhitespaceAndNewlines();
       tt = this.scanner.peek();
     } else if (tt == TokenType.Arrow) {
@@ -683,7 +683,7 @@ export class LPCParser {
           } else {
             nd.closed = true;
             break;
-          }        
+          }
       }
     }
 
@@ -1495,6 +1495,7 @@ export class LPCParser {
     parent: LPCNode,
     minPrec: number
   ) {
+    const startingPrecLevel = this.lastPrecLevel;
     this.opParseLevel++;
 
     let t: TokenType;
@@ -1508,7 +1509,7 @@ export class LPCParser {
       op_precedence[(op = this.scanner.getTokenText().trim())] >= minPrec
     ) {
       t = this.scanner.scan(); // consume operator
-      const prec = op_precedence[op];
+      const prec = (this.lastPrecLevel = op_precedence[op]);
 
       t = this.scanner.scan(); // consume next token
       rh = this.parseToken(t, lh, ParseExpressionFlag.StatementOnly);
@@ -1551,6 +1552,7 @@ export class LPCParser {
     }
 
     this.opParseLevel--;
+    this.lastPrecLevel = startingPrecLevel;
     return lh;
   }
 

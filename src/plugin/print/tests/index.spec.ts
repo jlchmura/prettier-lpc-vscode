@@ -107,6 +107,11 @@ describe("prettier-lpc plugin", () => {
 
     formatted = format(mapping_with_ternary_value);
     expect(formatted).toMatchSnapshot("mapping_with_ternary_value");
+
+    formatted = format(
+      `test() { str = (str[0] == '/' ? "/" + implode(path, "/") : implode(path, "/")) }`
+    );
+    expect(formatted).toMatchSnapshot("ternary-after-binary");
   });
 
   test("format binary expressions", () => {
