@@ -571,7 +571,7 @@ export class LPCParser {
       }
       if (t == TokenType.Semicolon) {
         // leftover semi, consume it
-        this.eatWhitespaceAndNewlines();        
+        this.eatWhitespaceAndNewlines();
         continue;
       }
 
@@ -1834,7 +1834,13 @@ export class LPCParser {
         case TokenType.Comma:
           // start a new mapping entry
           if (!key) throw "got comma before seeing a mapping entry";
+
+          // value's suffix comment comes after the comma
+          this.eatWhitespace();
+          if (val) this.tryParseComment(last(val)!);
+
           nd.elements.push(new MappingPair(key, val));
+
           key = undefined;
           val = [];
           break;

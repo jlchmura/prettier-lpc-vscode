@@ -1,7 +1,7 @@
 import * as prettierPlugin from "../..";
 import * as prettier from "prettier";
 import { LPCParser, ParseLPC } from "../../../parser/lpcParser";
-import { spec_input_room } from "./inputs";
+import { mapping_with_ternary_value, spec_input_room } from "./inputs";
 
 describe("prettier-lpc plugin", () => {
   const format = (input: string, options?: prettier.Options) => {
@@ -248,5 +248,10 @@ describe("prettier-lpc plugin", () => {
      * Should not move the coment up after the semi
      */`);
      expect(formatted).toMatchSnapshot("function-stub-with-newline-comments");
+  });
+
+  test("format ternary expressions", ()=>{
+    let formatted = format(mapping_with_ternary_value);
+    expect(formatted).toMatchSnapshot('mapping_with_ternary_value');
   });
 });

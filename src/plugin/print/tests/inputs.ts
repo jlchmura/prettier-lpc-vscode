@@ -38,3 +38,33 @@ reset(arg)
     }
 }
 `;
+
+
+export const mapping_with_ternary_value =
+`/**
+* send data
+*/
+public varargs int send_config(object player) {
+ mixed *arr = ({}); // array of environment data objects
+ 
+ mapping data = MASTER->query_data();
+ if (!data) {
+   write("WARN: Could not load");
+ }
+ foreach (string nm : data) {
+   int id = data[nm, 0];
+   mapping d = ([
+       ID: id ? id : "0", // need string zero, not int 0
+       NAME: nm,
+       C: data[nm, 1]
+   ]);
+
+   arr += ({d});
+ }
+
+ // package
+ mapping pkg = ([KEY: arr]);
+
+ object p = player ? player : this_player();
+ return p->send(PKG, pkg);
+}`;

@@ -31,7 +31,10 @@ import {
 import { LiteralNode } from "../nodeTypes/literal";
 import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import { LPCNode } from "../nodeTypes/lpcNode";
-import { MappingExpressionNode } from "../nodeTypes/mappingExpression";
+import {
+  MappingExpressionNode,
+  MappingPair,
+} from "../nodeTypes/mappingExpression";
 import {
   MemberExpressionNode,
   ParentExpressionNode,
@@ -53,6 +56,7 @@ import {
   printArray,
   printIndexorExpression,
   printMapping,
+  printMappingPair,
 } from "./print/array";
 import { printCodeblock } from "./print/block";
 import {
@@ -187,6 +191,8 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
       );
     case "mapping":
       return printMapping(node as MappingExpressionNode, ...commonPrintArgs);
+    case "mapping-pair":
+      return printMappingPair(node as MappingPair, ...commonPrintArgs);
     case "array":
       return printArray(node as ArrayExpressionNode, ...commonPrintArgs);
     case "if":

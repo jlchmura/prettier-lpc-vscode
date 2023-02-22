@@ -67,6 +67,36 @@ exports[`prettier-lpc plugin format macros: define-macro-with-wrap 1`] = `
   trim("really really really really long string"->word_wrap(str), 2)"
 `;
 
+exports[`prettier-lpc plugin format ternary expressions: mapping_with_ternary_value 1`] = `
+"/**
+* send data */
+public varargs int send_config(object player) {
+  mixed *arr = ({}); // array of environment data objects
+
+  mapping data = MASTER->query_data();
+  if (!data) {
+    write("WARN: Could not load");
+  }
+  foreach (string nm : data) {
+    int id = data[nm, 0];
+    mapping d = ([
+      ID:
+        id ? id : "0", // need string zero, not int 0
+      NAME: nm,
+      C: data[nm, 1],
+    ]);
+
+    arr += ({d});
+  }
+
+  // package
+  mapping pkg = ([KEY: arr]);
+
+  object p = player ? player : this_player();
+  return p->send(PKG, pkg);
+}"
+`;
+
 exports[`prettier-lpc plugin general formatting: spec_input_room 1`] = `
 "#include "../globals.h"
 inherit "/room/room";

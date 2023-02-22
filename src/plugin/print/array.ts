@@ -4,7 +4,13 @@ import {
   ArrayExpressionNode,
   IndexorExpressionNode,
 } from "../../nodeTypes/arrayExpression";
-import { MappingExpressionNode } from "../../nodeTypes/mappingExpression";
+import { LPCNode } from "../../nodeTypes/lpcNode";
+import {
+  MappingExpressionNode,
+  MappingPair,
+} from "../../nodeTypes/mappingExpression";
+import { last } from "../../utils/arrays";
+import { printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -64,12 +70,32 @@ export const printArray: PrintNodeFunction<
       ])
     );
   }
-  
+
   printed.push(ifBreak("", ""), dedent("})"));
 
   // fill will cause nested arrays to inline if possible
   //return fill(printed);
   return printed;
+};
+
+export const printMappingPair: PrintNodeFunction<MappingPair, MappingPair> = (
+  node,
+  path,
+  options,
+  printChildren
+) => {
+  const pair = node;
+  // always print a mapping key
+  const pairPrinted: Doc = [path.call(printChildren, "key")];
+
+  // if there are values, print those
+  if (pair.value && pair.value.length > 0) {
+    pairPrinted.push(":");
+    // there may be multiple values, which are joined by a semi
+    const valuesPrinted = path.map(printChildren, "value");
+    pairPrinted.push(group([indent([line, join([";", line], valuesPrinted)])]));
+  }
+  return group(pairPrinted);
 };
 
 export const printMapping: PrintNodeFunction<
@@ -80,19 +106,7 @@ export const printMapping: PrintNodeFunction<
   printed.push("([");
 
   if (node.elements.length > 0) {
-    const elsPrinted = path.map((e) => {
-      const pair = e.getValue();
-      // always print a mapping key
-      const pairPrinted: Doc = [e.call(printChildren, "key")];
-
-      // if there are values, print those
-      if (pair.value && pair.value.length > 0) {
-        pairPrinted.push(":", line);
-        // there may be multiple values, which are joined by a semi
-        pairPrinted.push(join([";", line], e.map(printChildren, "value")));
-      }
-      return group(pairPrinted);
-    }, "elements");
+    const elsPrinted = path.map(printChildren, "elements");
 
     printed.push(
       indent([

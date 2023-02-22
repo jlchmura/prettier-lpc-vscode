@@ -5,7 +5,7 @@ import { ParenBlockNode } from "../../nodeTypes/parenBlock";
 import { SwitchNode } from "../../nodeTypes/switch";
 import { TernaryExpressionNode } from "../../nodeTypes/ternaryExpression";
 import { last } from "../../utils/arrays";
-import { printCommentBlock } from "./comment";
+import { printCommentBlock, printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -147,5 +147,8 @@ export const printTernary: PrintNodeFunction<
     printed.push(path.call(printChildren, "alternate"));
   }
 
-  return group([test, indent([softline, printed])]);
+  return [
+    group([test, indent([softline, printed])]),
+    printSuffixComments(node, path, options, printChildren),
+  ];
 };
