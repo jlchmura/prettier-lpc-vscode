@@ -276,4 +276,11 @@ describe("prettier-lpc plugin", () => {
     let formatted = format(if_condense_test);
     expect(formatted).toMatchSnapshot("if_condense_test");
   });
+
+  test("formats for loops", () => {
+    let formatted = format(
+      `test() { for (i = 0, j = sizeof(keys); i < j; i++, j--) { string key = keys[i];     }}`
+    );
+    expect(formatted).toMatchSnapshot("for-loop_multi_expression");
+  });
 });

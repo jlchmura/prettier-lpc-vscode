@@ -27,6 +27,7 @@ import {
   ForEachRangeExpressionNode,
   ForEachStatementNode,
   ForStatementNode,
+  MultiExpressionNode,
 } from "../nodeTypes/forStatement";
 import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
@@ -2007,7 +2008,29 @@ export class LPCParser {
       else if (t == TokenType.Semicolon)
         if (lastToken == t) stack.push(undefined);
         else continue;
-      else stack.push(this.parseToken(t, nd));
+      else if (t == TokenType.Comma) {
+        this.eatWhitespace();
+        const nextExpr = this.parseToken(
+          this.scanner.scan(),
+          nd,
+          ParseExpressionFlag.AllowDeclaration
+        )!;
+        const l = last(stack)!;
+        if (l?.type == "multi-expression-node") {
+          l.children.push(nextExpr);
+        } else {
+          // convert to a multi-expression node and replace the last expr on the 
+          // stack with the new multi-expr
+          stack.pop();
+          const me = new MultiExpressionNode(l.start, nextExpr.end, [], nd);
+          me.children.push(l, nextExpr);
+          stack.push(me);
+        }
+        this.eatWhitespace();
+      } else
+        stack.push(
+          this.parseToken(t, nd, ParseExpressionFlag.AllowDeclaration)
+        );
 
       lastToken = t;
     }

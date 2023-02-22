@@ -5,6 +5,7 @@ import {
   ForEachRangeExpressionNode,
   ForEachStatementNode,
   ForStatementNode,
+  MultiExpressionNode,
 } from "../../nodeTypes/forStatement";
 import { WhileStatementNode } from "../../nodeTypes/whileStatement";
 import { PrintNodeFunction } from "./shared";
@@ -125,5 +126,13 @@ export const printControlFlowStatement: PrintNodeFunction<
   ControlFlowStatementNode
 > = (node, path, options, printChildren) => {
   const printed: Doc = [node.controlStatement || "", ";"];
+  return printed;
+};
+
+export const printMultiExpression: PrintNodeFunction<
+  MultiExpressionNode,
+  MultiExpressionNode
+> = (node, path, options, printChildren) => {
+  const printed: Doc = join([",", line], path.map(printChildren, "children"));
   return printed;
 };

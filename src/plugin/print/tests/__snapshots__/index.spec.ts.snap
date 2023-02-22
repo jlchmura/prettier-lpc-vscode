@@ -111,6 +111,12 @@ exports[`prettier-lpc plugin format ternary expressions: ternary-after-binary 1`
 }"
 `;
 
+exports[`prettier-lpc plugin formats for loops: for-loop_multi_expression 1`] = `
+"test() {
+  for (i = 0, j = sizeof(keys); i < j; i++, j--) { string key = keys[i]; }
+}"
+`;
+
 exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
 "test() {
   // this should be fairly condensed

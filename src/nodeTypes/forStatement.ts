@@ -23,3 +23,10 @@ export class ForEachRangeExpressionNode extends LPCNode {
   right: LPCNode | undefined;
   public type = "foreach-range-exp";
 }
+
+/**
+ * multiple expressions separate by comma, for example in a for init
+ */
+export class MultiExpressionNode extends LPCNode {
+  public type = "multi-expression-node";
+}

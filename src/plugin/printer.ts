@@ -18,6 +18,7 @@ import {
   ForEachRangeExpressionNode,
   ForEachStatementNode,
   ForStatementNode,
+  MultiExpressionNode,
 } from "../nodeTypes/forStatement";
 import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
@@ -84,6 +85,7 @@ import {
   printForEachRangeStatement,
   printForEachStatement,
   printForStatement,
+  printMultiExpression,
   printWhileStatement,
 } from "./print/iteration";
 import {
@@ -233,6 +235,11 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
       );
     case "for":
       return printForStatement(node as ForStatementNode, ...commonPrintArgs);
+    case "multi-expression-node":
+      return printMultiExpression(
+        node as MultiExpressionNode,
+        ...commonPrintArgs
+      );
     case "while":
       return printWhileStatement(
         node as WhileStatementNode,
