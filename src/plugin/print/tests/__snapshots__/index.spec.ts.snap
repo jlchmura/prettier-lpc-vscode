@@ -2,6 +2,14 @@
 
 exports[`prettier-lpc plugin format arrow operators: arrow-newline-after 1`] = `"test() { "/obj/master"->query_player_exists(); }"`;
 
+exports[`prettier-lpc plugin format assignment expressions: assign_exp_suffix_comment 1`] = `
+"test() {
+  exits = room->exits();
+  if (exits == -1) arr = ([]); // erase all exits
+  else if (stringp(exits)) arr -= ([exits]);
+}"
+`;
+
 exports[`prettier-lpc plugin format closures: closure-greaterthan-this_player 1`] = `
 "test() {
   object *hash = ({});
@@ -94,6 +102,21 @@ public varargs int send_config(object player) {
 
   object p = player ? player : this_player();
   return p->send(PKG, pkg);
+}"
+`;
+
+exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
+"test() {
+  // this should be fairly condensed
+  if (
+    str != "down" && str != "up" && str != "hole" && str != "hill" &&
+    str != "mountain"
+  ) return 0;
+  else if (str == "sky") {
+    // send them
+    move_player("sky");
+    return 1;
+  } else return 0;
 }"
 `;
 

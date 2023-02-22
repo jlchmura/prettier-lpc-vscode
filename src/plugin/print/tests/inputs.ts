@@ -68,3 +68,35 @@ public varargs int send_config(object player) {
  object p = player ? player : this_player();
  return p->send(PKG, pkg);
 }`;
+
+export const assign_exp_suffix_comment = 
+`test() { 
+  exits = room->exits();   
+  if (exits == -1)
+      arr = ([]); // erase all exits      
+  else if (stringp(exits))
+      arr -= ([ exits ]);   
+}`;
+
+export const if_condense_test = `test() {
+  // this should be fairly condensed
+  if (
+    str !=
+    "down" &&
+    str !=
+    "up" &&
+    str !=
+    "hole" &&
+    str !=
+    "hill" &&
+    str !=
+    "mountain"
+  ) return 0;
+  else if (str == "sky")
+  {
+    // send them
+    move_player("sky");
+    return 1;
+  } else 
+  return 0;
+}`;

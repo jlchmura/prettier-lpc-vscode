@@ -619,22 +619,29 @@ export class LPCParser {
     nd.body = this.text.substring(nd.start, nd.end);
 
     let t: TokenType;
-    while (!nd.closed && (t = this.scanner.scan())) {
+    while (!nd.closed && (t = this.scanner.peek())) {
       if (t == TokenType.EOS)
         throw Error(
           `Could not find consequent @ ${this.scanner.getTokenOffset()}`
         );
       switch (t) {
+        case TokenType.ElseIf:
+        case TokenType.Else:
+          nd.closed = true;
+          break;
         case TokenType.BlankLines:
         case TokenType.Whitespace:
+          this.scanner.scan();
           break;
         case TokenType.CodeBlockStart:
+          this.scanner.scan();
           nd.consequent = this.parseCodeBlock(nd);
           this.scanner.eat(TokenType.BlankLines);
           nd.consequent.closed = true;
           nd.closed = true;
           break;
         case TokenType.Semicolon:
+          this.scanner.scan();
           if (!nd.consequent) {
             // use a literal node to fake out the printer and get a single semi on this line
             nd.consequent = new LiteralNode(
@@ -648,10 +655,12 @@ export class LPCParser {
           } else {
             // semi is part of consequent stmt so parse and add it there.
             this.parseToken(t, nd.consequent);
+            this.tryParseComment(nd.consequent);
           }
           nd.closed = true;
           break;
         case TokenType.ParenBlock:
+          this.scanner.scan();
           // if we don't have a conseuqent then parens are part of test
           // otherwise let it fall through so parens will get parsed into
           // current consequent
@@ -665,13 +674,16 @@ export class LPCParser {
           }
         default:
           if (!nd.consequent) {
+            this.scanner.scan();
             nd.consequent = this.parseToken(
               t,
               nd,
               ParseExpressionFlag.StatementOnly
             );
-          }
-          nd.closed = true;
+          } else {
+            nd.closed = true;
+            break;
+          }        
       }
     }
 

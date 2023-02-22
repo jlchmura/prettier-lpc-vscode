@@ -1,7 +1,12 @@
 import * as prettierPlugin from "../..";
 import * as prettier from "prettier";
 import { LPCParser, ParseLPC } from "../../../parser/lpcParser";
-import { mapping_with_ternary_value, spec_input_room } from "./inputs";
+import {
+  assign_exp_suffix_comment,
+  if_condense_test,
+  mapping_with_ternary_value,
+  spec_input_room,
+} from "./inputs";
 
 describe("prettier-lpc plugin", () => {
   const format = (input: string, options?: prettier.Options) => {
@@ -99,6 +104,9 @@ describe("prettier-lpc plugin", () => {
           );
     }"
     `);
+
+    formatted = format(mapping_with_ternary_value);
+    expect(formatted).toMatchSnapshot("mapping_with_ternary_value");
   });
 
   test("format binary expressions", () => {
@@ -154,8 +162,12 @@ describe("prettier-lpc plugin", () => {
     );
     expect(formatted).toMatchSnapshot("closure-greaterthan-this_player");
 
-    formatted = format(`object *a = filter(all_inventory(room), (: $1->id("something") :));`)
-    expect(formatted).toMatchInlineSnapshot(`"object *a = filter(all_inventory(room), (: $1->id("something") :));"`);
+    formatted = format(
+      `object *a = filter(all_inventory(room), (: $1->id("something") :));`
+    );
+    expect(formatted).toMatchInlineSnapshot(
+      `"object *a = filter(all_inventory(room), (: $1->id("something") :));"`
+    );
   });
 
   test("format variable declarations", () => {
@@ -247,11 +259,16 @@ describe("prettier-lpc plugin", () => {
     /**
      * Should not move the coment up after the semi
      */`);
-     expect(formatted).toMatchSnapshot("function-stub-with-newline-comments");
+    expect(formatted).toMatchSnapshot("function-stub-with-newline-comments");
   });
 
-  test("format ternary expressions", ()=>{
-    let formatted = format(mapping_with_ternary_value);
-    expect(formatted).toMatchSnapshot('mapping_with_ternary_value');
+  test("format assignment expressions", () => {
+    let formatted = format(assign_exp_suffix_comment);
+    expect(formatted).toMatchSnapshot("assign_exp_suffix_comment");
+  });
+
+  test("formats if statements", () => {
+    let formatted = format(if_condense_test);
+    expect(formatted).toMatchSnapshot("if_condense_test");
   });
 });
