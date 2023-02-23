@@ -94,16 +94,16 @@ describe("prettier-lpc plugin", () => {
 `
     );
     expect(formatted).toMatchInlineSnapshot(`
-    "test() {
-      if (!a && !ob->b()) return "foo";
-      else
-        return
-          sprintf(
-            "bar %s",
-            ob->test() && ob2->test() ? "bar" : ob->bar() ? "baz" : "baz2"
-          );
-    }"
-    `);
+          "test() {
+            if (!a && !ob->b()) return "foo";
+            else
+              return
+                sprintf(
+                  "bar %s",
+                  ob->test() && ob2->test() ? "bar" : ob->bar() ? "baz" : "baz2"
+                );
+          }"
+        `);
 
     formatted = format(mapping_with_ternary_value);
     expect(formatted).toMatchSnapshot("mapping_with_ternary_value");
@@ -151,14 +151,14 @@ describe("prettier-lpc plugin", () => {
       list = filter_array(info(), lambda(({ 'test }), ({ #'!=, ({ #'[, 'isValid, NAME }), \"NONAME\" }) )); 
     }`);
     expect(formatted).toMatchInlineSnapshot(`
-    "test() {
-      list =
-        filter_array(
-          info(),
-          lambda(({'test}), ({#'!=, ({#'[, 'isValid, NAME}), "NONAME"}))
-        );
-    }"
-    `);
+          "test() {
+            list =
+              filter_array(
+                info(),
+                lambda(({'test}), ({#'!=, ({#'[, 'isValid, NAME}), "NONAME"}))
+              );
+          }"
+        `);
   });
 
   test("format closures", () => {
@@ -182,8 +182,32 @@ describe("prettier-lpc plugin", () => {
     `);
 
     expect(formatted).toMatchInlineSnapshot(`
-    "string *arr, /* OPTIONAL: Array of stuff */
-           code; /* test comment */"
+          "string *arr, /* OPTIONAL: Array of stuff */
+                 code; /* test comment */"
+        `);
+
+    // multi-decl var
+    formatted = format(`string *arr, code="", test=0, s;`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"string *arr, code = "", test = 0, s;"`
+    );
+
+    // multilpe types of var decls
+    formatted = format(`string s; mixed m; int i=0; mapping mp;`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s;
+      mixed m;
+      int i = 0;
+      mapping mp;"
+    `);
+
+    // var decl inside function
+    formatted = format(`test() { int i, j; string s=""; }`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "test() {
+        int i, j;
+        string s = "";
+      }"
     `);
   });
 
@@ -192,9 +216,9 @@ describe("prettier-lpc plugin", () => {
     struct coords { int x; int y; };`);
 
     expect(formatted).toMatchInlineSnapshot(`
-    "// this struct should be on a single line
-    struct coords { int x; int y; };"
-    `);
+          "// this struct should be on a single line
+          struct coords { int x; int y; };"
+        `);
   });
 
   test("format macros", () => {
@@ -225,6 +249,38 @@ describe("prettier-lpc plugin", () => {
     }`);
 
     expect(formatted).toMatchSnapshot("arrow-newline-after");
+
+    // arrow after obj
+    formatted = format(`string s = obj->test();`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = obj->test();"`);
+
+    // arrow after call-exp
+    formatted = format(`string s=fn()->test();`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = fn()->test();"`);
+
+    // arrow after binary-exp in parens
+    formatted = format(`string s=("obj"+"name")->test();`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"string s = ("obj" + "name")->test();"`
+    );
+
+    // arrow inside ternary after arrow
+    formatted = format(`string s = obj->test()?obj->test2() : "";`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"string s = obj->test() ? obj->test2() : "";"`
+    );
+
+    // arrow with newlines
+    formatted = format(`string s = obj
+    ->
+    test();`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = obj->test();"`);
+
+    // arrow with suffix comment
+    formatted = format(`string s = obj->fn(); // comment`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"string s = obj->fn(); // comment"`
+    );
   });
 
   test("format foreach loops", () => {
