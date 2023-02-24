@@ -3,6 +3,7 @@ import * as prettier from "prettier";
 import { LPCParser, ParseLPC } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
+  for_loop_various,
   if_condense_test,
   mapping_with_ternary_value,
   spec_input_room,
@@ -173,6 +174,11 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"object *a = filter(all_inventory(room), (: $1->id("something") :));"`
     );
+
+    formatted = format(`int *arr=filter(arr2,(:($1==1&&$1<10):));`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`
+    );
   });
 
   test("format variable declarations", () => {
@@ -338,5 +344,8 @@ describe("prettier-lpc plugin", () => {
       `test() { for (i = 0, j = sizeof(keys); i < j; i++, j--) { string key = keys[i];     }}`
     );
     expect(formatted).toMatchSnapshot("for-loop_multi_expression");
+
+    formatted = for_loop_various;
+    expect(formatted).toMatchSnapshot("for_loop_various");
   });
 });

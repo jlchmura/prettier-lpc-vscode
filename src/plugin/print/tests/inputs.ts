@@ -100,3 +100,11 @@ export const if_condense_test = `test() {
   } else 
   return 0;
 }`;
+
+
+export const for_loop_various = `test() {
+  for (int i=0,j=1;i<10;i++,j+=2) { fn(i,j); }
+  for (int i=0,j=1;i<10;) { fn(i,j); }
+  int i;
+  for (i=0;i<10;i--) { fn(i); }
+}`
