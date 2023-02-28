@@ -81,6 +81,19 @@ describe("prettier-lpc plugin", () => {
       `"printf("Foo is %s\\n", (test == "bar") ? "bar" : "notbar");"`
     );
 
+    // arith op inside ternary
+    formatted = format(
+      `private int round(float n) { return (int)(n < 0 ? n - 0.5 : n + 0.5); }`
+    );
+    expect(formatted).toMatchInlineSnapshot(
+      `"private int round(float n) { return (int)(n < 0 ? n - 0.5 : n + 0.5); }"`
+    );
+
+    formatted = format(
+      `private int round(float n) { int i=(int)(n < 0 ? n - 0.5 : n + 0.5); return i; }`
+    );
+    expect(formatted).toMatchSnapshot("ternary_arith_op_inside");
+
     formatted = format(
       `test ()
 {
@@ -349,9 +362,11 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("for_loop_various");
   });
 
-  test("formatter should handle missing semi's",()=>{
+  test("formatter should handle missing semi's", () => {
     // comma instead of semi
-    let formatted=format(`test() { short = "short name", long = "long" + "desc"; }`);
+    let formatted = format(
+      `test() { short = "short name", long = "long" + "desc"; }`
+    );
     expect(formatted).toMatchSnapshot("missing_semi_comma_instead");
-  })
+  });
 });

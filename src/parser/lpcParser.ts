@@ -61,6 +61,7 @@ import {
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
 import { logical_ops_set, op_precedence, unary_ops_set } from "./defs";
 import { Scanner } from "./lpcScanner";
+import { util } from "prettier";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -1448,10 +1449,10 @@ export class LPCParser {
       case TokenType.Operator:
       case TokenType.LogicalOperator:
       case TokenType.Star: // if star shows up here, treat it as an operator
-        if (this.opParseLevel == 0) {
-          // binary expr
-          return this.parsePrecedenceClimber(lh, parent, 0);
-        }
+        //if (this.opParseLevel <= this.lastPrecLevel) {
+        // binary expr
+        return this.parsePrecedenceClimber(lh, parent, 0);
+        //}
         break;
       // this.scanner.scan();
       // return this.parseBinaryExpression(
@@ -2020,7 +2021,7 @@ export class LPCParser {
         if (l?.type == "multi-expression-node") {
           l.children.push(nextExpr);
         } else {
-          // convert to a multi-expression node and replace the last expr on the 
+          // convert to a multi-expression node and replace the last expr on the
           // stack with the new multi-expr
           stack.pop();
           const me = new MultiExpressionNode(l.start, nextExpr.end, [], nd);

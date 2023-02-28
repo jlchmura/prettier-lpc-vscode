@@ -105,6 +105,13 @@ public varargs int send_config(object player) {
 }"
 `;
 
+exports[`prettier-lpc plugin format ternary expressions: ternary_arith_op_inside 1`] = `
+"private int round(float n) {
+  int i = (int)(n < 0 ? n - 0.5 : n + 0.5);
+  return i;
+}"
+`;
+
 exports[`prettier-lpc plugin format ternary expressions: ternary-after-binary 1`] = `
 "test() {
   str = (str[0] == '/' ? "/" + implode(path, "/") : implode(path, "/"));
@@ -130,7 +137,10 @@ exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
 "test() {
   // this should be fairly condensed
   if (
-    str != "down" && str != "up" && str != "hole" && str != "hill" &&
+    str != "down" &&
+    str != "up" &&
+    str != "hole" &&
+    str != "hill" &&
     str != "mountain"
   ) return 0;
   else if (str == "sky") {
