@@ -570,8 +570,9 @@ export class LPCParser {
       if (t == TokenType.EOS) {
         throw Error(`unexpected eos in codeblock starting at [${cb.start}]`);
       }
-      if (t == TokenType.Semicolon) {
+      if (t == TokenType.Semicolon || t == TokenType.Comma) {
         // leftover semi, consume it
+        // also treat comma as a semi here
         this.eatWhitespaceAndNewlines();
         continue;
       }

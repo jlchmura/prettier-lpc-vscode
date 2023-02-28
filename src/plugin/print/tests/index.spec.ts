@@ -348,4 +348,10 @@ describe("prettier-lpc plugin", () => {
     formatted = for_loop_various;
     expect(formatted).toMatchSnapshot("for_loop_various");
   });
+
+  test("formatter should handle missing semi's",()=>{
+    // comma instead of semi
+    let formatted=format(`test() { short = "short name", long = "long" + "desc"; }`);
+    expect(formatted).toMatchSnapshot("missing_semi_comma_instead");
+  })
 });

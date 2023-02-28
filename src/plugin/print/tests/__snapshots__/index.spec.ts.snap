@@ -141,6 +141,13 @@ exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
 }"
 `;
 
+exports[`prettier-lpc plugin formatter should handle missing semi's: missing_semi_comma_instead 1`] = `
+"test() {
+  short = "short name";
+  long = "long" + "desc";
+}"
+`;
+
 exports[`prettier-lpc plugin general formatting: spec_input_room 1`] = `
 "#include "../globals.h"
 inherit "/room/room";
