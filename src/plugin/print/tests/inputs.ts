@@ -108,3 +108,13 @@ export const for_loop_various = `test() {
   int i;
   for (i=0;i<10;i--) { fn(i); }
 }`
+
+export const literal_consecutive_strings = `test() {
+  desc = "this is line one. it is the first line in the description\n"
+    "this is line 2.\n"
+    "this is line 3.";
+
+  desc = "this is line one. it is the first line in the description\n" +
+  "this is line 2.\n" +
+  "this is line 3.";
+}`;

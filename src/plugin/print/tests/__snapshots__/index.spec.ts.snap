@@ -65,6 +65,24 @@ public int query_next_level();
 public int query_level() { return level; }"
 `;
 
+exports[`prettier-lpc plugin format literal strings: literal_consecutive_strings 1`] = `
+"test() {
+  desc =
+    "this is line one. it is the first line in the description
+" +
+    "this is line 2.
+" +
+    "this is line 3.";
+
+  desc =
+    "this is line one. it is the first line in the description
+" +
+    "this is line 2.
+" +
+    "this is line 3.";
+}"
+`;
+
 exports[`prettier-lpc plugin format macros: define-macro-multiline 1`] = `
 "#define W2(s) \\
   trim("local/really really really long string really really really really long/util")->       wrap(({ a, s }))"

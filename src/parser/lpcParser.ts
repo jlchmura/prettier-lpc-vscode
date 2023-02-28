@@ -443,7 +443,7 @@ export class LPCParser {
     return nd;
   }
 
-  private parseLiteral(token: TokenType, parent: LPCNode) {
+  private parseLiteral(token: TokenType, parent: LPCNode): LPCNode {
     let lh: LPCNode = this.parseLiteralInternal(token, parent);
 
     this.eatWhitespace();
@@ -467,10 +467,10 @@ export class LPCParser {
         throw Error(`Expected string before arrow but got ${ln.dataType}`);
       return this.parseArrow(parent, ln);
     } else if (tt == TokenType.Literal) {
-      // consequetive literals can be treated like a binary expression
+      // consecutive literals can be treated like a binary expression
       this.scanner.scan();
 
-      const rh = this.parseLiteralInternal(tt, lh);
+      const rh = this.parseLiteral(tt, lh);
       return this.parseBinaryExpression(lh, parent, rh, "+");
     }
 

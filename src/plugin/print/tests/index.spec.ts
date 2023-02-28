@@ -5,6 +5,7 @@ import {
   assign_exp_suffix_comment,
   for_loop_various,
   if_condense_test,
+  literal_consecutive_strings,
   mapping_with_ternary_value,
   spec_input_room,
 } from "./inputs";
@@ -368,5 +369,11 @@ describe("prettier-lpc plugin", () => {
       `test() { short = "short name", long = "long" + "desc"; }`
     );
     expect(formatted).toMatchSnapshot("missing_semi_comma_instead");
+  });
+
+  test("format literal strings", ()=>{
+    // consecutive strings with no +
+    let formatted = format(literal_consecutive_strings);
+    expect(formatted).toMatchSnapshot('literal_consecutive_strings');
   });
 });
