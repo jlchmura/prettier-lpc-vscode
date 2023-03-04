@@ -43,6 +43,8 @@ export const printArray: PrintNodeFunction<
     const elsPrinted: Doc = [];
     let sepParts: Doc = [];
 
+    if (!options.condenseArrays) elsPrinted.push(breakParent);
+
     path.each((childPath) => {
       const nd = childPath.getValue();
 

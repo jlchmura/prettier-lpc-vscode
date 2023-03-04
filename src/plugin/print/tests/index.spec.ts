@@ -11,7 +11,10 @@ import {
 } from "./inputs";
 
 describe("prettier-lpc plugin", () => {
-  const format = (input: string, options?: prettier.Options) => {
+  const format = (
+    input: string,
+    options?: Partial<prettierPlugin.LPCOptions>
+  ) => {
     const formatted = prettier.format(input, {
       parser: prettierPlugin.AST_PARSER_NAME,
       plugins: [prettierPlugin],
@@ -56,6 +59,20 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"string *dirs = obj->fn((string*)env->query_dest_dir());"`
     );
+  });
+
+  test("format arrays", () => {
+    let formatted = format(
+      `test() { items = ({     ({"gates", "steel gates"}), "Strong metal gates.", }); }`,
+      { condenseArrays: true }
+    );
+    expect(formatted).toMatchSnapshot("array-condensed");
+
+    formatted = format(
+      `test() { items = ({     ({"gates", "steel gates"}), "Strong metal gates.", }); }`,
+      { condenseArrays: false }
+    );
+    expect(formatted).toMatchSnapshot("array-not-condensed");
   });
 
   test("format args passed byref", () => {
@@ -371,9 +388,9 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("missing_semi_comma_instead");
   });
 
-  test("format literal strings", ()=>{
+  test("format literal strings", () => {
     // consecutive strings with no +
     let formatted = format(literal_consecutive_strings);
-    expect(formatted).toMatchSnapshot('literal_consecutive_strings');
+    expect(formatted).toMatchSnapshot("literal_consecutive_strings");
   });
 });

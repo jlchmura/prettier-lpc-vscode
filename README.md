@@ -7,6 +7,21 @@ This extension is a very early release. **It may break your code**. Use at your 
 ## Installation
 Install from the VS Code Marketplace: [prettier-lpc-vscode](https://marketplace.visualstudio.com/items?itemName=jlchmura.prettier-lpc-vscode)
 
+## Configuration
+
+This plugin, like Prettier, is
+[opinionated](https://prettier.io/docs/en/option-philosophy.html). The following
+options are available:
+
+| API Option           | Default | Description                                                                        |
+| -------------------- | ------- | ---------------------------------------------------------------------------------- |
+| `printWidth`         |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#print-width) |
+| `tabWidth`           |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tab-width)   |
+| `useTabs`            |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tabs)        |
+| `condenseArrays`     | `true`  | Condenses arrays into a single line, whenever possible.                           |
+| `condenseSingleExpressionParams`   | `true` | Tries to keep function call parameters on a single line, even if they are arrays or mappings |
+| `condenseSingleStatementFunctions`     | `true`  | Condenses short functions into single lines, whenever possible. |
+
 ## Known Limitations
 The folowing languages features are not supported yet:
 - Lambda parsing works, but is untested. Use extra caution.

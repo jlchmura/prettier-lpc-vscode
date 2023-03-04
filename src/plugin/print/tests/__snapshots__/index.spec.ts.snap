@@ -1,5 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `"test() { items = ({({"gates", "steel gates"}), "Strong metal gates."}); }"`;
+
+exports[`prettier-lpc plugin format arrays: array-not-condensed 1`] = `
+"test() {
+  items = ({
+    ({
+      "gates",
+      "steel gates",
+    }),
+    "Strong metal gates.",
+  });
+}"
+`;
+
 exports[`prettier-lpc plugin format arrow operators: arrow-newline-after 1`] = `"test() { "/obj/master"->query_player_exists(); }"`;
 
 exports[`prettier-lpc plugin format assignment expressions: assign_exp_suffix_comment 1`] = `

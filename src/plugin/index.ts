@@ -9,6 +9,7 @@ export const AST_FORMAT_NAME = "lpc";
 export interface LPCOptions extends RequiredOptions, ParserOptions {
   condenseSingleExpressionParams?: boolean;
   condenseSingleStatementFunctions?: boolean;
+  condenseArrays?: boolean;
 }
 
 export const options = {
@@ -28,12 +29,20 @@ export const options = {
     description:
       "Condense single statement function bodies onto a single line, if possible.",
   } as SupportOption,
+  condenseArrays: {
+    since: "0.0.37",
+    category: "LPC",
+    type: "boolean",
+    default: true,
+    description: "Collapse arrays to one line when possible"
+  } as SupportOption
 };
 
 export const defaultOptions: Partial<LPCOptions> = {
   tabWidth: 2,
   condenseSingleExpressionParams: true,
   condenseSingleStatementFunctions: true,
+  condenseArrays: true
 };
 
 export const languages: Plugin["languages"] = [
