@@ -43,6 +43,7 @@ export const printArray: PrintNodeFunction<
     const elsPrinted: Doc = [];
     let sepParts: Doc = [];
 
+    // see: https://prettier.io/docs/en/rationale.html#multi-line-objects
     const bracketPos = node.start + 2;
     const firstElPos = node.elements[0].start;
     if (util.hasNewlineInRange(options.originalText, bracketPos, firstElPos)) {
