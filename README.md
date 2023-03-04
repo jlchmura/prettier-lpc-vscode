@@ -11,7 +11,7 @@ Install from the VS Code Marketplace: [prettier-lpc-vscode](https://marketplace.
 
 This plugin, like Prettier, is
 [opinionated](https://prettier.io/docs/en/option-philosophy.html). The following
-options are available:
+options are available but may be removed in the future:
 
 | API Option           | Default | Description                                                                        |
 | -------------------- | ------- | ---------------------------------------------------------------------------------- |
