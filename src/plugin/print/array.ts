@@ -1,4 +1,4 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import {
   ArrayExpressionNode,
@@ -9,7 +9,7 @@ import {
   MappingExpressionNode,
   MappingPair,
 } from "../../nodeTypes/mappingExpression";
-import { last } from "../../utils/arrays";
+import { findFirst, last } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
@@ -43,7 +43,11 @@ export const printArray: PrintNodeFunction<
     const elsPrinted: Doc = [];
     let sepParts: Doc = [];
 
-    if (!options.condenseArrays) elsPrinted.push(breakParent);
+    const bracketPos = node.start + 2;
+    const firstElPos = node.elements[0].start;
+    if (util.hasNewlineInRange(options.originalText, bracketPos, firstElPos)) {
+      elsPrinted.push(breakParent);
+    }
 
     path.each((childPath) => {
       const nd = childPath.getValue();

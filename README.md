@@ -18,7 +18,6 @@ options are available but may be removed in the future:
 | `printWidth`         |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#print-width) |
 | `tabWidth`           |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tab-width)   |
 | `useTabs`            |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tabs)        |
-| `condenseArrays`     | `true`  | Condenses arrays into a single line, whenever possible.                           |
 | `condenseSingleExpressionParams`   | `true` | Tries to keep function call parameters on a single line, even if they are arrays or mappings |
 | `condenseSingleStatementFunctions`     | `true`  | Condenses short functions into single lines, whenever possible. |
 

@@ -2,7 +2,16 @@
 
 exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `"test() { items = ({({"gates", "steel gates"}), "Strong metal gates."}); }"`;
 
-exports[`prettier-lpc plugin format arrays: array-not-condensed 1`] = `
+exports[`prettier-lpc plugin format arrays: array-inner-condensed 1`] = `
+"test() {
+  items = ({
+    ({"gates", "steel gates"}),
+    "Strong metal gates.",
+  });
+}"
+`;
+
+exports[`prettier-lpc plugin format arrays: array-none-condensed 1`] = `
 "test() {
   items = ({
     ({
@@ -215,7 +224,10 @@ reset(arg) {
       "A bench made of wood",
     });
 
-    dest_dir = ({BASE + "/northroom", "north"});
+    dest_dir = ({
+      BASE + "/northroom",
+      "north",
+    });
   }
 
   if (!present("monster")) {

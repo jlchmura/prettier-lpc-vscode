@@ -63,16 +63,22 @@ describe("prettier-lpc plugin", () => {
 
   test("format arrays", () => {
     let formatted = format(
-      `test() { items = ({     ({"gates", "steel gates"}), "Strong metal gates.", }); }`,
-      { condenseArrays: true }
+      `test() { items = ({     ({"gates", "steel gates"}), "Strong metal gates.", }); }`
     );
     expect(formatted).toMatchSnapshot("array-condensed");
 
     formatted = format(
-      `test() { items = ({     ({"gates", "steel gates"}), "Strong metal gates.", }); }`,
-      { condenseArrays: false }
+      `test() { items = ({     
+        ({"gates", "steel gates"}), "Strong metal gates.", }); }`
     );
-    expect(formatted).toMatchSnapshot("array-not-condensed");
+    expect(formatted).toMatchSnapshot("array-inner-condensed");
+
+    formatted = format(
+      `test() { items = ({     
+        ({ 
+          "gates", "steel gates"}), "Strong metal gates.", }); }`
+    );
+    expect(formatted).toMatchSnapshot("array-none-condensed");
   });
 
   test("format args passed byref", () => {
