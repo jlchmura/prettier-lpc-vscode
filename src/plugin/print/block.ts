@@ -1,6 +1,7 @@
 import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { CodeBlockNode } from "../../nodeTypes/codeBlock";
+import { first, last } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
@@ -27,8 +28,15 @@ export const printCodeblock: PrintNodeFunction<CodeBlockNode, CodeBlockNode> = (
   options,
   printChildren
 ) => {
+  // if there is no newline in the codeblock, try to condense it to one line
+  const tryCondense = !util.hasNewlineInRange(
+    options.originalText,
+    node.start,
+    first(node.children)?.end || node.end
+  );
+
   const sep =
-    options.condenseSingleStatementFunctions &&
+    tryCondense &&
     node.children.length <= 1 &&
     // don't collapse single-line if consequents
     path.match(

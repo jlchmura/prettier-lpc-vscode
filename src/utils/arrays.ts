@@ -47,6 +47,11 @@ export function last<T>(array: T[]): T | undefined {
 	return undefined;
 }
 
+export function first<T>(array: T[]): T | undefined {
+	if (array.length > 0) return array[0];
+	return undefined;
+}
+
 export function pushIfVal<T>(array: T[], val: T) {
 	if (!!val) {
 		array.push(val);
