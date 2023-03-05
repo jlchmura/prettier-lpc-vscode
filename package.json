@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "engines": {
     "vscode": "^1.63.0"
   },

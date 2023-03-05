@@ -23,6 +23,24 @@ exports[`prettier-lpc plugin format arrays: array-none-condensed 1`] = `
 }"
 `;
 
+exports[`prettier-lpc plugin format arrays: array-with-multi-sfx-comments 1`] = `
+"
+test() {
+  items = ({
+    ({"gates", "steel gates"}),
+    "Strong metal gates.", // inner sfx
+  }); // sfx
+  // post
+}"
+`;
+
+exports[`prettier-lpc plugin format arrays: array-with-sfx-comment 1`] = `
+"
+test() {
+  items = ({({"gates", "steel gates"}), "Strong metal gates."}); // sfx
+}"
+`;
+
 exports[`prettier-lpc plugin format arrow operators: arrow-newline-after 1`] = `"test() { "/obj/master"->query_player_exists(); }"`;
 
 exports[`prettier-lpc plugin format assignment expressions: assign_exp_suffix_comment 1`] = `

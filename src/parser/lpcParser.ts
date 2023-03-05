@@ -177,11 +177,11 @@ export class LPCParser {
           curr.children.length > 0
             ? curr.children[curr.children.length - 1]
             : undefined;
+        //    if (lastChild && !util.hasNewlineInRange(this.text, lastChild?.end, this.scanner.getTokenOffset())) {
         if (!this.scanner.didTokenStartOnOwnLine() && lastChild) {
-          return this.parseComment(
-            curr.children[curr.children.length - 1],
-            true
-          );
+          this.parseComment(curr.children[curr.children.length - 1], true);
+          // return nothing so that this sfx comment doesn't get added as a child
+          return undefined;
         } else {
           return this.parseComment(curr);
         }
@@ -307,11 +307,25 @@ export class LPCParser {
   }
 
   private tryParseComment(parent: LPCNode) {
-    if (this.scanner.peek() == TokenType.Comment) {
+    // confirm that this is really a suffix comment
+    // not all parents send an end
+    const nextToken = this.scanner.peek();
+    if (
+      parent.end > 0 &&
+      util.hasNewlineInRange(
+        this.text,
+        parent.end,
+        this.scanner.getTokenOffset()
+      )
+    ) {
+      return undefined; // not a suffix comment
+    }
+
+    if (nextToken == TokenType.Comment) {
       this.scanner.scan();
       return this.parseComment(parent, true);
     }
-    if (this.scanner.peek() == TokenType.StartCommentBlock) {
+    if (nextToken == TokenType.StartCommentBlock) {
       const cb = new CommentBlockNode(
         this.scanner.getTokenOffset(),
         this.scanner.getTokenEnd(),
@@ -328,7 +342,7 @@ export class LPCParser {
     }
   }
 
-  private parseComment(parent: LPCNode, isSuffix = false) {
+  private parseComment(parent: LPCNode, maybeSuffix = false) {
     const com = new InlineCommentNode(
       this.scanner.getTokenOffset(),
       this.scanner.getTokenEnd(),
@@ -338,10 +352,9 @@ export class LPCParser {
     com.body = this.scanner.getTokenText().replace("//", "").trim();
     com.type = "comment-singleline";
     com.endsLine = true;
-    if (com.body == "comment after test_m()") debugger;
 
     // some comments go in children, some are a suffixComment
-    if (parent.type == "codeblock" || !isSuffix) {
+    if (parent.type == "codeblock" || !maybeSuffix) {
       parent.children.push(com);
     } else {
       parent.suffixComments = com;
@@ -1775,9 +1788,7 @@ export class LPCParser {
     }
 
     nd.elements = children;
-
     nd.end = this.scanner.stream.pos();
-    //this.eatWhitespaceAndNewlines();
 
     return nd;
   }

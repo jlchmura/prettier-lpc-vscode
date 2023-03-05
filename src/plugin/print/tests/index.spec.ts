@@ -79,6 +79,24 @@ describe("prettier-lpc plugin", () => {
           "gates", "steel gates"}), "Strong metal gates.", }); }`
     );
     expect(formatted).toMatchSnapshot("array-none-condensed");
+
+    // array w/ suffix comment
+    formatted = format(`
+    test() { 
+      items = ({     ({"gates", "steel gates"}), "Strong metal gates.",  
+      });  // sfx
+    }    
+    `);
+    expect(formatted).toMatchSnapshot("array-with-sfx-comment");
+
+    formatted = format(`
+    test() { 
+      items = ({     ({"gates", "steel gates"}), "Strong metal gates.",   // inner sfx
+      });  // sfx
+      // post 
+    }    
+    `);
+    expect(formatted).toMatchSnapshot("array-with-multi-sfx-comments");
   });
 
   test("format args passed byref", () => {
