@@ -939,7 +939,7 @@ export class LPCParser {
     parenBlock?: ParenBlockNode
   ) {
     let nd = new CallExpressionNode(
-      this.scanner.getTokenOffset(),
+      Math.min(this.scanner.getTokenOffset(), callee.start),
       this.scanner.getTokenEnd(),
       [],
       parent

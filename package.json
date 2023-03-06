@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -98,12 +98,7 @@
     ],
     "configuration": {
       "title": "Prettier LPC",
-      "properties": {
-        "Prettier-LPC.condenseSingleExpressionParams": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Put array or mapping opening brackets on the same line as call-exp parens"
-        },
+      "properties": {        
         "Prettier-LPC.tabWidth": {
           "type": "number",
           "default": 2,

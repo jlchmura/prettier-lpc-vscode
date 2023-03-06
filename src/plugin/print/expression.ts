@@ -53,11 +53,14 @@ export const printCallExpression: PrintNodeFunction<
   if (node.arguments && node.arguments.length > 0) {
     const arg0 = node.arguments[0];
     const argPrinted = join([",", line], path.map(printChildren, "arguments"));
-    if (
-      options.condenseSingleExpressionParams &&
-      node.arguments.length == 1 &&
-      (arg0.type == "array" || arg0.type == "mapping")
-    ) {
+
+    const tryCondense = !util.hasNewlineInRange(
+      options.originalText,
+      node.start,
+      arg0.start
+    );
+
+    if (tryCondense && node.arguments.length == 1) {
       // don't indent these
       printed.push(argPrinted);
     } else {

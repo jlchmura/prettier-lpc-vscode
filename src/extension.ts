@@ -6,8 +6,7 @@ const getConfigs = (
   extensionSettings: vscode.WorkspaceConfiguration,
   formattingOptions: vscode.FormattingOptions
 ): Partial<LPCOptions> => {
-  return {
-    condenseSingleExpressionParams: extensionSettings.get<boolean>('condenseSingleExpressionParams'),
+  return {    
     tabWidth: extensionSettings.get<number>('tabWidth'),
     parser: "lpc",
     plugins: [plugin]
