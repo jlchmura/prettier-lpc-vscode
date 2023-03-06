@@ -402,6 +402,26 @@ describe("prettier-lpc plugin", () => {
 
     formatted = for_loop_various;
     expect(formatted).toMatchSnapshot("for_loop_various");
+
+    formatted = format(`for (int i=0; i < 10; ++i) { }`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"for (int i = 0; i < 10; ++i) {  }"`
+    );
+
+    formatted = format(`for (int i=0; i < 10; i++) { }`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"for (int i = 0; i < 10; i++) {  }"`
+    );
+
+    formatted = format(`for (int i=10; i > 0; --i) { }`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"for (int i = 10; i > 0; --i) {  }"`
+    );
+
+    formatted = format(`for (int i=10; i > 0; i--) { }`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"for (int i = 10; i > 0; i--) {  }"`
+    );
   });
 
   test("formatter should handle missing semi's", () => {
