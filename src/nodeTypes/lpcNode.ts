@@ -1,5 +1,7 @@
 import { findFirst } from "../utils/arrays";
 import { InlineCommentNode } from "./comment";
+import { IVisitor, IVisitorFunction } from "./nodes";
+
 
 export class LPCNode {
   public type: string | undefined;
@@ -9,9 +11,7 @@ export class LPCNode {
   public endsLine: boolean = false;
 
   public suffixComments: InlineCommentNode | undefined;
-
-  // public startTagEnd: number | undefined;
-  // public endTagStart: number | undefined;
+    
   public attributes: { [name: string]: string | null } | undefined;
   public get attributeNames(): string[] {
     return this.attributes ? Object.keys(this.attributes) : [];
@@ -28,6 +28,11 @@ export class LPCNode {
     public children: LPCNode[],
     public parent?: LPCNode
   ) {}
+
+  public get length(): number {
+    return this.end - this.start;
+  }
+
   public isSameTag(tagInLowerCase: string | undefined) {
     if (this.type === undefined) {
       return tagInLowerCase === undefined;
@@ -76,4 +81,17 @@ export class LPCNode {
     }
     return this;
   }
+
+  public accept(visitor: IVisitorFunction): void {
+		if (visitor(this) && this.children) {
+			for (const child of this.children) {
+				child.accept(visitor);
+			}
+		}
+	}
+
+	public acceptVisitor(visitor: IVisitor): void {
+		this.accept(visitor.visitNode.bind(visitor));
+	}
+
 }

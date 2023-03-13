@@ -452,6 +452,7 @@ export class LPCParser {
       return this.parseArrow(parent, nd);
     }
 
+    nd.end = this.scanner.getTokenOffset() - 1;
     parent.children.push(nd);
     return nd;
   }
@@ -705,11 +706,14 @@ export class LPCParser {
 
     // see if there is another if
     this.eatWhitespace();
+    nd.end = nd.consequent?.end || this.scanner.getTokenOffset();
+
     if (
       this.scanner.peek() == TokenType.Else ||
       this.scanner.peek() == TokenType.ElseIf
     ) {
       nd.alternate = this.parseIf(this.scanner.scan(), nd);
+      nd.end = nd.alternate.end;
     }
 
     return nd;
@@ -961,7 +965,7 @@ export class LPCParser {
       ) as ParenBlockNode;
     }
     nd.arguments = [...parenBlock.children];
-
+    nd.children = nd.arguments;
     this.eatWhitespace();
 
     const peekToken = this.scanner.peek();
