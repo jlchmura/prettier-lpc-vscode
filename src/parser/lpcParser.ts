@@ -1927,6 +1927,8 @@ export class LPCParser {
       t != TokenType.EOS &&
       t != TokenType.ForEachIn
     ) {
+      if (t == TokenType.Comma) continue; 
+      
       const typeNode = this.parseType();
       const hasStar = this.parseStar();
       const identNode = this.parseIdentifier(hasStar);

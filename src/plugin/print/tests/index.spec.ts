@@ -374,6 +374,9 @@ describe("prettier-lpc plugin", () => {
       `test() { foreach(i : 1 .. 6) { printf("%d\n", i); j++; } }`
     );
     expect(formatted).toMatchSnapshot("foreach-range-multiline");
+
+    formatted = format(`test() {foreach (x, y in a){z = b[x];        } }`);
+    expect(formatted).toMatchSnapshot("foreach-multi-var");
   });
 
   test("general formatting", () => {
