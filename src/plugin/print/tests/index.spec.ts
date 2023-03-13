@@ -240,6 +240,12 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`
     );
+
+    // fluffos $() syntax
+    formatted = format(`int *arr=filter(arr2,(:$(var):));`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"int *arr = filter(arr2, (: $(var) :));"`
+    );
   });
 
   test("format variable declarations", () => {

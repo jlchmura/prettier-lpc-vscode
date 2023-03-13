@@ -1429,8 +1429,7 @@ export class LPCParser {
 
       this.eatWhitespace();
 
-      t = this.scanner.peek();
-      if (t == TokenType.IndexorEnd) throw Error("Unexpected ]");
+      t = this.scanner.peek();      
 
       lh = me;
     }
