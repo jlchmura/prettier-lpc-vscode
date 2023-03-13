@@ -1810,6 +1810,10 @@ export class LPCParser {
     );
     const children = [];
     while (t !== TokenType.IndexorEnd) {
+      if (t == TokenType.Whitespace) {
+        t = this.scanner.scan();
+        continue;
+      }
       if (t == TokenType.EOS)
         throw Error(
           `Unexpected EOS inside indexor [${this.scanner.getTokenOffset()}]`
@@ -1928,7 +1932,7 @@ export class LPCParser {
       t != TokenType.ForEachIn
     ) {
       if (t == TokenType.Comma) continue; 
-      
+
       const typeNode = this.parseType();
       const hasStar = this.parseStar();
       const identNode = this.parseIdentifier(hasStar);

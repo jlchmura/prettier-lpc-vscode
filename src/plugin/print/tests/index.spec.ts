@@ -452,4 +452,24 @@ describe("prettier-lpc plugin", () => {
     let formatted = format(literal_consecutive_strings);
     expect(formatted).toMatchSnapshot("literal_consecutive_strings");
   });
+
+  test("format indexors", () => {
+    let formatted = format(`string s = a[0..2]`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = a[0..2];"`);
+
+    formatted = format(`string s = a[ 0..]`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = a[0..];"`);
+
+    formatted = format(`string s = a[0..<2]`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = a[0..<2];"`);
+
+    formatted = format(`string s = a[<1..<2]`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
+
+    formatted = format(`string s = a[<1]`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = a[<1];"`);
+
+    formatted = format(`string s = a[ <1.. <2]`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
+  });
 });

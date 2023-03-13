@@ -512,14 +512,20 @@ export class Scanner implements IScanner {
 
         if (this.stream.advanceIfChar(tt._OSB)) {
           // [
+          this.parenStack.push(TokenType.IndexorStart);
           return this.finishToken(offset, TokenType.IndexorStart);
         }
         if (this.stream.advanceIfChar(tt._CSB)) {
           // ]
+          if (last(this.parenStack) != TokenType.IndexorStart) {
+            throw Error(`Expected indexor start on stack @ ${this.stream.pos}`);
+          }
+          this.parenStack.pop();
           return this.finishToken(offset, TokenType.IndexorEnd);
         }
         if (
-          this.stream.peekChar(-1) == tt._OSB &&
+          this.testParenStack(TokenType.IndexorStart)
+          &&
           (this.stream.advanceIfChar(tt._LAN) ||
             this.stream.advanceIfChar(tt._RAN))
         ) {
