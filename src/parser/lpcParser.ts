@@ -1469,7 +1469,7 @@ export class LPCParser {
       case TokenType.Star: // if star shows up here, treat it as an operator
         //if (this.opParseLevel <= this.lastPrecLevel) {
         // binary expr
-        return this.parsePrecedenceClimber(lh, parent, 0);
+        return this.parsePrecedenceClimber(lh, parent, this.lastPrecLevel+1);
         //}
         break;
       // this.scanner.scan();

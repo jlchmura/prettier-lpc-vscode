@@ -168,6 +168,10 @@ describe("prettier-lpc plugin", () => {
       `test() { str = (str[0] == '/' ? "/" + implode(path, "/") : implode(path, "/")) }`
     );
     expect(formatted).toMatchSnapshot("ternary-after-binary");
+
+
+    formatted = format(`test() { set_long("The " + race_arr[race] + " looks at " + (gender == 1 ? "him" : "her") + "."); }`);
+    expect(formatted).toMatchSnapshot("ternary-with-lit-binary-op");
   });
 
   test("format binary expressions", () => {

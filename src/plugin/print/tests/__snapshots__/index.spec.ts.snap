@@ -185,6 +185,16 @@ exports[`prettier-lpc plugin format ternary expressions: ternary-after-binary 1`
 }"
 `;
 
+exports[`prettier-lpc plugin format ternary expressions: ternary-with-lit-binary-op 1`] = `
+"test() {
+  set_long(
+    "The " + race_arr[race] +
+    " looks at " + (gender == 1 ? "him" : "her") +
+    "."
+  );
+}"
+`;
+
 exports[`prettier-lpc plugin formats for loops: for_loop_various 1`] = `
 "test() {
   for (int i=0,j=1;i<10;i++,j+=2) { fn(i,j); }
@@ -204,10 +214,7 @@ exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
 "test() {
   // this should be fairly condensed
   if (
-    str != "down" &&
-    str != "up" &&
-    str != "hole" &&
-    str != "hill" &&
+    str != "down" && str != "up" && str != "hole" && str != "hill" &&
     str != "mountain"
   ) return 0;
   else if (str == "sky") {

@@ -60,11 +60,12 @@ export const printCallExpression: PrintNodeFunction<
       arg0.start
     );
 
+    const grouped = group([indent([softline, argPrinted])], { id: sym });
     if (tryCondense && node.arguments.length == 1) {
       // don't indent these
-      printed.push(argPrinted);
+      printed.push(ifBreak(grouped,argPrinted));
     } else {
-      printed.push(group([indent([softline, argPrinted])], { id: sym }));
+      printed.push(grouped);
     }
   }
 
