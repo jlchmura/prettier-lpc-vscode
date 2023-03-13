@@ -116,13 +116,13 @@ export class MultiLineStream {
 
   public advanceIfModifier(): string {
     return this.advanceIfWordWithTest((match) =>
-      modifiers_set.has(match[0].toLowerCase())
+      modifiers_set.has(match[0])
     );
   }
 
   public advanceIfType(): string {
     return this.advanceIfWordWithTest((match) =>
-      typesSet.has(match[0].toLowerCase())
+      typesSet.has(match[0])
     );
   }
 
