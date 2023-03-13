@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.41",
+  "version": "0.0.43",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -98,13 +98,7 @@
     ],
     "configuration": {
       "title": "Prettier LPC",
-      "properties": {        
-        "Prettier-LPC.tabWidth": {
-          "type": "number",
-          "default": 2,
-          "minimum": 1,
-          "markdownDescription": "Tab width"
-        }
+      "properties": {                
       }
     }
   }

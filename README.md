@@ -10,8 +10,9 @@ Install from the VS Code Marketplace: [prettier-lpc-vscode](https://marketplace.
 ## Configuration
 
 This plugin, like Prettier, is
-[opinionated](https://prettier.io/docs/en/option-philosophy.html). The following
-options are available but may be removed in the future:
+[opinionated](https://prettier.io/docs/en/option-philosophy.html). The plugin honors standard prettier config options which 
+can be set via a [`.prettierrc` file](https://prettier.io/docs/en/configuration.html). In particular, the following
+options may be of interest to LPC developers:
 
 | API Option           | Default | Description                                                                        |
 | -------------------- | ------- | ---------------------------------------------------------------------------------- |

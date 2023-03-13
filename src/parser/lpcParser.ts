@@ -2416,7 +2416,7 @@ export class LPCParser {
     // <..<,
 
     return nd;
-  }  
+  }
 }
 
 export function ParseLPC(text: string) {
