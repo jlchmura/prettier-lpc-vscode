@@ -965,7 +965,8 @@ export class LPCParser {
       ) as ParenBlockNode;
     }
     nd.arguments = [...parenBlock.children];
-    nd.children = nd.arguments;
+    nd.children = [...nd.arguments];
+    
     this.eatWhitespace();
 
     const peekToken = this.scanner.peek();
@@ -981,6 +982,7 @@ export class LPCParser {
     nd.closed = true;
     this.tryParseComment(nd);
 
+    
     parent.children.push(nd);
 
     return nd;
