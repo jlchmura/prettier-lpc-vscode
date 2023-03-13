@@ -1947,6 +1947,12 @@ export class LPCParser {
       varDecl.declarations.push(this.varDeclFromIdent(identNode, nd));
       nd.vars?.push(varDecl);
     }
+
+    if (t != TokenType.ForEachIn) {
+      throw Error(`Expected foreach in node @ ${this.scanner.getTokenOffset()}`);
+    }
+    nd.inType = this.scanner.getTokenText().trim();
+
     this.eatWhitespaceAndNewlines();
 
     // parse the expression, which might be a range

@@ -93,7 +93,7 @@ export const printForEachStatement: PrintNodeFunction<
   if (node.vars) {
     inner.push(join([",", line], path.map(printChildren, "vars")));
   }
-  inner.push(" : ");
+  inner.push(" ", node.inType || ":", " ");
 
   inner.push(group(path.call(printChildren, "exp")));
 

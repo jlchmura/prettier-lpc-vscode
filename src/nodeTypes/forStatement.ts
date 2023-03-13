@@ -13,8 +13,9 @@ export class ForStatementNode extends LPCNode {
 
 export class ForEachStatementNode extends LPCNode {
   vars: VariableDeclarationNode[] | undefined;
-  exp: LPCNode|undefined;
-  codeblock:LPCNode | undefined;
+  exp: LPCNode | undefined;
+  codeblock: LPCNode | undefined;
+  inType: string | undefined;
   public type = "foreach";
 }
 

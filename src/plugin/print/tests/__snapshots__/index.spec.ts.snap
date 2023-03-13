@@ -72,6 +72,8 @@ exports[`prettier-lpc plugin format foreach loops: foreach-collapsed 1`] = `
 
 exports[`prettier-lpc plugin format foreach loops: foreach-multi-var 1`] = `"test() { foreach (x, y : a) { z = b[x]; } }"`;
 
+exports[`prettier-lpc plugin format foreach loops: foreach-multi-var-keep-in 1`] = `"test() { foreach (x, y in a) { z = b[x]; } }"`;
+
 exports[`prettier-lpc plugin format foreach loops: foreach-multiline 1`] = `
 "test() {
   string exitKey;

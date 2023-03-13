@@ -320,7 +320,7 @@ export class Scanner implements IScanner {
             this.stream.advanceIfChars(tt._IN))
         ) {
           this.stream.skipWhitespace();
-          return this.finishToken(offset, TokenType.ForEachIn);
+          return this.finishToken(offset, TokenType.ForEachIn);          
         }
 
         // foreach range ".."

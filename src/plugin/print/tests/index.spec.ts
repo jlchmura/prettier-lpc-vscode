@@ -375,8 +375,11 @@ describe("prettier-lpc plugin", () => {
     );
     expect(formatted).toMatchSnapshot("foreach-range-multiline");
 
-    formatted = format(`test() {foreach (x, y in a){z = b[x];        } }`);
+    formatted = format(`test() {foreach (x, y : a){z = b[x];        } }`);
     expect(formatted).toMatchSnapshot("foreach-multi-var");
+
+    formatted = format(`test() {foreach (x, y in a){z = b[x];        } }`);
+    expect(formatted).toMatchSnapshot("foreach-multi-var-keep-in");
   });
 
   test("general formatting", () => {
