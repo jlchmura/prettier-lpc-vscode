@@ -128,6 +128,7 @@ export const modifiers: { [mod: string]: number } = {
   varargs: DeclType.Function,
   deprecated: DeclType.Function | DeclType.Variable,
   virtual: DeclType.Inherit,
+  nosave: DeclType.Variable
 };
 
 export const types = [

@@ -1209,7 +1209,7 @@ export class LPCParser {
   }
 
   private parseModifiers() {
-    const mods: IdentifierNode[] = [];
+    const mods: IdentifierNode[] = [];    
     while (this.scanner.getTokenType() == TokenType.Modifier) {
       const nd = new IdentifierNode(
         this.scanner.tokenOffset,
@@ -1220,8 +1220,7 @@ export class LPCParser {
       nd.name = this.scanner.getTokenText().trim();
       mods.push(nd);
 
-      this.eatWhitespace();
-      this.scanner.scan();
+      this.eatWhitespaceAndNewlines();      
     }
     return mods;
   }

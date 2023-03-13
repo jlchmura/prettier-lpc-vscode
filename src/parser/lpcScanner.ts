@@ -450,8 +450,12 @@ export class Scanner implements IScanner {
         }
 
         // INLINE CLOSURES
-        if (this.stream.advanceIfChars([tt._OPP, tt._COL])) {
-          // (:
+        if (this.stream.peekChar(tt._OPP)) {
+          this.stream.skipWhitespace
+        }
+        
+        if (this.stream.advanceIfRegExp(/^\(\s*\:/)) {
+          // (:  use regex to account for space between tokens
           this.stream.skipWhitespace();
           this.parenStack.push(TokenType.InlineClosureStart);
           return this.finishToken(offset, TokenType.InlineClosureStart);
