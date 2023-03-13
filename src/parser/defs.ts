@@ -1,6 +1,7 @@
 export const tt = {
   _HSH: "#".charCodeAt(0),
   _BNG: "!".charCodeAt(0),
+  _DLR: "$".charCodeAt(0),
   _MIN: "-".charCodeAt(0),
   _LAN: "<".charCodeAt(0),
   _RAN: ">".charCodeAt(0),

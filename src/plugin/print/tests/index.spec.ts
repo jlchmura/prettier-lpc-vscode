@@ -230,6 +230,12 @@ describe("prettier-lpc plugin", () => {
       `"object *a = filter(all_inventory(room), (: $1->id("something") :));"`
     );
 
+    // whitespace between ( and :
+    formatted = format(`int *arr=filter(arr2,( :($1==1&&$1<10):));`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`
+    );
+
     formatted = format(`int *arr=filter(arr2,(:($1==1&&$1<10):));`);
     expect(formatted).toMatchInlineSnapshot(
       `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`

@@ -1221,6 +1221,7 @@ export class LPCParser {
       mods.push(nd);
 
       this.eatWhitespaceAndNewlines();      
+      this.scanner.scan();
     }
     return mods;
   }
@@ -1599,6 +1600,8 @@ export class LPCParser {
 
     const hasStar = this.parseStar();
     const byRef = this.parseByRef();
+    const tt = this.scanner.getTokenType();
+    const ttxt = this.scanner.getTokenText();
     let identNode = this.parseIdentifier(hasStar, byRef);
 
     let t: TokenType = this.scanner.peek();

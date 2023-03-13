@@ -474,6 +474,11 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.InlineClosureArgument);
         }
 
+        // match single $ for Fluffos $() syntax
+        if (this.stream.advanceIfChar(tt._DLR)) {
+          return this.finishToken(offset, TokenType.DeclarationName);
+        }
+
         if (this.stream.advanceIfChar(tt._COM)) {
           this.stream.skipWhitespace();
           return this.finishToken(offset, TokenType.Comma);
