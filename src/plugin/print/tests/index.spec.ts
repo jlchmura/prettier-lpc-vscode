@@ -6,7 +6,6 @@ import {
   for_loop_various,
   if_condense_test,
   literal_consecutive_strings,
-  literal_strings_multiple_escapes,
   mapping_with_ternary_value,
   spec_input_room,
 } from "./inputs";
@@ -496,7 +495,19 @@ describe("prettier-lpc plugin", () => {
     let formatted = format(`string s = "testing\\" 123";`);
     expect(formatted).toMatchInlineSnapshot(`"string s = "testing\\" 123";"`);
 
-    formatted = format(literal_strings_multiple_escapes);
+    formatted = format(`string s = "testing\\" 123\\\\";`);
     expect(formatted).toMatchSnapshot("literal_strings_multiple_escapes");
+  });
+
+  test("function declarations", () => {
+    // fluffos version with no variable name
+    let formatted = format(`string evaluate_path(string);`);
+    expect(formatted).toMatchInlineSnapshot(`"string evaluate_path(string);"`);
+
+    // LD version
+    formatted = format(`string evaluate_path(string s);`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"string evaluate_path(string s);"`
+    );
   });
 });

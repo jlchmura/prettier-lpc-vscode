@@ -1185,8 +1185,6 @@ export class LPCParser {
 
     // see if there is an initializer
     if (this.scanner.peek() == TokenType.AssignmentOperator) {
-      
-
       if (this.scanner.getTokenText() == "=") {
         this.scanner.scan(); // consume assignment op
         if (this.scanner.getTokenText().trim() != "=") {
@@ -1209,7 +1207,7 @@ export class LPCParser {
         aExp.operator = this.scanner.getTokenText().trim();
 
         //d.init = aExp;
-        d.id = this.parseAssignmentExpression(aExp, parent);                
+        d.id = this.parseAssignmentExpression(aExp, parent);
       }
     }
 
@@ -1629,8 +1627,7 @@ export class LPCParser {
 
     const hasStar = this.parseStar();
     const byRef = this.parseByRef();
-    const tt = this.scanner.getTokenType();
-    const ttxt = this.scanner.getTokenText();
+
     let identNode = this.parseIdentifier(hasStar, byRef);
 
     let t: TokenType = this.scanner.peek();
@@ -1732,17 +1729,40 @@ export class LPCParser {
       if (!identNode) throw "unexpected arrow w/o ident";
       return this.parseArrow(parent, identNode);
     }
-    if (t == TokenType.ParenBlock) {
+
+    // fluffos function decl with no var name can look like a type cast in this sitaution
+    if (t == TokenType.ParenBlock || (allowFn && t == TokenType.TypeCast)) {
       this.scanner.scan();
       // paren block here means this is either a call exp
       // or a function decl
       if (!identNode) throw "got call-exp without ident node";
-      const parenNode = this.parseParenBlock(
-        nd,
-        allowFn
-          ? ParseExpressionFlag.AllowDeclaration
-          : ParseExpressionFlag.StatementOnly
-      );
+
+      let parenNode: ParenBlockNode;
+      if (t == TokenType.TypeCast) {
+        // fill in a paren node
+        parenNode = new ParenBlockNode(
+          this.scanner.getTokenOffset(),
+          this.scanner.getTokenEnd(),
+          [],
+          nd
+        );
+        const idNd = new IdentifierNode(
+          this.scanner.getTokenOffset(),
+          this.scanner.getTokenEnd() - 1,
+          [],
+          parenNode
+        );
+        idNd.name = this.scanner.getTokenText();
+        idNd.name = idNd.name.substring(1, idNd.name.length - 1);
+        parenNode.children.push(idNd);
+      } else {
+        parenNode = this.parseParenBlock(
+          nd,
+          allowFn
+            ? ParseExpressionFlag.AllowDeclaration
+            : ParseExpressionFlag.StatementOnly
+        ) as ParenBlockNode;
+      }
 
       this.eatWhitespaceAndNewlines();
 

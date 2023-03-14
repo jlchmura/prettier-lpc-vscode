@@ -96,6 +96,7 @@ export const printTypeCast: PrintNodeFunction<
   TypeCastExpressionNode
 > = (node, path, options, printChildren) => {
   const printed: Doc = ["("];
+
   if (node.dataType) printed.push(path.call(printChildren, "dataType"));
   if (node.isArray) printed.push("*");
   printed.push(")");

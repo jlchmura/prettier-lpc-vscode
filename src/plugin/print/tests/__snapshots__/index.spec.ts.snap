@@ -278,6 +278,8 @@ reset(arg) {
 }"
 `;
 
+exports[`prettier-lpc plugin handle string literals with escaped quotes: literal_strings_multiple_escapes 1`] = `"string s = "testing\\" 123\\\\";"`;
+
 exports[`prettier-lpc plugin handles the spread operator (FluffOS): spread-op-function-and-callexp 1`] = `
 "mixed sum(mixed *numbers...) {
   mixed number, result = 0;
