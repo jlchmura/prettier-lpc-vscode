@@ -32,7 +32,7 @@ export const tt = {
   _AMP: "&".charCodeAt(0),
   _QUE: "?".charCodeAt(0),
   _PCT: "%".charCodeAt(0),
-  _IN: "in".split("").map((c) => c.charCodeAt(0)),
+  _IN: "in ".split("").map((c) => c.charCodeAt(0)),  // must have a space after it
   _CALLOTHER: "->".split("").map((c) => c.charCodeAt(0)),
   _INHERIT: "inherit".split("").map((c) => c.charCodeAt(0)),
   _IF: "if".split("").map((c) => c.charCodeAt(0)),
