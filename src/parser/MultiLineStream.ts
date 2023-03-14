@@ -128,7 +128,7 @@ export class MultiLineStream {
 
   public advanceIfWordNonReserved(): string {
     return this.advanceIfWordWithTest(
-      (match) => !reserved_words_set.has(match[0].toLowerCase())
+      (match) => !reserved_words_set.has(match[0])
     );
   }
 
