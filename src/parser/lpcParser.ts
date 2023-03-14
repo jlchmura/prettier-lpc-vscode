@@ -78,6 +78,14 @@ export const enum ParseExpressionFlag {
   AllowFunction = 0b0010,
 }
 
+export class ParserError extends Error {
+  loc: number | undefined;
+  constructor(msg: string, loc: number) {
+    super(msg);
+    this.loc = loc;
+  }
+}
+
 export class LPCParser {
   private scanner!: Scanner;
   private text!: string;
@@ -202,23 +210,21 @@ export class LPCParser {
       case TokenType.MappingStart:
         return this.parseMaybeExpression(token, curr, flags);
       case TokenType.FunctionArgumentType:
-        throw Error("not handled"); // todo: remove this
+        throw this.parserError("not handled"); // todo: remove this
       case TokenType.FunctionArgument:
-        throw Error("not handled"); // todo: remove this
+        throw this.parserError("not handled"); // todo: remove this
       case TokenType.CodeBlockStart:
         return this.parseCodeBlock(curr);
       case TokenType.CodeBlockEnd:
-        throw Error(
-          `unexpected codeblock end at [${this.scanner.getTokenOffset()}]: ${this.scanner.getTokenText()}`
+        throw this.parserError(
+          `unexpected codeblock end: ${this.scanner.getTokenText()}`
         );
       case TokenType.If:
       case TokenType.ElseIf:
       case TokenType.Else:
         return this.parseIf(token, curr);
       case TokenType.Ternary:
-        throw Error(
-          `Unexpected ternary expression at ${this.scanner.getTokenOffset()}`
-        );
+        throw this.parserError(`Unexpected ternary expression`);
       case TokenType.ForEach:
         return this.parseForEach(curr);
       case TokenType.For:
@@ -268,8 +274,8 @@ export class LPCParser {
         return this.parseLambdaEmptyArg(curr);
     }
 
-    throw Error(
-      `unhandled token type ${token} @ ${this.scanner.getTokenOffset()} [${this.scanner.getTokenText()}]:\nErr: ${this.scanner.getTokenError()}`
+    throw this.parserError(
+      `unhandled token type ${token} [${this.scanner.getTokenText()}]:\nErr: ${this.scanner.getTokenError()}`
     );
   }
 
@@ -437,8 +443,7 @@ export class LPCParser {
       } else {
         t = this.scanner.scan();
         newNode = this.parseToken(t, tempParent, flags);
-        if (!newNode)
-          throw Error(`Unexpected token @ ${this.scanner.getTokenOffset()}`);
+        if (!newNode) throw this.parserError(`Unexpected token`);
         children.push(newNode);
       }
     }
@@ -492,7 +497,9 @@ export class LPCParser {
       this.scanner.scan();
       const ln = lh as LiteralNode;
       if (ln.dataType != "string")
-        throw Error(`Expected string before arrow but got ${ln.dataType}`);
+        throw this.parserError(
+          `Expected string before arrow but got ${ln.dataType}`
+        );
       return this.parseArrow(parent, ln);
     } else if (tt == TokenType.Literal) {
       // consecutive literals can be treated like a binary expression
@@ -597,7 +604,9 @@ export class LPCParser {
     // scan until we get a paren block end
     while ((t = this.scanner.scan()) && t != TokenType.CodeBlockEnd) {
       if (t == TokenType.EOS) {
-        throw Error(`unexpected eos in codeblock starting at [${cb.start}]`);
+        throw this.parserError(
+          `unexpected eos in codeblock starting at [${cb.start}]`
+        );
       }
       if (t == TokenType.Semicolon || t == TokenType.Comma) {
         // leftover semi, consume it
@@ -652,7 +661,7 @@ export class LPCParser {
     let t: TokenType;
     while (!nd.closed && (t = this.scanner.peek())) {
       if (t == TokenType.EOS)
-        throw Error(
+        throw this.parserError(
           `Could not find consequent @ ${this.scanner.getTokenOffset()}`
         );
       switch (t) {
@@ -774,7 +783,7 @@ export class LPCParser {
   private parseOperator(token: TokenType, parent: LPCNode) {
     const nd = this.parseMaybeUnaryPrefixOperator(token, parent);
     if (!nd)
-      throw Error(
+      throw this.parserError(
         `Could not parse operator @ [${this.scanner.getTokenOffset()}]`
       );
     return nd;
@@ -782,7 +791,7 @@ export class LPCParser {
 
   private parseLogicalExpression(left: LPCNode, flags: ParseExpressionFlag) {
     if (!left)
-      throw Error(
+      throw this.parserError(
         `logical exp missing left token @ ${this.scanner.getTokenOffset()}`
       );
 
@@ -910,7 +919,7 @@ export class LPCParser {
         // ok
         break;
       default:
-        throw Error(
+        throw this.parserError(
           `Invalid expression type (${
             inh.argument?.type
           }) after inherit @ ${this.scanner.getTokenOffset()}`
@@ -920,7 +929,9 @@ export class LPCParser {
     // there should be a semicolon left
 
     if (this.scanner.scan() != TokenType.Semicolon)
-      throw Error(`Expected semicolon at ${this.scanner.getTokenOffset()}`);
+      throw this.parserError(
+        `Expected semicolon at ${this.scanner.getTokenOffset()}`
+      );
 
     inh.end = this.scanner.getTokenOffset();
 
@@ -1059,14 +1070,14 @@ export class LPCParser {
       nd.property = exp;
       nd.isStruct = true;
       if (this.scanner.scan() != TokenType.ParenBlockEnd)
-        throw Error(
+        throw this.parserError(
           `Expected paren block end after struct member @ ${this.scanner.getTokenOffset()}`
         );
       return nd;
     }
 
     if (t != TokenType.DeclarationName)
-      throw Error(
+      throw this.parserError(
         `unexpected token after arrow @ ${this.scanner.getTokenOffset()}`
       );
 
@@ -1188,7 +1199,7 @@ export class LPCParser {
       if (this.scanner.getTokenText() == "=") {
         this.scanner.scan(); // consume assignment op
         if (this.scanner.getTokenText().trim() != "=") {
-          throw Error(
+          throw this.parserError(
             `Unexpected token in variable initializer @ ${this.scanner.getTokenOffset()}`
           );
         }
@@ -1322,7 +1333,7 @@ export class LPCParser {
 
   private parseStructDefinition(structName: IdentifierNode, parent: LPCNode) {
     if (this.scanner.scan() != TokenType.CodeBlockStart)
-      throw Error(
+      throw this.parserError(
         `Expected opening bracket in struct definition @ ${this.scanner.getTokenOffset()}`
       );
 
@@ -1563,7 +1574,7 @@ export class LPCParser {
       t = this.scanner.scan(); // consume next token
       rh = this.parseToken(t, lh, ParseExpressionFlag.StatementOnly);
       this.eatWhitespaceAndNewlines();
-      if (!rh) throw Error("Expected rh");
+      if (!rh) throw this.parserError("Expected rh");
 
       t = this.scanner.peek();
       const rhPrec = op_precedence[(rh as BinaryExpressionNode).operator || ""];
@@ -1581,7 +1592,7 @@ export class LPCParser {
       }
 
       if (!lh)
-        throw Error(
+        throw this.parserError(
           `left-hand operator was undefined @ ${this.scanner.getTokenOffset()}`
         );
 
@@ -1665,10 +1676,10 @@ export class LPCParser {
         return this.parseVariableDeclaration(varDecl, parent, identNode);
       } else {
         if (modNodes.length > 0 || !!typeNode)
-          throw Error(
+          throw this.parserError(
             `did not expect mod or type at ${this.scanner.getTokenOffset()}`
           );
-        if (!identNode) throw Error("expected ident");
+        if (!identNode) throw this.parserError("expected ident");
         return identNode;
       }
     }
@@ -1816,7 +1827,9 @@ export class LPCParser {
     // if we get all the way down here, then it is just a variable
     // maybe used in an binop or as a call-exp arg
     if (!identNode)
-      throw Error(`expected ident node @ ${this.scanner.getTokenOffset()}`);
+      throw this.parserError(
+        `expected ident node @ ${this.scanner.getTokenOffset()}`
+      );
 
     // don't push to parent.children in this case..
     // it will be handled by the parent directly
@@ -1876,7 +1889,7 @@ export class LPCParser {
         continue;
       }
       if (t == TokenType.EOS)
-        throw Error(
+        throw this.parserError(
           `Unexpected EOS inside indexor [${this.scanner.getTokenOffset()}]`
         );
       if (t == TokenType.Comma) {
@@ -1999,7 +2012,7 @@ export class LPCParser {
       const identNode = this.parseIdentifier(hasStar);
 
       if (!identNode)
-        throw Error(
+        throw this.parserError(
           `Expected var after foreach @ ${this.scanner.getTokenOffset()}`
         );
 
@@ -2010,7 +2023,7 @@ export class LPCParser {
     }
 
     if (t != TokenType.ForEachIn) {
-      throw Error(
+      throw this.parserError(
         `Expected foreach in node @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2025,7 +2038,7 @@ export class LPCParser {
       ParseExpressionFlag.StatementOnly
     );
     if (!nd.exp)
-      throw Error(
+      throw this.parserError(
         `Expected expression but did not get one @ ${this.scanner.getTokenOffset()}`
       );
 
@@ -2041,7 +2054,7 @@ export class LPCParser {
         ParseExpressionFlag.StatementOnly
       );
       if (!rh)
-        throw Error(
+        throw this.parserError(
           `Expected rh expression but did not get one @ ${this.scanner.getTokenOffset()}`
         );
 
@@ -2055,7 +2068,7 @@ export class LPCParser {
     }
 
     if (this.scanner.scan() != TokenType.ParenBlockEnd) {
-      throw Error(
+      throw this.parserError(
         `Expected closing paren after foreach expression @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2065,7 +2078,7 @@ export class LPCParser {
     this.scanner.eat(TokenType.BlankLines);
 
     if (!nd.codeblock) {
-      throw Error(
+      throw this.parserError(
         `Could not find codeblock for foreach @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2090,14 +2103,15 @@ export class LPCParser {
     this.eatWhitespace();
 
     if (this.scanner.scan() != TokenType.ParenBlock)
-      throw Error("expected opening paren");
+      throw this.parserError("expected opening paren");
 
     const stack: (LPCNode | undefined)[] = [];
     let t: TokenType,
       lastToken: TokenType = 0;
 
     while ((t = this.scanner.scan()) && t != TokenType.ParenBlockEnd) {
-      if (t == TokenType.EOS) throw Error("Unexpected EOS in for statement");
+      if (t == TokenType.EOS)
+        throw this.parserError("Unexpected EOS in for statement");
 
       if (t == TokenType.BlankLines || t == TokenType.Whitespace) continue;
       else if (t == TokenType.Semicolon)
@@ -2131,7 +2145,7 @@ export class LPCParser {
     }
 
     if (stack.length > 3)
-      throw Error(
+      throw this.parserError(
         `Unexpected stack size [${
           stack.length
         }] in for statement @ ${this.scanner.getTokenOffset()}`
@@ -2172,7 +2186,7 @@ export class LPCParser {
     this.eatWhitespace();
 
     if (this.scanner.scan() != TokenType.ParenBlock)
-      throw Error("expected opening paren");
+      throw this.parserError("expected opening paren");
 
     nd.test = this.parseParenBlock(nd, ParseExpressionFlag.StatementOnly);
 
@@ -2205,7 +2219,7 @@ export class LPCParser {
     );
 
     if (this.scanner.scan() != TokenType.ParenBlock) {
-      throw Error(
+      throw this.parserError(
         `Expected ( got '${this.scanner.getTokenText()}' @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2218,14 +2232,15 @@ export class LPCParser {
     this.tryParseComment(switchNode.test!);
 
     if (this.scanner.scan() != TokenType.CodeBlockStart)
-      throw Error(
+      throw this.parserError(
         `Expected { got '${this.scanner.getTokenText()}' @ ${this.scanner.getTokenOffset()}`
       );
 
     this.eatWhitespaceAndNewlines();
     while (this.scanner.scan() != TokenType.CodeBlockEnd) {
       const t = this.scanner.getTokenType();
-      if (t == TokenType.EOS) throw Error("Unexpected EOS in switch case");
+      if (t == TokenType.EOS)
+        throw this.parserError("Unexpected EOS in switch case");
       if (t == TokenType.Whitespace || t == TokenType.BlankLines) {
         // WHITESPACE/BLANKLINE
         continue;
@@ -2280,7 +2295,9 @@ export class LPCParser {
           }
 
           if (this.scanner.getTokenType() != TokenType.Colon)
-            throw Error(`Expected colon at ${this.scanner.getTokenOffset()}`);
+            throw this.parserError(
+              `Expected colon at ${this.scanner.getTokenOffset()}`
+            );
 
           this.eatWhitespace();
           this.tryParseComment(caseNode);
@@ -2292,7 +2309,7 @@ export class LPCParser {
         if (caseType == "case") switchNode.cases.push(caseNode);
         else switchNode.default = cb;
       } else {
-        throw Error(
+        throw this.parserError(
           `Unexpected token in switch case at ${this.scanner.getTokenOffset()}`
         );
       }
@@ -2328,7 +2345,8 @@ export class LPCParser {
       }
 
       this.scanner.scan();
-      if (t == TokenType.EOS) throw Error("Unexpected EOS in switch case");
+      if (t == TokenType.EOS)
+        throw this.parserError("Unexpected EOS in switch case");
 
       pushIfVal(
         children,
@@ -2367,7 +2385,7 @@ export class LPCParser {
     }
 
     if (!arg)
-      throw Error(
+      throw this.parserError(
         `Unespected token after closure start @ ${this.scanner.getTokenOffset()}`
       );
 
@@ -2440,7 +2458,7 @@ export class LPCParser {
 
     let t = this.scanner.scan();
     if (t != TokenType.ArrayStart) {
-      throw Error(
+      throw this.parserError(
         `Unepxected argument type passed to lambda @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2448,7 +2466,7 @@ export class LPCParser {
 
     this.eatWhitespaceAndNewlines();
     if (this.scanner.scan() != TokenType.Comma) {
-      throw Error(
+      throw this.parserError(
         `Expected comma after lambda arguments array @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2458,7 +2476,7 @@ export class LPCParser {
 
     this.eatWhitespaceAndNewlines();
     if (this.scanner.scan() != TokenType.LabmdaEnd) {
-      throw Error(
+      throw this.parserError(
         `Unexpected token after lambda code @ ${this.scanner.getTokenOffset()}`
       );
     }
@@ -2494,6 +2512,10 @@ export class LPCParser {
     // <..<,
 
     return nd;
+  }
+
+  private parserError(msg: string, loc?: number) {
+    return new ParserError(msg, loc || this.scanner.getTokenOffset());
   }
 }
 

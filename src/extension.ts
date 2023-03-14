@@ -124,8 +124,13 @@ function format(document: TextDocument, config: Config) {
 function tryFormat(doc: TextDocument, config: prettier.Config) {
   try {
     return prettier.format(doc.getText(), config);
-  } catch (e) {
-    console.log(e);
+  } catch (e) {    
+    console.log(e);    
+    if ((e as any).loc) {      
+      const pos = doc.positionAt((e as any).loc);
+      window.showTextDocument(doc, { selection: new Range(pos,pos)});      
+    }
+    
     window.showErrorMessage((e as any).message);
 
     return doc.getText();
