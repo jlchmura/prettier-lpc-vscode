@@ -62,6 +62,11 @@ export const printIdentifier: PrintNodeFunction<IdentifierNode> = (
     arr.push("[", printChildren(["property"]), "]");
   }
 
+  // fluffos only
+  if (node.spread) {
+    arr.push("...");
+  }
+
   return arr;
 };
 

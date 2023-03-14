@@ -13,7 +13,10 @@ import {
   BinaryishExpressionNode,
 } from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
-import { CallExpressionNode, SpreadOperatorNode } from "../nodeTypes/callExpression";
+import {
+  CallExpressionNode,
+  SpreadOperatorNode,
+} from "../nodeTypes/callExpression";
 import {
   ClosureNode,
   InlineClosureArgumentNode,
@@ -418,17 +421,6 @@ export class LPCParser {
         // a comma in this position is a separator
         // also skip blanklines
         continue;
-      }
-
-      // FluffOS: spread operator must be the last token in the paren group
-      if (t == TokenType.Spread) {
-        this.scanner.scan();
-        const spread = this.parseSpreadOperator(nd);
-        children.push(spread);
-
-        this.eatWhitespaceAndNewlines();
-
-        break;
       }
 
       let newNode: LPCNode | undefined;
@@ -988,7 +980,7 @@ export class LPCParser {
     }
     nd.arguments = [...parenBlock.children];
     nd.children = [...nd.arguments];
-    
+
     this.eatWhitespace();
 
     const peekToken = this.scanner.peek();
@@ -1004,7 +996,6 @@ export class LPCParser {
     nd.closed = true;
     this.tryParseComment(nd);
 
-    
     parent.children.push(nd);
 
     return nd;
@@ -1231,7 +1222,7 @@ export class LPCParser {
   }
 
   private parseModifiers() {
-    const mods: IdentifierNode[] = [];    
+    const mods: IdentifierNode[] = [];
     while (this.scanner.getTokenType() == TokenType.Modifier) {
       const nd = new IdentifierNode(
         this.scanner.tokenOffset,
@@ -1242,7 +1233,7 @@ export class LPCParser {
       nd.name = this.scanner.getTokenText().trim();
       mods.push(nd);
 
-      this.eatWhitespaceAndNewlines();      
+      this.eatWhitespaceAndNewlines();
       this.scanner.scan();
     }
     return mods;
@@ -1451,7 +1442,7 @@ export class LPCParser {
 
       this.eatWhitespace();
 
-      t = this.scanner.peek();      
+      t = this.scanner.peek();
 
       lh = me;
     }
@@ -1491,7 +1482,7 @@ export class LPCParser {
       case TokenType.Star: // if star shows up here, treat it as an operator
         //if (this.opParseLevel <= this.lastPrecLevel) {
         // binary expr
-        return this.parsePrecedenceClimber(lh, parent, this.lastPrecLevel+1);
+        return this.parsePrecedenceClimber(lh, parent, this.lastPrecLevel + 1);
         //}
         break;
       // this.scanner.scan();
@@ -1626,13 +1617,22 @@ export class LPCParser {
     let identNode = this.parseIdentifier(hasStar, byRef);
 
     let t: TokenType = this.scanner.peek();
+
+    // parse fluffos spread operator and attach to ident node being spread
+    if (t == TokenType.Spread && identNode) {
+      this.scanner.scan();
+      identNode.spread = this.parseSpreadOperator(identNode);
+      this.eatWhitespaceAndNewlines();
+      t = this.scanner.peek();
+    }
+
     // tokens that indicate a variable or declaration
     if (
       t == TokenType.ParenBlockEnd ||
       t == TokenType.Semicolon ||
       t == TokenType.Comma ||
       t == TokenType.IndexorEnd ||
-      t == TokenType.Spread
+      !!identNode?.spread // having a spread node means its def a variable or decl
     ) {
       // at this point we know its either a variable or a declaration
       // check disallow
@@ -1955,7 +1955,7 @@ export class LPCParser {
       t != TokenType.EOS &&
       t != TokenType.ForEachIn
     ) {
-      if (t == TokenType.Comma) continue; 
+      if (t == TokenType.Comma) continue;
 
       const typeNode = this.parseType();
       const hasStar = this.parseStar();
@@ -1973,7 +1973,9 @@ export class LPCParser {
     }
 
     if (t != TokenType.ForEachIn) {
-      throw Error(`Expected foreach in node @ ${this.scanner.getTokenOffset()}`);
+      throw Error(
+        `Expected foreach in node @ ${this.scanner.getTokenOffset()}`
+      );
     }
     nd.inType = this.scanner.getTokenText().trim();
 

@@ -4,6 +4,7 @@ import { CodeBlockNode } from "../../nodeTypes/codeBlock";
 import { FunctionDeclarationNode } from "../../nodeTypes/functionDeclaration";
 import { ParentExpressionNode } from "../../nodeTypes/memberExpression";
 import { ReturnNode } from "../../nodeTypes/returnNode";
+import { VariableDeclarationNode } from "../../nodeTypes/variableDeclaration";
 import { printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
@@ -40,17 +41,8 @@ export const printFunction: PrintNodeFunction<FunctionDeclarationNode> = (
 
   arr.push("(");
   if (node.params.length > 0) {
-    const paramsPrinted = path.map(printChildren, "params");
-    const paramsJoined: Doc = [];
-
-    paramsPrinted.forEach((prm, ix) => {
-      if (ix > 0 && node.params![ix].type != "spread") {
-        paramsJoined.push(",", line);
-      }
-      paramsJoined.push(prm);
-    });
-
-    arr.push(group(paramsJoined));
+    const paramsPrinted = join([",", line], path.map(printChildren, "params"));
+    arr.push(group(paramsPrinted));
   }
   arr.push(")");
 
