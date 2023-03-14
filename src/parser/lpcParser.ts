@@ -1185,15 +1185,32 @@ export class LPCParser {
 
     // see if there is an initializer
     if (this.scanner.peek() == TokenType.AssignmentOperator) {
-      this.scanner.scan(); // consume assignment op
-      if (this.scanner.getTokenText().trim() != "=") {
-        throw Error(
-          `Unexpected token in variable initializer @ ${this.scanner.getTokenOffset()}`
-        );
-      }
+      
 
-      const t = this.scanner.scan();
-      d.init = this.parseToken(t, d);
+      if (this.scanner.getTokenText() == "=") {
+        this.scanner.scan(); // consume assignment op
+        if (this.scanner.getTokenText().trim() != "=") {
+          throw Error(
+            `Unexpected token in variable initializer @ ${this.scanner.getTokenOffset()}`
+          );
+        }
+
+        const t = this.scanner.scan();
+        d.init = this.parseToken(t, d);
+      } else {
+        this.scanner.scan();
+        const aExp = new AssignmentExpressionNode(
+          this.scanner.getTokenOffset(),
+          this.scanner.getTokenEnd(),
+          [],
+          parent
+        );
+        aExp.left = i;
+        aExp.operator = this.scanner.getTokenText().trim();
+
+        //d.init = aExp;
+        d.id = this.parseAssignmentExpression(aExp, parent);                
+      }
     }
 
     d.children = []; // not needed, blank this out

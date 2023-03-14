@@ -409,6 +409,9 @@ describe("prettier-lpc plugin", () => {
   test("format assignment expressions", () => {
     let formatted = format(assign_exp_suffix_comment);
     expect(formatted).toMatchSnapshot("assign_exp_suffix_comment");
+
+    formatted = format(`int i=0; test() { indices = ({i, index++}); }`);
+    expect(formatted).toMatchSnapshot("assignment_inside_array");
   });
 
   test("formats if statements", () => {

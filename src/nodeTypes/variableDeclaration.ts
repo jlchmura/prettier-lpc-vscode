@@ -1,3 +1,4 @@
+import { AssignmentExpressionNode } from "./assignmentExpression";
 import { IdentifierNode } from "./identifier";
 import { LPCNode } from "./lpcNode";
 
@@ -14,6 +15,6 @@ export class VariableDeclarationNode extends BaseDeclarationNode {
 
 export class VariableDeclaratorNode extends LPCNode {
   public override type: string | undefined = "var";
-  public id: IdentifierNode | undefined;
+  public id: IdentifierNode | AssignmentExpressionNode | undefined;
   public init: LPCNode | undefined;
 }

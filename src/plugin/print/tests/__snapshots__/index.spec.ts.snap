@@ -55,6 +55,11 @@ exports[`prettier-lpc plugin format assignment expressions: assign_exp_suffix_co
 }"
 `;
 
+exports[`prettier-lpc plugin format assignment expressions: assignment_inside_array 1`] = `
+"int i = 0;
+test() { indices = ({i, index++}); }"
+`;
+
 exports[`prettier-lpc plugin format closures: closure-greaterthan-this_player 1`] = `
 "test() {
   object *hash = ({});
