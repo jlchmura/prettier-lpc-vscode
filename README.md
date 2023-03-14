@@ -1,5 +1,5 @@
 # prettier-lpc-vscode
-VSCode extension to format LPC (Lars Pensjö C) files with [Prettier](https://prettier.io/). It is written mainly for the [LDMud](http://www.ldmud.eu/) flavor of LPC, though it may work for others as well.
+VSCode extension to format LPC (Lars Pensjö C) files with [Prettier](https://prettier.io/). It is written mainly for the [LDMud](http://www.ldmud.eu/) flavor of LPC, but includes preliminary support for FluffOS as well.
 
 ### WARNING 
 This extension is a very early release. **It may break your code**. Use at your own risk.

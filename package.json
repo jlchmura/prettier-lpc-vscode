@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -37,7 +37,8 @@
     "lpmud",
     "prettier",
     "formatter",
-    "Lars Pensjö C"
+    "Lars Pensjö C",
+    "FluffOS"
   ],
   "activationEvents": [
     "onStartupFinished",
