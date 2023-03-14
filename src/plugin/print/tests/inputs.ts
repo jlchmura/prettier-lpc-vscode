@@ -118,3 +118,13 @@ export const literal_consecutive_strings = `test() {
   "this is line 2.\n" +
   "this is line 3.";
 }`;
+
+export const literal_strings_multiple_escapes = `test(string a) {
+  a = replace_string(a, "\"", "\\\"");
+  a = "\"" + a + "\"";
+  a = replace_string(a, "\\", "\\\\");
+  a = replace_string(a, "\\\"", "\"");
+  a = replace_string(a, "\n", "\\n");
+  a = replace_string(a, "\t", "\\t");
+  return a;
+}`;

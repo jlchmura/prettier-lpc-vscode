@@ -6,6 +6,7 @@ import {
   for_loop_various,
   if_condense_test,
   literal_consecutive_strings,
+  literal_strings_multiple_escapes,
   mapping_with_ternary_value,
   spec_input_room,
 } from "./inputs";
@@ -169,8 +170,9 @@ describe("prettier-lpc plugin", () => {
     );
     expect(formatted).toMatchSnapshot("ternary-after-binary");
 
-
-    formatted = format(`test() { set_long("The " + race_arr[race] + " looks at " + (gender == 1 ? "him" : "her") + "."); }`);
+    formatted = format(
+      `test() { set_long("The " + race_arr[race] + " looks at " + (gender == 1 ? "him" : "her") + "."); }`
+    );
     expect(formatted).toMatchSnapshot("ternary-with-lit-binary-op");
   });
 
@@ -483,8 +485,18 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
   });
 
-  test("handles the spread operator (FluffOS)",()=>{
-    let formatted=format(`mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`);
-    expect(formatted).toMatchSnapshot('spread-op-function-and-callexp');
+  test("handles the spread operator (FluffOS)", () => {
+    let formatted = format(
+      `mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`
+    );
+    expect(formatted).toMatchSnapshot("spread-op-function-and-callexp");
+  });
+
+  test("handle string literals with escaped quotes", () => {
+    let formatted = format(`string s = "testing\\" 123";`);
+    expect(formatted).toMatchInlineSnapshot(`"string s = "testing\\" 123";"`);
+
+    formatted = format(literal_strings_multiple_escapes);
+    expect(formatted).toMatchSnapshot("literal_strings_multiple_escapes");
   });
 });

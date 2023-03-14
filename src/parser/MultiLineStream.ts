@@ -115,15 +115,11 @@ export class MultiLineStream {
   }
 
   public advanceIfModifier(): string {
-    return this.advanceIfWordWithTest((match) =>
-      modifiers_set.has(match[0])
-    );
+    return this.advanceIfWordWithTest((match) => modifiers_set.has(match[0]));
   }
 
   public advanceIfType(): string {
-    return this.advanceIfWordWithTest((match) =>
-      typesSet.has(match[0])
-    );
+    return this.advanceIfWordWithTest((match) => typesSet.has(match[0]));
   }
 
   public advanceIfWordNonReserved(): string {
@@ -156,13 +152,14 @@ export class MultiLineStream {
 
   public advanceUntilUnescapedQuote(): boolean {
     while (this.position < this.source.length) {
-      if (
-        this.source.charCodeAt(this.position) === tt._DQO &&
-        this.source.charCodeAt(this.position - 1) !== tt._BSL
-      ) {
+      if (this.source.charCodeAt(this.position) === tt._BSL) {
+        // next char is escaped
+        this.advance(2);
+      } else if (this.source.charCodeAt(this.position) === tt._DQO) {
         return true;
+      } else {
+        this.advance(1);
       }
-      this.advance(1);
     }
     return false;
   }
