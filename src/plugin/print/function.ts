@@ -32,17 +32,27 @@ export const printFunction: PrintNodeFunction<FunctionDeclarationNode> = (
 ) => {
   const arr: Doc = [];
   const { modifiers, varType, id } = node;
-  
+
   if (modifiers.length > 0)
     arr.push(join(" ", path.map(printChildren, "modifiers")), " ");
   if (varType) arr.push(path.call(printChildren, "varType"), " ");
   if (id) arr.push(path.call(printChildren, "id"));
 
+  arr.push("(");
   if (node.params.length > 0) {
-    arr.push("(", group(join(", ", path.map(printChildren, "params"))), ")");
-  } else {
-    arr.push("()");
+    const paramsPrinted = path.map(printChildren, "params");
+    const paramsJoined: Doc = [];
+
+    paramsPrinted.forEach((prm, ix) => {
+      if (ix > 0 && node.params![ix].type != "spread") {
+        paramsJoined.push(",", line);
+      }
+      paramsJoined.push(prm);
+    });
+
+    arr.push(group(paramsJoined));
   }
+  arr.push(")");
 
   if (node.isStub) {
     arr.push(";");

@@ -5,7 +5,10 @@ import {
   BinaryExpressionNode,
   BinaryishExpressionNode,
 } from "../../nodeTypes/binaryExpression";
-import { CallExpressionNode } from "../../nodeTypes/callExpression";
+import {
+  CallExpressionNode,
+  SpreadOperatorNode,
+} from "../../nodeTypes/callExpression";
 import { LogicalExpressionNode } from "../../nodeTypes/logicalExpression";
 import { LPCNode } from "../../nodeTypes/lpcNode";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
@@ -43,6 +46,13 @@ export const printUnaryPrefixExpression: PrintNodeFunction<
   return printed;
 };
 
+export const printSpreadOperator: PrintNodeFunction<
+  SpreadOperatorNode,
+  SpreadOperatorNode
+> = (node, path, options, printChildren) => {
+  return "...";
+};
+
 export const printCallExpression: PrintNodeFunction<
   CallExpressionNode,
   CallExpressionNode
@@ -52,7 +62,14 @@ export const printCallExpression: PrintNodeFunction<
   printed.push("(");
   if (node.arguments && node.arguments.length > 0) {
     const arg0 = node.arguments[0];
-    const argPrinted = join([",", line], path.map(printChildren, "arguments"));
+    const argPrinted = path.map(printChildren, "arguments");
+    const argJoined: Doc = [];
+
+    argPrinted.forEach((arg, ix) => {
+      if (ix > 0 && node.arguments![ix].type != "spread")
+        argJoined.push(",", line);
+      argJoined.push(arg);
+    });
 
     const tryCondense = !util.hasNewlineInRange(
       options.originalText,
@@ -60,10 +77,10 @@ export const printCallExpression: PrintNodeFunction<
       arg0.start
     );
 
-    const grouped = group([indent([softline, argPrinted])], { id: sym });
+    const grouped = group([indent([softline, argJoined])], { id: sym });
     if (tryCondense && node.arguments.length == 1) {
       // don't indent these
-      printed.push(ifBreak(grouped,argPrinted));
+      printed.push(ifBreak(grouped, argJoined));
     } else {
       printed.push(grouped);
     }

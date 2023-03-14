@@ -13,7 +13,7 @@ import {
   BinaryishExpressionNode,
 } from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
-import { CallExpressionNode } from "../nodeTypes/callExpression";
+import { CallExpressionNode, SpreadOperatorNode } from "../nodeTypes/callExpression";
 import {
   ClosureNode,
   InlineClosureArgumentNode,
@@ -381,6 +381,17 @@ export class LPCParser {
     return comBlk;
   }
 
+  private parseSpreadOperator(parent: LPCNode) {
+    const nd = new SpreadOperatorNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    return nd;
+  }
+
   private parseParenBlock(parent: LPCNode, flags: ParseExpressionFlag) {
     const nd = new ParenBlockNode(
       this.scanner.getTokenOffset(),
@@ -407,6 +418,17 @@ export class LPCParser {
         // a comma in this position is a separator
         // also skip blanklines
         continue;
+      }
+
+      // FluffOS: spread operator must be the last token in the paren group
+      if (t == TokenType.Spread) {
+        this.scanner.scan();
+        const spread = this.parseSpreadOperator(nd);
+        children.push(spread);
+
+        this.eatWhitespaceAndNewlines();
+
+        break;
       }
 
       let newNode: LPCNode | undefined;
@@ -1604,13 +1626,15 @@ export class LPCParser {
     let identNode = this.parseIdentifier(hasStar, byRef);
 
     let t: TokenType = this.scanner.peek();
+    // tokens that indicate a variable or declaration
     if (
       t == TokenType.ParenBlockEnd ||
       t == TokenType.Semicolon ||
       t == TokenType.Comma ||
-      t == TokenType.IndexorEnd
+      t == TokenType.IndexorEnd ||
+      t == TokenType.Spread
     ) {
-      // either a variable or a declaration
+      // at this point we know its either a variable or a declaration
       // check disallow
       if (allowDecl) {
         const varDecl = new VariableDeclarationNode(

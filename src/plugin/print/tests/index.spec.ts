@@ -479,4 +479,9 @@ describe("prettier-lpc plugin", () => {
     formatted = format(`string s = a[ <1.. <2]`);
     expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
   });
+
+  test("handles the spread operator (FluffOS)",()=>{
+    let formatted=format(`mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`);
+    expect(formatted).toMatchSnapshot('spread-op-function-and-callexp');
+  });
 });

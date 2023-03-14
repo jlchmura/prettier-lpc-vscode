@@ -88,6 +88,7 @@ export enum TokenType {
   Bang,
   Star,
   CallByRef,
+  Spread, // FluffOS only
 
   Whitespace,
   BlankLines,

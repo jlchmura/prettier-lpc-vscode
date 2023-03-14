@@ -5,3 +5,7 @@ export class CallExpressionNode extends LPCNode {
   public callee: LPCNode | undefined;
   public arguments: LPCNode[] | undefined;  
 }
+
+export class SpreadOperatorNode extends LPCNode {
+  public override type: string | undefined = "spread";   
+}

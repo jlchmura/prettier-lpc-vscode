@@ -48,6 +48,7 @@ export const tt = {
   _CASE: "case".split("").map((c) => c.charCodeAt(0)),
   _DEFAULT: "default".split("").map((c) => c.charCodeAt(0)),
   _LAMBDA: "lambda".split("").map((c) => c.charCodeAt(0)),
+  _SPREAD: "...".split("").map((c) => c.charCodeAt(0)),
 };
 
 export const binary_ops = [

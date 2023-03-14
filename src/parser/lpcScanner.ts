@@ -300,6 +300,11 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.Star);
         }
 
+        if (this.stream.advanceIfChars(tt._SPREAD)) {
+          this.stream.skipWhitespace();
+          return this.finishToken(offset, TokenType.Spread);
+        }
+
         // FOREACH
         if (this.stream.advanceIfChars(tt._FOREACH)) {
           this.stream.skipWhitespace();

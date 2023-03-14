@@ -8,7 +8,10 @@ import {
 import { AssignmentExpressionNode } from "../nodeTypes/assignmentExpression";
 import { BinaryExpressionNode } from "../nodeTypes/binaryExpression";
 import { BlankLinkNode } from "../nodeTypes/blankLine";
-import { CallExpressionNode } from "../nodeTypes/callExpression";
+import {
+  CallExpressionNode,
+  SpreadOperatorNode,
+} from "../nodeTypes/callExpression";
 import { ClosureNode, InlineClosureArgumentNode } from "../nodeTypes/closure";
 import { CodeBlockNode } from "../nodeTypes/codeBlock";
 import { CommentBlockNode, InlineCommentNode } from "../nodeTypes/comment";
@@ -73,6 +76,7 @@ import {
   printCallExpression,
   printLogicalExpression,
   printMemberExpression,
+  printSpreadOperator,
   printUnaryPrefixExpression,
 } from "./print/expression";
 import {
@@ -184,6 +188,11 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
     case "call-exp":
       return printCallExpression(
         node as CallExpressionNode,
+        ...commonPrintArgs
+      );
+    case "spread":
+      return printSpreadOperator(
+        node as SpreadOperatorNode,
         ...commonPrintArgs
       );
     case "member-exp":
