@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`prettier-lpc plugin fluffos text formatting shortcuts (@): textFormattingDouble 1`] = `
+"void test() {
+  set_desc(@@TXT
+This is
+  a tes
+TXT
+  );
+}"
+`;
+
+exports[`prettier-lpc plugin fluffos text formatting shortcuts (@): textFormattingSingle 1`] = `
+"void test() {
+  set_desc(@TXT
+This is
+  a test
+TXT
+  );
+}"
+`;
+
 exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `"test() { items = ({({"gates", "steel gates"}), "Strong metal gates."}); }"`;
 
 exports[`prettier-lpc plugin format arrays: array-inner-condensed 1`] = `

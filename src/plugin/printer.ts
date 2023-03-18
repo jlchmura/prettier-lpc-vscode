@@ -32,7 +32,7 @@ import {
   LambdaIndexorNode,
   LambdaNode,
 } from "../nodeTypes/lambda";
-import { LiteralNode } from "../nodeTypes/literal";
+import { LiteralNode, StringLiteralBlockNode } from "../nodeTypes/literal";
 import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import { LPCNode } from "../nodeTypes/lpcNode";
 import {
@@ -97,7 +97,7 @@ import {
   printLambdaEmptyArg,
   printLambdaIndexor,
 } from "./print/lambda";
-import { printLiteral } from "./print/literal";
+import { printLiteral, printStringLiteralBlock } from "./print/literal";
 import {
   printBlankline,
   printDirective,
@@ -161,6 +161,11 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
       return printInherit(node as InheritNode, ...commonPrintArgs);
     case "literal":
       return printLiteral(node as LiteralNode, ...commonPrintArgs);
+    case "string-literal-block":
+      return printStringLiteralBlock(
+        node as StringLiteralBlockNode,
+        ...commonPrintArgs
+      );
     case "identifier":
       return printIdentifier(node as IdentifierNode, ...commonPrintArgs);
     case "directive":

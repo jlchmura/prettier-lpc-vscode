@@ -8,6 +8,8 @@ import {
   literal_consecutive_strings,
   mapping_with_ternary_value,
   spec_input_room,
+  textFormattingDouble,
+  textFormattingSingle,
 } from "./inputs";
 
 describe("prettier-lpc plugin", () => {
@@ -509,5 +511,13 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"string evaluate_path(string s);"`
     );
+  });
+
+  test("fluffos text formatting shortcuts (@)", () => {
+    let formatted = format(textFormattingSingle);
+    expect(formatted).toMatchSnapshot("textFormattingSingle");
+
+    formatted = format(textFormattingDouble);
+    expect(formatted).toMatchSnapshot("textFormattingDouble");
   });
 });

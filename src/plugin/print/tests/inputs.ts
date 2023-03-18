@@ -118,3 +118,21 @@ export const literal_consecutive_strings = `test() {
   "this is line 2.\n" +
   "this is line 3.";
 }`;
+
+export const textFormattingSingle = `void test() {
+  set_desc(@TXT
+This is
+  a test
+TXT
+  );
+}`
+
+
+export const textFormattingDouble = `void test() {
+  set_desc(@@TXT
+This is
+  a test
+TXT
+  );
+}`
+

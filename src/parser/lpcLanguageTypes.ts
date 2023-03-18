@@ -93,6 +93,9 @@ export enum TokenType {
   Whitespace,
   BlankLines,
 
+  StringLiteralStart,
+  StringLiteralBody,
+
   Unknown,
   EOS,
 }
@@ -126,4 +129,6 @@ export enum ScannerState {
   WithinIf,
 
   WithinIndexor,
+
+  WithinStringLiteralBlock
 }

@@ -40,7 +40,7 @@ import {
   LambdaIndexorNode,
   LambdaNode,
 } from "../nodeTypes/lambda";
-import { LiteralNode } from "../nodeTypes/literal";
+import { LiteralNode, StringLiteralBlockNode } from "../nodeTypes/literal";
 import { LogicalExpressionNode } from "../nodeTypes/logicalExpression";
 import {
   MappingExpressionNode,
@@ -178,6 +178,8 @@ export class LPCParser {
       case TokenType.LiteralNumber:
       case TokenType.LiteralChar:
         return this.parseLiteral(token, curr);
+      case TokenType.StringLiteralStart:
+        return this.parseStringLiteral(curr);
       case TokenType.StartCommentBlock:
         return this.parseCommentBlock(curr);
       case TokenType.EndCommentBlock:
@@ -2511,6 +2513,29 @@ export class LPCParser {
     // lambda indexors can only have a set number of chars
     // <..<,
 
+    return nd;
+  }
+
+  private parseStringLiteral(parent: LPCNode) {
+    const nd = new StringLiteralBlockNode(
+      this.scanner.getTokenOffset(),
+      this.scanner.getTokenEnd(),
+      [],
+      parent
+    );
+
+    nd.marker = this.scanner.getTokenText();
+
+    const t = this.scanner.scan();
+    if (t != TokenType.StringLiteralBody) {
+      throw this.parserError("Expected string literal block");
+    }
+
+    nd.body = this.scanner.getTokenText();
+    // remove the ending marker
+    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length );
+
+    this.eatWhitespaceAndNewlines();
     return nd;
   }
 

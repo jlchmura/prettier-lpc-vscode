@@ -325,7 +325,7 @@ export class Scanner implements IScanner {
             this.stream.advanceIfChars(tt._IN))
         ) {
           this.stream.skipWhitespace();
-          return this.finishToken(offset, TokenType.ForEachIn);          
+          return this.finishToken(offset, TokenType.ForEachIn);
         }
 
         // foreach range ".."
@@ -456,9 +456,9 @@ export class Scanner implements IScanner {
 
         // INLINE CLOSURES
         if (this.stream.peekChar(tt._OPP)) {
-          this.stream.skipWhitespace
+          this.stream.skipWhitespace;
         }
-        
+
         if (this.stream.advanceIfRegExp(/^\(\s*\:/)) {
           // (:  use regex to account for space between tokens
           this.stream.skipWhitespace();
@@ -529,8 +529,7 @@ export class Scanner implements IScanner {
           return this.finishToken(offset, TokenType.IndexorEnd);
         }
         if (
-          this.testParenStack(TokenType.IndexorStart)
-          &&
+          this.testParenStack(TokenType.IndexorStart) &&
           (this.stream.advanceIfChar(tt._LAN) ||
             this.stream.advanceIfChar(tt._RAN))
         ) {
@@ -580,6 +579,14 @@ export class Scanner implements IScanner {
           // " or '
           this.state = ScannerState.WithinLiteral;
           return this.internalScan();
+        }
+
+        //FluffOS string literal blocks (i.e. @FOO ... FOO)
+        if (this.stream.advanceIfChar(tt._AT)) {
+          this.stream.advanceIfChar(tt._AT); // handle @@ too
+          this.lastLiteral = this.stream.advanceIfWord();
+          this.state = ScannerState.WithinStringLiteralBlock;
+          return this.finishToken(offset, TokenType.StringLiteralStart);
         }
 
         if (this.isNumber(this.stream.peekChar())) {
@@ -672,6 +679,18 @@ export class Scanner implements IScanner {
           TokenType.Unknown,
           "Malformed string literal"
         );
+      case ScannerState.WithinStringLiteralBlock:
+        if (!this.lastLiteral) {
+          throw "State was within string literal but there was no literal marker";
+        }
+        this.stream.advanceUntilChars(
+          ("\n" + this.lastLiteral).split("").map((c) => c.charCodeAt(0))
+        );
+        this.stream.advance(this.lastLiteral.length+1);
+
+        this.state = ScannerState.WithinFile;
+
+        return this.finishToken(offset, TokenType.StringLiteralBody);
       case ScannerState.StartDirective:
         const txt = this.stream.remaining_source;
         if (this.stream.advanceIfRegExp(/^\w+(?:\(\w+\))?/)) {
