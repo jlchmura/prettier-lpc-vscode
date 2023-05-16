@@ -104,9 +104,9 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("array-with-multi-sfx-comments");
   });
 
-  test("format call-exp inside arrays",()=>{
+  test("format call-exp inside arrays", () => {
     let formatted = format(textFormatCallExpInArray);
-    expect(formatted).toMatchSnapshot('call-exp-in-array');
+    expect(formatted).toMatchSnapshot("call-exp-in-array");
   });
 
   test("format args passed byref", () => {
@@ -125,8 +125,8 @@ describe("prettier-lpc plugin", () => {
       `"void test() { obj->set_weight(1 + random(avail_weight - 1)); }"`
     );
 
-    formatted=format(textNestedParenBlocksWithLogicalExpr);
-    expect(formatted).toMatchSnapshot('nested-parens-with-logical-exp');
+    formatted = format(textNestedParenBlocksWithLogicalExpr);
+    expect(formatted).toMatchSnapshot("nested-parens-with-logical-exp");
   });
 
   test("format ternary expressions", () => {
@@ -211,7 +211,7 @@ describe("prettier-lpc plugin", () => {
     `);
 
     formatted = format(textFormatCallExpInStringBinaryExp);
-    expect(formatted).toMatchSnapshot('call-exp-inside-binary-string-exp');
+    expect(formatted).toMatchSnapshot("call-exp-inside-binary-string-exp");
   });
 
   test("format logical expression", () => {
@@ -410,7 +410,7 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("foreach-multi-var");
 
     formatted = format(`test() {foreach (x, y in a){z = b[x];        } }`);
-    expect(formatted).toMatchSnapshot("foreach-multi-var-keep-in");    
+    expect(formatted).toMatchSnapshot("foreach-multi-var-keep-in");
   });
 
   test("general formatting", () => {
@@ -527,6 +527,17 @@ describe("prettier-lpc plugin", () => {
 
     formatted = format(`string s = a[ <1.. <2]`);
     expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
+
+    // deep mapping indexors
+    formatted = format(
+      `void test() { printf("%O\n", animals["bird"]["age"]["born"]["date"]["time"]);  }`
+    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "void test() {
+        printf("%O
+      ", animals["bird"]["age"]["born"]["date"]["time"]);
+      }"
+    `);
   });
 
   test("handles the spread operator (FluffOS)", () => {
