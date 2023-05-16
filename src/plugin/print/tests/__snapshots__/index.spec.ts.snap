@@ -244,6 +244,10 @@ exports[`prettier-lpc plugin formats for loops: for-loop_multi_expression 1`] = 
 }"
 `;
 
+exports[`prettier-lpc plugin formats for loops: loop-break-shouldhave-semi 1`] = `"void test() { while (true) { if (1 == 1) break; } }"`;
+
+exports[`prettier-lpc plugin formats for loops: loop-continue-shouldhave-semi 1`] = `"void test() { while (true) { if (1 == 1) continue; } }"`;
+
 exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
 "test() {
   // this should be fairly condensed
