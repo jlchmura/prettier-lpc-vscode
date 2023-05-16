@@ -419,6 +419,19 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("function-stub-with-newline-comments");
   });
 
+  test("format variables that look like types", () => {
+    let formatted = format(
+      `void somefunc() { string status; status = sprintf("Stutus number: %d\n", status); }`
+    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "void somefunc() {
+        string status;
+        status = sprintf("Stutus number: %d
+      ", status);
+      }"
+    `);
+  });
+
   test("format assignment expressions", () => {
     let formatted = format(assign_exp_suffix_comment);
     expect(formatted).toMatchSnapshot("assign_exp_suffix_comment");
