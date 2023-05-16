@@ -52,7 +52,7 @@ export const tt = {
   _SPREAD: "...".split("").map((c) => c.charCodeAt(0)),
 };
 
-export const binary_ops = [
+export const binary_ops_list = [
   "==",
   "!=",
   "<<<",
@@ -62,7 +62,9 @@ export const binary_ops = [
   ">",
   "<<",
   ">>",
-].map((o) => o.split("").map((c) => c.charCodeAt(0)));
+];
+export const binary_ops = binary_ops_list.map((o) => o.split("").map((c) => c.charCodeAt(0)));
+export const binary_ops_set = new Set(binary_ops_list);
 
 export const logical_ops_set = new Set(["||", "&&"]);
 

@@ -62,7 +62,7 @@ import {
   VariableDeclaratorNode,
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
-import { logical_ops_set, op_precedence, unary_ops_set } from "./defs";
+import { binary_ops, binary_ops_set, logical_ops_set, op_precedence, unary_ops_set } from "./defs";
 import { Scanner } from "./lpcScanner";
 import { util } from "prettier";
 
@@ -415,6 +415,7 @@ export class LPCParser {
     let t: TokenType;
     // scan until we get a paren block end
     let tempParent: LPCNode = nd;
+    let lastOp="";
     while (
       (t = this.scanner.peek()) &&
       t != TokenType.ParenBlockEnd &&
@@ -432,22 +433,24 @@ export class LPCParser {
       }
 
       let newNode: LPCNode | undefined;
+      
       if (this.isBinaryOp(t)) {
         const op = this.scanner.getTokenText().trim();
-        if (unary_ops_set.has(op)) {
+        if ((binary_ops_set.has(lastOp) || children.length==0) && unary_ops_set.has(op)) {
           this.scanner.scan();
           newNode = this.parseMaybeUnaryPrefixOperator(t, parent);
         } else {
           newNode = this.parsePrecedenceClimber(last(children)!, parent, 0);
           children.pop();
         }
-        children.push(newNode);
+        lastOp=op;
+        children.push(newNode);        
       } else {
         t = this.scanner.scan();
         newNode = this.parseToken(t, tempParent, flags);
         if (!newNode) throw this.parserError(`Unexpected token`);
         children.push(newNode);
-      }
+      }      
     }
 
     t = this.scanner.scan();
@@ -709,7 +712,7 @@ export class LPCParser {
           if (!nd.consequent) {
             nd.test = this.parseParenBlock(
               nd,
-              ParseExpressionFlag.StatementOnly
+              ParseExpressionFlag.StatementOnly              
             );
             this.eatWhitespaceAndNewlines();
             break;
@@ -1642,7 +1645,7 @@ export class LPCParser {
     const byRef = this.parseByRef();
 
     let identNode = this.parseIdentifier(hasStar, byRef);
-
+      if (identNode?.name=='random') debugger;
     let t: TokenType = this.scanner.peek();
 
     // parse fluffos spread operator and attach to ident node being spread
@@ -2117,7 +2120,7 @@ export class LPCParser {
 
       if (t == TokenType.BlankLines || t == TokenType.Whitespace) continue;
       else if (t == TokenType.Semicolon)
-        if (lastToken == t) stack.push(undefined);
+        if (lastToken == t as TokenType) stack.push(undefined);
         else continue;
       else if (t == TokenType.Comma) {
         this.eatWhitespace();
