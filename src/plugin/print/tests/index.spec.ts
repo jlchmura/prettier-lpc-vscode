@@ -108,6 +108,16 @@ describe("prettier-lpc plugin", () => {
     );
   });
 
+  test("format parens", () => {
+    // arith ops inside paren
+    let formatted = format(
+      `void test() { obj->set_weight(1 + random(avail_weight-1))     }`
+    );
+    expect(formatted).toMatchInlineSnapshot(
+      `"void test() { obj->set_weight(1 + random(avail_weight - 1)); }"`
+    );
+  });
+
   test("format ternary expressions", () => {
     // without paren
     let formatted = format(
