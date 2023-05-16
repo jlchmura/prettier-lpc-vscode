@@ -9,6 +9,7 @@ import {
   mapping_with_ternary_value,
   spec_input_room,
   textFormatCallExpInArray,
+  textFormatCallExpInStringBinaryExp,
   textFormattingDouble,
   textFormattingSingle,
 } from "./inputs";
@@ -204,6 +205,9 @@ describe("prettier-lpc plugin", () => {
         }
       }"
     `);
+
+    formatted = format(textFormatCallExpInStringBinaryExp);
+    expect(formatted).toMatchSnapshot('call-exp-inside-binary-string-exp');
   });
 
   test("format logical expression", () => {

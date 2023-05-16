@@ -142,3 +142,12 @@ void somefunc() {
     string *words ;
     words = ({ SOME_DEFINE, lower_case(SOME_DEFINE), upper_case(SOME_DEFINE) }) ;
 }`;
+
+export const textFormatCallExpInStringBinaryExp = `string test() {
+  string name = query_name();
+  return
+      name +
+      " was defeated by " +
+      "/daemons/time_d"->query_time() +
+      ".\n";
+}`;
