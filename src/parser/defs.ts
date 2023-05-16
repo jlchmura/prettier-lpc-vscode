@@ -205,6 +205,7 @@ export const reserved_words = [
   "switch",
   "case",
   "break",
+  "continue",
   "struct",
   "union",
   "enum",

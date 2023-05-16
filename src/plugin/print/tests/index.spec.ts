@@ -396,7 +396,7 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("foreach-multi-var");
 
     formatted = format(`test() {foreach (x, y in a){z = b[x];        } }`);
-    expect(formatted).toMatchSnapshot("foreach-multi-var-keep-in");
+    expect(formatted).toMatchSnapshot("foreach-multi-var-keep-in");    
   });
 
   test("general formatting", () => {
@@ -473,6 +473,12 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"for (int i = 10; i > 0; i--) {  }"`
     );
+
+    formatted = format(`void test() { while(true) {if (1==1)continue ;}}`);
+    expect(formatted).toMatchSnapshot("loop-continue-shouldhave-semi");
+
+    formatted = format(`void test() { while(true) {if (1==1)break ;}}`);
+    expect(formatted).toMatchSnapshot("loop-break-shouldhave-semi");
   });
 
   test("formatter should handle missing semi's", () => {
