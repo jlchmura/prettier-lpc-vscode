@@ -80,6 +80,14 @@ exports[`prettier-lpc plugin format assignment expressions: assignment_inside_ar
 test() { indices = ({i, index++}); }"
 `;
 
+exports[`prettier-lpc plugin format binary expressions: call-exp-inside-binary-string-exp 1`] = `
+"string test() {
+  string name = query_name();
+  return name + " was defeated by " + "/daemons/time_d"->query_time() + ".
+";
+}"
+`;
+
 exports[`prettier-lpc plugin format call-exp inside arrays: call-exp-in-array 1`] = `
 "#define SOME_DEFINE "some define"
 
