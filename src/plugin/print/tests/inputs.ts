@@ -151,3 +151,9 @@ export const textFormatCallExpInStringBinaryExp = `string test() {
       "/daemons/time_d"->query_time() +
       ".\n";
 }`;
+
+export const textNestedParenBlocksWithLogicalExpr = `test() {
+  if( (ob=present("id", TP)) && (str == "to" || str == "from")) {
+    write("hi");
+  }
+}`;

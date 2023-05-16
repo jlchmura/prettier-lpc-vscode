@@ -184,6 +184,14 @@ exports[`prettier-lpc plugin format macros: define-macro-with-wrap 1`] = `
   trim("really really really really long string"->word_wrap(str), 2)"
 `;
 
+exports[`prettier-lpc plugin format parens: nested-parens-with-logical-exp 1`] = `
+"test() {
+  if ((ob = present("id", TP)) && (str == "to" || str == "from")) {
+    write("hi");
+  }
+}"
+`;
+
 exports[`prettier-lpc plugin format ternary expressions: mapping_with_ternary_value 1`] = `
 "/**
 * send data */

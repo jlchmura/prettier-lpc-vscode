@@ -12,6 +12,7 @@ import {
   textFormatCallExpInStringBinaryExp,
   textFormattingDouble,
   textFormattingSingle,
+  textNestedParenBlocksWithLogicalExpr,
 } from "./inputs";
 
 describe("prettier-lpc plugin", () => {
@@ -123,6 +124,9 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"void test() { obj->set_weight(1 + random(avail_weight - 1)); }"`
     );
+
+    formatted=format(textNestedParenBlocksWithLogicalExpr);
+    expect(formatted).toMatchSnapshot('nested-parens-with-logical-exp');
   });
 
   test("format ternary expressions", () => {

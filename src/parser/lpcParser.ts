@@ -487,7 +487,7 @@ export class LPCParser {
     }
 
     nd.end = this.scanner.getTokenOffset() - 1;
-    parent.children.push(nd);
+    //parent.children.push(nd);
     return nd;
   }
 
