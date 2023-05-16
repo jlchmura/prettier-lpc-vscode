@@ -136,3 +136,9 @@ TXT
   );
 }`
 
+export const textFormatCallExpInArray = `#define SOME_DEFINE "some define"
+
+void somefunc() {
+    string *words ;
+    words = ({ SOME_DEFINE, lower_case(SOME_DEFINE), upper_case(SOME_DEFINE) }) ;
+}`;

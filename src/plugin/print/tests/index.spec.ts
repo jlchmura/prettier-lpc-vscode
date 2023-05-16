@@ -8,6 +8,7 @@ import {
   literal_consecutive_strings,
   mapping_with_ternary_value,
   spec_input_room,
+  textFormatCallExpInArray,
   textFormattingDouble,
   textFormattingSingle,
 } from "./inputs";
@@ -99,6 +100,11 @@ describe("prettier-lpc plugin", () => {
     }    
     `);
     expect(formatted).toMatchSnapshot("array-with-multi-sfx-comments");
+  });
+
+  test("format call-exp inside arrays",()=>{
+    let formatted = format(textFormatCallExpInArray);
+    expect(formatted).toMatchSnapshot('call-exp-in-array');
   });
 
   test("format args passed byref", () => {

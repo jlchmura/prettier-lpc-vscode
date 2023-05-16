@@ -1296,15 +1296,15 @@ export class LPCParser {
       const next = this.scanner.peek();
       const nextText = this.scanner.getTokenText();
       switch (next) {
-        case TokenType.Star:        
+        case TokenType.Star:
         case TokenType.Type:
         case TokenType.DeclarationName:
           this.scanner.scan();
           break;
         case TokenType.Operator:
-          if (nextText=="&") {
+          if (nextText == "&") {
             this.scanner.scan();
-          }        
+          }
           break;
       }
 
@@ -1669,9 +1669,7 @@ export class LPCParser {
     const allowFn = !!(flags & ParseExpressionFlag.AllowFunction);
 
     const modNodes = this.parseModifiers();
-    if (this.scanner.getTokenText() == "string") debugger;
     let typeNode = this.parseType();
-    //if (typeNode?.name=='string') debugger;
     let structTypeNode =
       typeNode?.name == "struct" ? this.parseStructIdentifier() : undefined;
 
@@ -1909,7 +1907,7 @@ export class LPCParser {
       )
         continue;
 
-      const elToken = this.parseToken(t, nd);
+      const elToken = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
       if (elToken) {
         // eat whitespace & comma in case there is a suffix comment
         this.eatWhitespace();

@@ -80,6 +80,15 @@ exports[`prettier-lpc plugin format assignment expressions: assignment_inside_ar
 test() { indices = ({i, index++}); }"
 `;
 
+exports[`prettier-lpc plugin format call-exp inside arrays: call-exp-in-array 1`] = `
+"#define SOME_DEFINE "some define"
+
+void somefunc() {
+  string *words;
+  words = ({SOME_DEFINE, lower_case(SOME_DEFINE), upper_case(SOME_DEFINE)});
+}"
+`;
+
 exports[`prettier-lpc plugin format closures: closure-greaterthan-this_player 1`] = `
 "test() {
   object *hash = ({});
