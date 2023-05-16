@@ -154,6 +154,12 @@ export const types = [
 ];
 export const typesSet = new Set(types);
 
+export const typesAllowAsVarNames = [
+  "status",
+  "symbol"
+];
+export const typesAllowAsVarNamesSet = new Set(typesAllowAsVarNames);
+
 export const modifiers_function = [
   "private",
   "protected",

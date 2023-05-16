@@ -62,7 +62,14 @@ import {
   VariableDeclaratorNode,
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
-import { binary_ops, binary_ops_set, logical_ops_set, op_precedence, unary_ops_set } from "./defs";
+import {
+  binary_ops,
+  binary_ops_set,
+  logical_ops_set,
+  op_precedence,
+  typesAllowAsVarNamesSet,
+  unary_ops_set,
+} from "./defs";
 import { Scanner } from "./lpcScanner";
 import { util } from "prettier";
 
@@ -415,7 +422,7 @@ export class LPCParser {
     let t: TokenType;
     // scan until we get a paren block end
     let tempParent: LPCNode = nd;
-    let lastOp="";
+    let lastOp = "";
     while (
       (t = this.scanner.peek()) &&
       t != TokenType.ParenBlockEnd &&
@@ -433,24 +440,27 @@ export class LPCParser {
       }
 
       let newNode: LPCNode | undefined;
-      
+
       if (this.isBinaryOp(t)) {
         const op = this.scanner.getTokenText().trim();
-        if ((binary_ops_set.has(lastOp) || children.length==0) && unary_ops_set.has(op)) {
+        if (
+          (binary_ops_set.has(lastOp) || children.length == 0) &&
+          unary_ops_set.has(op)
+        ) {
           this.scanner.scan();
           newNode = this.parseMaybeUnaryPrefixOperator(t, parent);
         } else {
           newNode = this.parsePrecedenceClimber(last(children)!, parent, 0);
           children.pop();
         }
-        lastOp=op;
-        children.push(newNode);        
+        lastOp = op;
+        children.push(newNode);
       } else {
         t = this.scanner.scan();
         newNode = this.parseToken(t, tempParent, flags);
         if (!newNode) throw this.parserError(`Unexpected token`);
         children.push(newNode);
-      }      
+      }
     }
 
     t = this.scanner.scan();
@@ -712,7 +722,7 @@ export class LPCParser {
           if (!nd.consequent) {
             nd.test = this.parseParenBlock(
               nd,
-              ParseExpressionFlag.StatementOnly              
+              ParseExpressionFlag.StatementOnly
             );
             this.eatWhitespaceAndNewlines();
             break;
@@ -1281,7 +1291,22 @@ export class LPCParser {
       nd.name = this.scanner.getTokenText().trim();
 
       this.eatWhitespaceAndNewlines();
-      this.scanner.scan();
+
+      // we want to advance the token for certain types only
+      const next = this.scanner.peek();
+      const nextText = this.scanner.getTokenText();
+      switch (next) {
+        case TokenType.Star:        
+        case TokenType.Type:
+        case TokenType.DeclarationName:
+          this.scanner.scan();
+          break;
+        case TokenType.Operator:
+          if (nextText=="&") {
+            this.scanner.scan();
+          }        
+          break;
+      }
 
       return nd;
     }
@@ -1399,7 +1424,14 @@ export class LPCParser {
   }
 
   private parseIdentifier(hasStar = false, byRef = false) {
-    if (this.scanner.getTokenType() == TokenType.DeclarationName) {
+    const t = this.scanner.getTokenType();
+    if (t == TokenType.DeclarationName || t == TokenType.Type) {
+      // if we got a type name here, make sure it wasn't a reserved type
+      const txt = this.scanner.getTokenText().trim();
+      if (t == TokenType.Type && !typesAllowAsVarNamesSet.has(txt)) {
+        return undefined;
+      }
+
       const identNode = new IdentifierNode(
         this.scanner.getTokenOffset(),
         this.scanner.getTokenEnd(),
@@ -1637,7 +1669,9 @@ export class LPCParser {
     const allowFn = !!(flags & ParseExpressionFlag.AllowFunction);
 
     const modNodes = this.parseModifiers();
-    const typeNode = this.parseType();
+    if (this.scanner.getTokenText() == "string") debugger;
+    let typeNode = this.parseType();
+    //if (typeNode?.name=='string') debugger;
     let structTypeNode =
       typeNode?.name == "struct" ? this.parseStructIdentifier() : undefined;
 
@@ -1645,7 +1679,20 @@ export class LPCParser {
     const byRef = this.parseByRef();
 
     let identNode = this.parseIdentifier(hasStar, byRef);
-      if (identNode?.name=='random') debugger;
+
+    if (
+      !identNode &&
+      !!typeNode &&
+      typesAllowAsVarNamesSet.has(typeNode.name || "")
+    ) {
+      // if we don't have an ident node but the typenode is not a reserved type
+      // then convert to the ident node
+      identNode = typeNode;
+      typeNode = undefined;
+      this.eatWhitespace();
+    }
+
+    const tt = this.scanner.getTokenText();
     let t: TokenType = this.scanner.peek();
 
     // parse fluffos spread operator and attach to ident node being spread
@@ -2120,7 +2167,7 @@ export class LPCParser {
 
       if (t == TokenType.BlankLines || t == TokenType.Whitespace) continue;
       else if (t == TokenType.Semicolon)
-        if (lastToken == t as TokenType) stack.push(undefined);
+        if (lastToken == (t as TokenType)) stack.push(undefined);
         else continue;
       else if (t == TokenType.Comma) {
         this.eatWhitespace();
@@ -2536,7 +2583,7 @@ export class LPCParser {
 
     nd.body = this.scanner.getTokenText();
     // remove the ending marker
-    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length );
+    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length);
 
     this.eatWhitespaceAndNewlines();
     return nd;
