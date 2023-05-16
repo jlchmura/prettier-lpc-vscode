@@ -1489,7 +1489,7 @@ export class LPCParser {
 
     let t = this.scanner.peek();
 
-    if (t == TokenType.IndexorStart) {
+    while (t == TokenType.IndexorStart) {
       // this can happen in the expression, and also after
       this.scanner.scan(); // consume [
 
