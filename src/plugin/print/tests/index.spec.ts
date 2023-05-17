@@ -1,6 +1,6 @@
 import * as prettierPlugin from "../..";
 import * as prettier from "prettier";
-import { LPCParser, ParseLPC } from "../../../parser/lpcParser";
+import { ParseLPC } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
   for_loop_various,
@@ -573,5 +573,16 @@ describe("prettier-lpc plugin", () => {
 
     formatted = format(textFormattingDouble);
     expect(formatted).toMatchSnapshot("textFormattingDouble");
+  });
+
+  test("print inherit statements",()=>{
+    let formatted=format(`inherit "/path/file"; test() { write("test"); }`);
+    expect(formatted).toMatchSnapshot('inherit-basic');
+
+    formatted = format(`inherit __DIR__ "file" ".c"; test() { write("test"); }`);
+    expect(formatted).toMatchSnapshot(`inherit-implied-concat`);
+
+    formatted = format(`inherit (__DIR__ + "file"); test() { write("test"); }`);
+    expect(formatted).toMatchSnapshot('inherit-parenblock');
   });
 });

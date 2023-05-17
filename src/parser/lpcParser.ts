@@ -410,7 +410,11 @@ export class LPCParser {
     return nd;
   }
 
-  private parseParenBlock(parent: LPCNode, flags: ParseExpressionFlag) {
+  private parseParenBlock(
+    parent: LPCNode,
+    flags: ParseExpressionFlag,
+    endsWith = TokenType.ParenBlockEnd
+  ) {
     const nd = new ParenBlockNode(
       this.scanner.getTokenOffset(),
       this.scanner.getTokenEnd(),
@@ -423,16 +427,14 @@ export class LPCParser {
     // scan until we get a paren block end
     let tempParent: LPCNode = nd;
     let lastOp = "";
-    while (
-      (t = this.scanner.peek()) &&
-      t != TokenType.ParenBlockEnd &&
-      t != TokenType.EOS
-    ) {
+    let possibleImpliedBinary = false;
+    while ((t = this.scanner.peek()) && t != endsWith && t != TokenType.EOS) {
       if (
         t == TokenType.Comma ||
         t == TokenType.BlankLines ||
         t == TokenType.Whitespace
       ) {
+        possibleImpliedBinary = false;
         this.scanner.scan();
         // a comma in this position is a separator
         // also skip blanklines
@@ -442,6 +444,7 @@ export class LPCParser {
       let newNode: LPCNode | undefined;
 
       if (this.isBinaryOp(t)) {
+        possibleImpliedBinary = false;
         const op = this.scanner.getTokenText().trim();
         if (
           (binary_ops_set.has(lastOp) || children.length == 0) &&
@@ -459,12 +462,28 @@ export class LPCParser {
         t = this.scanner.scan();
         newNode = this.parseToken(t, tempParent, flags);
         if (!newNode) throw this.parserError(`Unexpected token`);
+
+        if (possibleImpliedBinary && children.length > 0) {
+          // a second non-delim token and non-binary token means we have an implied
+          // string concat.  swap out for a binary expression node
+          const lh = children.pop()!;
+          const rh = newNode;
+          const be = (newNode = this.parseBinaryExpression(
+            lh,
+            tempParent,
+            rh,
+            "+"
+          ) as BinaryishExpressionNode);
+          be.implied = true;
+        }
+
         children.push(newNode);
+        possibleImpliedBinary = true;
       }
     }
 
     t = this.scanner.scan();
-    if (t != TokenType.ParenBlockEnd) throw "expected parenblock end";
+    if (t != endsWith) throw "expected ending token";
 
     nd.closed = true;
 
@@ -516,12 +535,26 @@ export class LPCParser {
           `Expected string before arrow but got ${ln.dataType}`
         );
       return this.parseArrow(parent, ln);
-    } else if (tt == TokenType.Literal) {
+    } else if (tt == TokenType.Literal || tt == TokenType.DeclarationName) {
       // consecutive literals can be treated like a binary expression
       this.scanner.scan();
 
-      const rh = this.parseLiteral(tt, lh);
-      return this.parseBinaryExpression(lh, parent, rh, "+");
+      const rh =
+        tt == TokenType.Literal
+          ? this.parseLiteral(tt, lh)
+          : this.parseMaybeExpression(
+              tt,
+              lh,
+              ParseExpressionFlag.StatementOnly
+            );
+      const be = this.parseBinaryExpression(
+        lh,
+        parent,
+        rh,
+        "+"
+      ) as BinaryishExpressionNode;
+      be.implied = true;
+      return be;
     }
 
     return lh;
@@ -919,34 +952,14 @@ export class LPCParser {
 
     this.eatWhitespace();
 
-    inh.argument = this.parseToken(
-      this.scanner.scan(),
+    // use a paren block to group all expressions
+    const parenNode = this.parseParenBlock(
       inh,
-      ParseExpressionFlag.StatementOnly
-    );
-
-    switch (inh.argument?.type) {
-      case "var-decl":
-      case "binary-exp":
-      case "literal":
-      case "parenblock":
-      case "identifier":
-        // ok
-        break;
-      default:
-        throw this.parserError(
-          `Invalid expression type (${
-            inh.argument?.type
-          }) after inherit @ ${this.scanner.getTokenOffset()}`
-        );
-    }
-
-    // there should be a semicolon left
-
-    if (this.scanner.scan() != TokenType.Semicolon)
-      throw this.parserError(
-        `Expected semicolon at ${this.scanner.getTokenOffset()}`
-      );
+      ParseExpressionFlag.StatementOnly,
+      TokenType.Semicolon
+    ) as ParenBlockNode;
+    parenNode.surroundingChars = ["", ""]; // don't need to print parens on this node
+    inh.argument = parenNode;
 
     inh.end = this.scanner.getTokenOffset();
 

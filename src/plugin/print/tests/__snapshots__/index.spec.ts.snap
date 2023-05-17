@@ -160,9 +160,9 @@ exports[`prettier-lpc plugin format literal strings: literal_consecutive_strings
 "test() {
   desc =
     "this is line one. it is the first line in the description
-" +
+"
     "this is line 2.
-" +
+"
     "this is line 3.";
 
   desc =
@@ -335,4 +335,19 @@ exports[`prettier-lpc plugin handles the spread operator (FluffOS): spread-op-fu
   fn(1, numbers...);
   return result;
 }"
+`;
+
+exports[`prettier-lpc plugin print inherit statements: inherit-basic 1`] = `
+"inherit "/path/file";
+test() { write("test"); }"
+`;
+
+exports[`prettier-lpc plugin print inherit statements: inherit-implied-concat 1`] = `
+"inherit __DIR__ "file" ".c";
+test() { write("test"); }"
+`;
+
+exports[`prettier-lpc plugin print inherit statements: inherit-parenblock 1`] = `
+"inherit (__DIR__ + "file");
+test() { write("test"); }"
 `;
