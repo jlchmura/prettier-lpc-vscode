@@ -139,8 +139,9 @@ export const printBinaryishExpression: PrintNodeFunction<
 
   printed.push(group(printChildren("left")));
 
-  const op = node.operator?.trim() || "";
-  const right = [" ", op, line, printChildren("right")];
+  // don't print operator for an implied binary expression
+  const op = node.implied ? "" : [" ", node.operator?.trim() || ""];
+  const right = [op, line, printChildren("right")];
 
   const parent = path.getParentNode()!;
   const inParen = isInParen(path);

@@ -115,7 +115,10 @@ export const printParenBlock: PrintNodeFunction<
 > = (node, path, options, printChildren) => {
   const printed: Doc = [];
 
-  printed.push("(");
+  const lhChar = node.surroundingChars[0];
+  const rhChar = node.surroundingChars[1];
+
+  printed.push(lhChar);
 
   if (node.children.length > 0) {
     const printedChildren = path.map(printChildren, "children");
@@ -142,7 +145,7 @@ export const printParenBlock: PrintNodeFunction<
     }
   }
 
-  printed.push(")");
+  printed.push(rhChar);
 
   printed.push(printSuffixComments(node, path, options, printChildren));
 
