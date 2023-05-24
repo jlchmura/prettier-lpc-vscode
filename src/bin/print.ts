@@ -4,7 +4,10 @@ import fs from "fs";
 import { format, Options } from "prettier";
 import { ParseLPC } from "../parser/lpcParser";
 import plugin, { LPCOptions } from "../plugin";
+
 import { mapping_with_ternary_value } from "../plugin/print/tests/inputs";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { TextDocument as td } from "vscode";
 
 const code = fs.existsSync(process.argv[2])
   ? fs.readFileSync(process.argv[2], "utf-8")

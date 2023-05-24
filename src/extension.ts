@@ -110,6 +110,13 @@ function format(document: TextDocument, config: Config) {
     ++j
   );
 
+  // return [
+  //   TextEdit.replace(
+  //     new Range(document.positionAt(0), document.positionAt(prev.length - 1)),
+  //     next
+  //   ),
+  // ];
+
   return [
     TextEdit.replace(
       new Range(document.positionAt(i), document.positionAt(prev.length - j)),
@@ -124,13 +131,13 @@ function format(document: TextDocument, config: Config) {
 function tryFormat(doc: TextDocument, config: prettier.Config) {
   try {
     return prettier.format(doc.getText(), config);
-  } catch (e) {    
-    console.log(e);    
-    if ((e as any).loc) {      
+  } catch (e) {
+    console.log(e);
+    if ((e as any).loc) {
       const pos = doc.positionAt((e as any).loc);
-      window.showTextDocument(doc, { selection: new Range(pos,pos)});      
+      window.showTextDocument(doc, { selection: new Range(pos, pos) });
     }
-    
+
     window.showErrorMessage((e as any).message);
 
     return doc.getText();
