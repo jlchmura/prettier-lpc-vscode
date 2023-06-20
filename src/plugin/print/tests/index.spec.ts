@@ -437,6 +437,19 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"test(int a, int b) { return a + b; }"`
     );
+
+    // multiple params, declaration with multi variables
+    formatted = format(
+      `int flag=1, noflag=0; int flag1,flag2,flag3; test(string type, int b) { int foo,bar=1; return type; }`
+    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "int flag = 1, noflag = 0;
+      int flag1, flag2, flag3;
+      test(string type, int b) {
+        int foo, bar = 1;
+        return type;
+      }"
+    `);
   });
 
   test("format variables that look like types", () => {
