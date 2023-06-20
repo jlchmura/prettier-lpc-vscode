@@ -431,6 +431,25 @@ describe("prettier-lpc plugin", () => {
      * Should not move the coment up after the semi
      */`);
     expect(formatted).toMatchSnapshot("function-stub-with-newline-comments");
+
+    // functions with multiple parameters
+    formatted = format(`test(int a, int b) { return a+b; }`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"test(int a, int b) { return a + b; }"`
+    );
+
+    // multiple params, declaration with multi variables
+    formatted = format(
+      `int flag=1, noflag=0; int flag1,flag2,flag3; test(string type, int b) { int foo,bar=1; return type; }`
+    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "int flag = 1, noflag = 0;
+      int flag1, flag2, flag3;
+      test(string type, int b) {
+        int foo, bar = 1;
+        return type;
+      }"
+    `);
   });
 
   test("format variables that look like types", () => {
@@ -575,14 +594,16 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("textFormattingDouble");
   });
 
-  test("print inherit statements",()=>{
-    let formatted=format(`inherit "/path/file"; test() { write("test"); }`);
-    expect(formatted).toMatchSnapshot('inherit-basic');
+  test("print inherit statements", () => {
+    let formatted = format(`inherit "/path/file"; test() { write("test"); }`);
+    expect(formatted).toMatchSnapshot("inherit-basic");
 
-    formatted = format(`inherit __DIR__ "file" ".c"; test() { write("test"); }`);
+    formatted = format(
+      `inherit __DIR__ "file" ".c"; test() { write("test"); }`
+    );
     expect(formatted).toMatchSnapshot(`inherit-implied-concat`);
 
     formatted = format(`inherit (__DIR__ + "file"); test() { write("test"); }`);
-    expect(formatted).toMatchSnapshot('inherit-parenblock');
+    expect(formatted).toMatchSnapshot("inherit-parenblock");
   });
 });

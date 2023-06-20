@@ -83,6 +83,7 @@ export const enum ParseExpressionFlag {
   StatementOnly = 0b0000,
   AllowDeclaration = 0b0001,
   AllowFunction = 0b0010,
+  AllowMultiDecl = 0b0100,
 }
 
 export class ParserError extends Error {
@@ -153,7 +154,8 @@ export class LPCParser {
     token: TokenType,
     curr: LPCNode,
     flags: ParseExpressionFlag = ParseExpressionFlag.AllowDeclaration |
-      ParseExpressionFlag.AllowFunction
+      ParseExpressionFlag.AllowFunction |
+      ParseExpressionFlag.AllowMultiDecl
   ): LPCNode | undefined {
     let nd: LPCNode;
 
@@ -460,7 +462,11 @@ export class LPCParser {
         children.push(newNode);
       } else {
         t = this.scanner.scan();
-        newNode = this.parseToken(t, tempParent, flags);
+        newNode = this.parseToken(
+          t,
+          tempParent,
+          ParseExpressionFlag.AllowDeclaration
+        );
         if (!newNode) throw this.parserError(`Unexpected token`);
 
         if (possibleImpliedBinary && children.length > 0) {
@@ -666,7 +672,8 @@ export class LPCParser {
       const child = this.parseToken(
         t,
         cb,
-        ParseExpressionFlag.AllowDeclaration
+        ParseExpressionFlag.AllowDeclaration |
+          ParseExpressionFlag.AllowMultiDecl
       );
       if (child) children.push(child);
     }
@@ -1156,7 +1163,8 @@ export class LPCParser {
     decl: VariableDeclarationNode,
     parent: LPCNode,
     id?: IdentifierNode,
-    init?: LPCNode
+    init?: LPCNode,
+    allowMultiDecl = true
   ) {
     this.eatWhitespace();
 
@@ -1172,6 +1180,7 @@ export class LPCParser {
         case TokenType.Comma:
         case TokenType.Whitespace:
         case TokenType.BlankLines:
+          if (!allowMultiDecl) return decl;
           this.scanner.scan();
           continue;
         case TokenType.Comment:
@@ -1523,9 +1532,10 @@ export class LPCParser {
       lh = me;
     }
 
+    const allowMultiDecl = !!(flags & ParseExpressionFlag.AllowMultiDecl);
     switch (t) {
       case TokenType.Comma:
-        if (lh.type == "var-decl") {
+        if (lh.type == "var-decl" && allowMultiDecl) {
           // multiple declarators in this variable declaration
           // otherwise let the comma go, its part of something else
           // (like an array of paren block)
@@ -1680,6 +1690,7 @@ export class LPCParser {
 
     const allowDecl = !!(flags & ParseExpressionFlag.AllowDeclaration);
     const allowFn = !!(flags & ParseExpressionFlag.AllowFunction);
+    const allowMultiDecl = !!(flags & ParseExpressionFlag.AllowMultiDecl);
 
     const modNodes = this.parseModifiers();
     let typeNode = this.parseType();
@@ -1736,7 +1747,13 @@ export class LPCParser {
         varDecl.structType = structTypeNode;
 
         parent.children.push(varDecl);
-        return this.parseVariableDeclaration(varDecl, parent, identNode);
+        return this.parseVariableDeclaration(
+          varDecl,
+          parent,
+          identNode,
+          undefined,
+          allowMultiDecl
+        );
       } else {
         if (modNodes.length > 0 || !!typeNode)
           throw this.parserError(
