@@ -2620,6 +2620,10 @@ export class LPCParser {
     nd.body = this.scanner.getTokenText();
     // remove the ending marker
     nd.body = nd.body.substring(0, nd.body.length - nd.marker.length);
+    nd.end = this.scanner.getTokenEnd();
+
+    this.eatWhitespace();
+    this.tryParseComment(nd);
 
     this.eatWhitespaceAndNewlines();
     return nd;

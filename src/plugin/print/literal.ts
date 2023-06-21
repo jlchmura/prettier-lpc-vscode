@@ -48,7 +48,9 @@ export const printStringLiteralBlock: PrintNodeFunction<
     trimmedMarker = trimmedMarker.substring(1);
   }
 
-  printed.push(dedentToRoot([body || "", hardline, trimmedMarker]),hardline);
+  printed.push(dedentToRoot([body || "", hardline, trimmedMarker]));
+  printed.push(printSuffixComments(node, path, options, printChildren));
+  printed.push(hardline);
 
   return printed;
 };

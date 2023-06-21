@@ -11,6 +11,7 @@ import {
   textFormatCallExpInArray,
   textFormatCallExpInStringBinaryExp,
   textFormattingDouble,
+  textFormattingLiteralBlockWithSuffix,
   textFormattingSingle,
   textNestedParenBlocksWithLogicalExpr,
 } from "./inputs";
@@ -270,12 +271,6 @@ describe("prettier-lpc plugin", () => {
     formatted = format(`int *arr=filter(arr2,(:($1==1&&$1<10):));`);
     expect(formatted).toMatchInlineSnapshot(
       `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`
-    );
-
-    // fluffos $() syntax
-    formatted = format(`int *arr=filter(arr2,(:$(var):));`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"int *arr = filter(arr2, (: $(var) :));"`
     );
   });
 
@@ -559,13 +554,6 @@ describe("prettier-lpc plugin", () => {
     `);
   });
 
-  test("handles the spread operator (FluffOS)", () => {
-    let formatted = format(
-      `mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`
-    );
-    expect(formatted).toMatchSnapshot("spread-op-function-and-callexp");
-  });
-
   test("handle string literals with escaped quotes", () => {
     let formatted = format(`string s = "testing\\" 123";`);
     expect(formatted).toMatchInlineSnapshot(`"string s = "testing\\" 123";"`);
@@ -584,14 +572,6 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchInlineSnapshot(
       `"string evaluate_path(string s);"`
     );
-  });
-
-  test("fluffos text formatting shortcuts (@)", () => {
-    let formatted = format(textFormattingSingle);
-    expect(formatted).toMatchSnapshot("textFormattingSingle");
-
-    formatted = format(textFormattingDouble);
-    expect(formatted).toMatchSnapshot("textFormattingDouble");
   });
 
   test("print inherit statements", () => {
@@ -615,5 +595,41 @@ describe("prettier-lpc plugin", () => {
       formatted = format(`test() { fn("a", -1); }`);
       expect(formatted).toMatchInlineSnapshot(`"test() { fn("a", -1); }"`);
     });
+  });
+
+  describe("FluffOS", () => {
+    describe("String Literal Blocks", () => {
+      test("fluffos text formatting shortcuts (@)", () => {
+        let formatted = format(textFormattingSingle);
+        expect(formatted).toMatchSnapshot("textFormattingSingle");
+
+        formatted = format(textFormattingDouble);
+        expect(formatted).toMatchSnapshot("textFormattingDouble");
+      });
+
+      test("Text formatting shorcuts with suffix comment", () => {
+        let formatted = format(textFormattingLiteralBlockWithSuffix);
+        expect(formatted).toMatchSnapshot(
+          "textFormattingLiteralBlockWithSuffix"
+        );
+      });
+    });
+
+    test("handles the spread operator (FluffOS)", () => {
+      let formatted = format(
+        `mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`
+      );
+      expect(formatted).toMatchSnapshot("spread-op-function-and-callexp");
+    });
+
+    test("Closures", () => {
+      // fluffos $() syntax
+      let formatted = format(`int *arr=filter(arr2,(:$(var):));`);
+      expect(formatted).toMatchInlineSnapshot(
+        `"int *arr = filter(arr2, (: $(var) :));"`
+      );
+    });
+
+    // end FluffOS
   });
 });
