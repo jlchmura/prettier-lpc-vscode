@@ -61,6 +61,7 @@ export const printCallExpression: PrintNodeFunction<
   const printed = [path.call(printChildren, "callee")];
   const sym = Symbol("argGroup");
   printed.push("(");
+
   if (node.arguments && node.arguments.length > 0) {
     const arg0 = node.arguments[0];
     const argPrinted = join([",", line], path.map(printChildren, "arguments"));
@@ -72,7 +73,7 @@ export const printCallExpression: PrintNodeFunction<
     );
 
     const grouped = group([indent([softline, argPrinted])], { id: sym });
-    if (tryCondense && node.arguments.length == 1) {
+    if (tryCondense) { //} && node.arguments.length == 1) {
       // don't indent these
       printed.push(ifBreak(grouped, argPrinted));
     } else {
@@ -80,7 +81,8 @@ export const printCallExpression: PrintNodeFunction<
     }
   }
 
-  printed.push(ifBreak(softline, "", { groupId: sym }), ")");
+  printed.push(ifBreak(softline, "", { groupId: sym }));
+  printed.push(")");
 
   printed.push(printSuffixComments(node, path, options, printChildren));
 

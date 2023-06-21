@@ -136,6 +136,22 @@ TXT
   );
 }`
 
+export const textFormattingLiteralBlockWithSuffix = `void test() {      
+  set(@txt
+Here is 
+another block with
+no suffix comment
+txt
+);
+
+set("test", @txt
+Here is 
+another block with
+a suffix comment
+txt // '
+);
+}`
+
 export const textFormatCallExpInArray = `#define SOME_DEFINE "some define"
 
 void somefunc() {

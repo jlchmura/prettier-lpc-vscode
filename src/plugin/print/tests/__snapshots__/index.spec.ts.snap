@@ -1,6 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`prettier-lpc plugin fluffos text formatting shortcuts (@): textFormattingDouble 1`] = `
+exports[`prettier-lpc plugin FluffOS String Literal Blocks Text formatting shorcuts with suffix comment: textFormattingLiteralBlockWithSuffix 1`] = `
+"void test() {
+  set(@txt
+Here is 
+another block with
+no suffix comment
+txt
+  );
+
+  set("test", @txt
+Here is 
+another block with
+a suffix comment
+txt // '
+  );
+}"
+`;
+
+exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatting shortcuts (@): textFormattingDouble 1`] = `
 "void test() {
   set_desc(@@TXT
 This is
@@ -10,13 +28,21 @@ TXT
 }"
 `;
 
-exports[`prettier-lpc plugin fluffos text formatting shortcuts (@): textFormattingSingle 1`] = `
+exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatting shortcuts (@): textFormattingSingle 1`] = `
 "void test() {
   set_desc(@TXT
 This is
   a test
 TXT
   );
+}"
+`;
+
+exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spread-op-function-and-callexp 1`] = `
+"mixed sum(mixed *numbers...) {
+  mixed number, result = 0;
+  fn(1, numbers...);
+  return result;
 }"
 `;
 
@@ -328,14 +354,6 @@ reset(arg) {
 `;
 
 exports[`prettier-lpc plugin handle string literals with escaped quotes: literal_strings_multiple_escapes 1`] = `"string s = "testing\\" 123\\\\";"`;
-
-exports[`prettier-lpc plugin handles the spread operator (FluffOS): spread-op-function-and-callexp 1`] = `
-"mixed sum(mixed *numbers...) {
-  mixed number, result = 0;
-  fn(1, numbers...);
-  return result;
-}"
-`;
 
 exports[`prettier-lpc plugin print inherit statements: inherit-basic 1`] = `
 "inherit "/path/file";
