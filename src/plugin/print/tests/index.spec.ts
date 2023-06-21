@@ -606,4 +606,14 @@ describe("prettier-lpc plugin", () => {
     formatted = format(`inherit (__DIR__ + "file"); test() { write("test"); }`);
     expect(formatted).toMatchSnapshot("inherit-parenblock");
   });
+
+  describe("function calls", () => {
+    test("handles multiple arguments", () => {
+      let formatted = format(`test() { fn("a","b"); }`);
+      expect(formatted).toMatchInlineSnapshot(`"test() { fn("a", "b"); }"`);
+
+      formatted = format(`test() { fn("a", -1); }`);
+      expect(formatted).toMatchInlineSnapshot(`"test() { fn("a", -1); }"`);
+    });
+  });
 });
