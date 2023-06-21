@@ -425,7 +425,8 @@ export class LPCParser {
     );
     const children: LPCNode[] = [];
 
-    let t: TokenType;
+    let t: TokenType,
+      lastToken: TokenType = 0;
     // scan until we get a paren block end
     let tempParent: LPCNode = nd;
     let lastOp = "";
@@ -440,6 +441,7 @@ export class LPCParser {
         this.scanner.scan();
         // a comma in this position is a separator
         // also skip blanklines
+        lastToken = t;
         continue;
       }
 
@@ -448,8 +450,12 @@ export class LPCParser {
       if (this.isBinaryOp(t)) {
         possibleImpliedBinary = false;
         const op = this.scanner.getTokenText().trim();
+        // check for a few conditions that indicate the operator is a prefix op
+        // and not an arithmetic operation
         if (
-          (binary_ops_set.has(lastOp) || children.length == 0) &&
+          (lastToken == TokenType.Comma ||
+            binary_ops_set.has(lastOp) ||
+            children.length == 0) &&
           unary_ops_set.has(op)
         ) {
           this.scanner.scan();
@@ -486,6 +492,8 @@ export class LPCParser {
         children.push(newNode);
         possibleImpliedBinary = true;
       }
+
+      lastToken = t;
     }
 
     t = this.scanner.scan();
