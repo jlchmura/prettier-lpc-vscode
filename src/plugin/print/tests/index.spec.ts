@@ -103,6 +103,16 @@ describe("prettier-lpc plugin", () => {
     }    
     `);
     expect(formatted).toMatchSnapshot("array-with-multi-sfx-comments");
+
+    formatted=format(`test() { 
+      items = ({
+#ifndef TEST
+        1, 2,
+        3
+#endif
+      });
+    }`);
+    expect(formatted).toMatchSnapshot("array-with-inline-directives");
   });
 
   test("format call-exp inside arrays", () => {

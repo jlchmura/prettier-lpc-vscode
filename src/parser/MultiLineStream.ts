@@ -61,7 +61,7 @@ export class MultiLineStream {
     return this.source.charCodeAt(this.position + n) || 0;
   }
 
-  public charAt(pos: number=0): number {
+  public charAt(pos: number = 0): number {
     return this.source.charCodeAt(pos) || 0;
   }
 
@@ -222,6 +222,6 @@ export class MultiLineStream {
   }
 
   public advanceWhileChar(condition: (ch: number) => boolean): number {
-    return this.advanceWhile(p => condition(this.charAt(p)));    
+    return this.advanceWhile((p) => condition(this.charAt(p)));
   }
 }

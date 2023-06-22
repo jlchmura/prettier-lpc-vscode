@@ -56,7 +56,7 @@ export const printArray: PrintNodeFunction<
       elsPrinted.push(sepParts, fill([printChildren()]));
 
       sepParts = [",", line];
-      if (nd.type == "blankline") sepParts = softline;
+      if (nd.type == "blankline" || nd.type == "directive") sepParts = softline;
       if (nd.type?.startsWith("comment")) sepParts = softline;
     }, "elements");
 

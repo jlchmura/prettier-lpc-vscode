@@ -69,6 +69,18 @@ exports[`prettier-lpc plugin format arrays: array-none-condensed 1`] = `
 }"
 `;
 
+exports[`prettier-lpc plugin format arrays: array-with-inline-directives 1`] = `
+"test() {
+  items = ({
+#ifndef TEST
+    1,
+    2,
+    3,
+#endif
+  });
+}"
+`;
+
 exports[`prettier-lpc plugin format arrays: array-with-multi-sfx-comments 1`] = `
 "
 test() {
