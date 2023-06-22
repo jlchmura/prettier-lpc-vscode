@@ -200,6 +200,12 @@ exports[`prettier-lpc plugin format literal strings: literal_consecutive_strings
 }"
 `;
 
+exports[`prettier-lpc plugin format macros: define-macro-multieline-withslash 1`] = `
+"#define TXT \\
+  "String here with embedded \\n slash that is pretty long and should wrap to the next"\\
+  + "line. Another line here. Don't combine this line because it is long too.""
+`;
+
 exports[`prettier-lpc plugin format macros: define-macro-multiline 1`] = `
 "#define W2(s) \\
   trim("local/really really really long string really really really really long/util")->       wrap(({ a, s }))"

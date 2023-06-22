@@ -700,16 +700,27 @@ export class Scanner implements IScanner {
       // fall through
       case ScannerState.WithinDirectiveArg:
         this.stream.skipWhitespace(false);
-
-        if (this.stream.advanceWhileChar((c) => c != tt._NWL && c != tt._BSL)) {
+        
+        if (this.stream.advanceWhile(p => {
+          const c0 = this.stream.charAt(p),
+                c1 = this.stream.charAt(p+1);
+          return (
+                c0 != tt._NWL
+          &&
+          !(
+            c0 == tt._BSL
+            && (this.isSpace(c1) || c1==tt._NWL)
+          ));
+        })) {
           this.state = ScannerState.WithinDirectiveArg;
           return this.finishToken(offset, TokenType.DirectiveArgument);
-        }
+        }        
 
         if (
-          this.stream.advanceIfChar(tt._BSL) &&
+          this.stream.advanceIfChar(tt._BSL) &&          
           this.stream.advanceToEndOfLine()
         ) {
+          const tt = this.stream.remaining_source;
           // directive continues on the next line.
           return this.finishToken(offset, TokenType.DirectiveLineBreak);
         }

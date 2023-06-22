@@ -29,6 +29,10 @@ export class MultiLineStream {
     return this.source;
   }
 
+  public length(): number {
+    return this.len;
+  }
+
   public pos(): number {
     return this.position;
   }
@@ -55,6 +59,10 @@ export class MultiLineStream {
 
   public peekChar(n: number = 0): number {
     return this.source.charCodeAt(this.position + n) || 0;
+  }
+
+  public charAt(pos: number=0): number {
+    return this.source.charCodeAt(pos) || 0;
   }
 
   public advanceIfChar(ch: number): boolean {
@@ -205,14 +213,15 @@ export class MultiLineStream {
     return n > 0;
   }
 
-  public advanceWhileChar(condition: (ch: number) => boolean): number {
+  public advanceWhile(condition: (position: number) => boolean): number {
     const posNow = this.position;
-    while (
-      this.position < this.len &&
-      condition(this.source.charCodeAt(this.position))
-    ) {
+    while (this.position < this.len && condition(this.position)) {
       this.position++;
     }
     return this.position - posNow;
+  }
+
+  public advanceWhileChar(condition: (ch: number) => boolean): number {
+    return this.advanceWhile(p => condition(this.charAt(p)));    
   }
 }

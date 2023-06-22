@@ -339,6 +339,12 @@ describe("prettier-lpc plugin", () => {
       wrap(({ a, s }))
     `);
     expect(formatted).toMatchSnapshot("define-macro-multiline");
+
+    formatted = format(`#define TXT \\
+      "String here with embedded \\n slash that is pretty long and should wrap to the next" \\
+      + "line. Another line here. Don't combine this line because it is long too."
+    `);
+    expect(formatted).toMatchSnapshot("define-macro-multieline-withslash");
   });
 
   test("format arrow operators", () => {
