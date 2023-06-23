@@ -10,6 +10,7 @@ import {
   spec_input_room,
   textFormatCallExpInArray,
   textFormatCallExpInStringBinaryExp,
+  textFormatStringBlockWithDuplicateMarker,
   textFormattingDouble,
   textFormattingLiteralBlockWithSuffix,
   textFormattingSingle,
@@ -104,7 +105,7 @@ describe("prettier-lpc plugin", () => {
     `);
     expect(formatted).toMatchSnapshot("array-with-multi-sfx-comments");
 
-    formatted=format(`test() { 
+    formatted = format(`test() { 
       items = ({
 #ifndef TEST
         1, 2,
@@ -627,6 +628,13 @@ describe("prettier-lpc plugin", () => {
         let formatted = format(textFormattingLiteralBlockWithSuffix);
         expect(formatted).toMatchSnapshot(
           "textFormattingLiteralBlockWithSuffix"
+        );
+      });
+
+      test("Text formatting shortcuts with duplicate marker", () => {
+        let formatted = format(textFormatStringBlockWithDuplicateMarker);
+        expect(formatted).toMatchSnapshot(
+          "textFormatStringBlockWithDuplicateMarker"
         );
       });
     });

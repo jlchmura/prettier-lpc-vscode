@@ -286,7 +286,7 @@ export class LPCParser {
     }
 
     throw this.parserError(
-      `unhandled token type ${token} [${this.scanner.getTokenText()}]:\nErr: ${this.scanner.getTokenError()}`
+      `unhandled token type ${token} [${this.scanner.getTokenText()}] @ ${this.scanner.getTokenOffset()}:\nErr: ${this.scanner.getTokenError()}`
     );
   }
 
@@ -2619,7 +2619,7 @@ export class LPCParser {
 
     nd.body = this.scanner.getTokenText();
     // remove the ending marker
-    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length);
+    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length - 1); // subtract 1 to account for newline before marker 
     nd.end = this.scanner.getTokenEnd();
 
     this.eatWhitespace();
