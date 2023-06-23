@@ -3,14 +3,14 @@
 exports[`prettier-lpc plugin FluffOS String Literal Blocks Text formatting shorcuts with suffix comment: textFormattingLiteralBlockWithSuffix 1`] = `
 "void test() {
   set(@txt
-Here is 
+  Here is 
 another block with
 no suffix comment
 txt
   );
 
   set("test", @txt
-Here is 
+  Here is 
 another block with
 a suffix comment
 txt // '
@@ -18,10 +18,23 @@ txt // '
 }"
 `;
 
+exports[`prettier-lpc plugin FluffOS String Literal Blocks Text formatting shortcuts with duplicate marker: textFormatStringBlockWithDuplicateMarker 1`] = `
+"test() {
+  set("long", @text
+  
+  The soft black and white pelt has been expertly cured to preserve the 
+texture and hairs of the panda's fur. Though the skin is quite beautiful,
+the animal itself must have been even more majestic.
+
+text
+  );
+}"
+`;
+
 exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatting shortcuts (@): textFormattingDouble 1`] = `
 "void test() {
   set_desc(@@TXT
-This is
+  This is
   a tes
 TXT
   );
@@ -31,7 +44,7 @@ TXT
 exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatting shortcuts (@): textFormattingSingle 1`] = `
 "void test() {
   set_desc(@TXT
-This is
+  This is
   a test
 TXT
   );

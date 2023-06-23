@@ -683,10 +683,27 @@ export class Scanner implements IScanner {
         if (!this.lastLiteral) {
           throw "State was within string literal but there was no literal marker";
         }
-        this.stream.advanceUntilChars(
-          ("\n" + this.lastLiteral).split("").map((c) => c.charCodeAt(0))
-        );
-        this.stream.advance(this.lastLiteral.length + 1);
+
+        const endComment = " //".split("").map((c) => c.charCodeAt(0));
+        const endMark = ("\n" + this.lastLiteral)
+          .split("")
+          .map((c) => c.charCodeAt(0));
+
+        let blockOpen = true;
+        while (blockOpen && !this.stream.eos()) {
+          this.stream.advanceUntilChars(endMark);
+          this.stream.advance(this.lastLiteral.length + 1);
+
+          // end marker must be on its own line or end with an inline comment
+          if (
+            this.stream.advanceToEndOfLine() ||
+            (this.stream.skipWhitespace(false) &&
+              this.stream.peekChar(0) == tt._FSL &&
+              this.stream.peekChar(1) == tt._FSL)
+          ) {
+            break;
+          }
+        }
 
         this.state = ScannerState.WithinFile;
 
