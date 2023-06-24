@@ -663,6 +663,14 @@ export class Scanner implements IScanner {
             this.stream.skipWhitespace();
             this.state = ScannerState.WithinFile;
             return this.finishToken(offset, TokenType.LiteralChar);
+          } else if (this.stream.peekChar(2)==tt._SQO && this.stream.peekChar(0)==tt._BSL) {
+            // escaped literal char 
+            this.stream.advance(2);
+            if (!this.stream.advanceIfChar(tt._SQO))
+              throw Error(`Expected single quote at [${this.stream.pos()}]`);
+            this.stream.skipWhitespace();
+            this.state = ScannerState.WithinFile;
+            return this.finishToken(offset, TokenType.LiteralChar);
           } else {
             // lambda call
             const litWord = this.nextWord();
