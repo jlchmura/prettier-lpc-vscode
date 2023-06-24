@@ -540,6 +540,25 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("literal_consecutive_strings");
   });
 
+  test("format literal characters", () => {
+    let formatted = format(`test() { int i='j'; }`);
+    expect(formatted).toMatchInlineSnapshot(`"test() { int i = 'j'; }"`);
+
+    formatted = format(`test() { fn('a'); }`);
+    expect(formatted).toMatchInlineSnapshot(`"test() { fn('a'); }"`);
+
+    formatted = format(`test() { fn('\\n'); }`);
+    expect(formatted).toMatchInlineSnapshot(`"test() { fn('\\n'); }"`);
+
+    formatted = format(`test() { int i='\\n'; }`);
+    expect(formatted).toMatchInlineSnapshot(`"test() { int i = '\\n'; }"`);
+
+    formatted = format(`test() { int i='\\n'+'a'; }`);
+    expect(formatted).toMatchInlineSnapshot(
+      `"test() { int i = '\\n' + 'a'; }"`
+    );
+  });
+
   test("format indexors", () => {
     let formatted = format(`string s = a[0..2]`);
     expect(formatted).toMatchInlineSnapshot(`"string s = a[0..2];"`);
