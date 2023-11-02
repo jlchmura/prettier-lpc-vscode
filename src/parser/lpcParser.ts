@@ -497,7 +497,7 @@ export class LPCParser {
     }
 
     t = this.scanner.scan();
-    if (t != endsWith) throw "expected ending token";
+    if (t != endsWith) throw this.parserError(`expected ending token @ ${this.scanner.getTokenOffset()}`, this.scanner.getTokenOffset());
 
     nd.closed = true;
 
