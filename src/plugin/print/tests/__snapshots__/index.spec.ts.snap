@@ -386,17 +386,24 @@ reset(arg) {
 
 exports[`prettier-lpc plugin handle string literals with escaped quotes: literal_strings_multiple_escapes 1`] = `"string s = "testing\\" 123\\\\";"`;
 
-exports[`prettier-lpc plugin print inherit statements: inherit-basic 1`] = `
+exports[`prettier-lpc plugin inherit statements parse inherit statements with just a define: inherit-define 1`] = `
+"
+#define D "test"
+inherit DEFINE;
+test() {  }"
+`;
+
+exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-basic 1`] = `
 "inherit "/path/file";
 test() { write("test"); }"
 `;
 
-exports[`prettier-lpc plugin print inherit statements: inherit-implied-concat 1`] = `
+exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-implied-concat 1`] = `
 "inherit __DIR__ "file" ".c";
 test() { write("test"); }"
 `;
 
-exports[`prettier-lpc plugin print inherit statements: inherit-parenblock 1`] = `
+exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-parenblock 1`] = `
 "inherit (__DIR__ + "file");
 test() { write("test"); }"
 `;

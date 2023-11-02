@@ -610,17 +610,31 @@ describe("prettier-lpc plugin", () => {
     );
   });
 
-  test("print inherit statements", () => {
-    let formatted = format(`inherit "/path/file"; test() { write("test"); }`);
-    expect(formatted).toMatchSnapshot("inherit-basic");
+  describe("inherit statements", () => {
+    test("print inherit statements", () => {
+      let formatted = format(`inherit "/path/file"; test() { write("test"); }`);
+      expect(formatted).toMatchSnapshot("inherit-basic");
 
-    formatted = format(
-      `inherit __DIR__ "file" ".c"; test() { write("test"); }`
-    );
-    expect(formatted).toMatchSnapshot(`inherit-implied-concat`);
+      formatted = format(
+        `inherit __DIR__ "file" ".c"; test() { write("test"); }`
+      );
+      expect(formatted).toMatchSnapshot(`inherit-implied-concat`);
 
-    formatted = format(`inherit (__DIR__ + "file"); test() { write("test"); }`);
-    expect(formatted).toMatchSnapshot("inherit-parenblock");
+      formatted = format(
+        `inherit (__DIR__ + "file"); test() { write("test"); }`
+      );
+      expect(formatted).toMatchSnapshot("inherit-parenblock");
+    });
+
+    test("parse inherit statements with just a define", () => {
+      let formatted = format(`
+      #define D "test"
+      inherit DEFINE;
+      test() {}
+      `);
+
+      expect(formatted).toMatchSnapshot("inherit-define");
+    });
   });
 
   describe("function calls", () => {

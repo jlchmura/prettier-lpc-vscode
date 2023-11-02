@@ -471,7 +471,9 @@ export class LPCParser {
         newNode = this.parseToken(
           t,
           tempParent,
-          ParseExpressionFlag.AllowDeclaration
+          endsWith != TokenType.ParenBlockEnd
+            ? ParseExpressionFlag.StatementOnly
+            : ParseExpressionFlag.AllowDeclaration
         );
         if (!newNode) throw this.parserError(`Unexpected token`);
 
@@ -497,7 +499,11 @@ export class LPCParser {
     }
 
     t = this.scanner.scan();
-    if (t != endsWith) throw this.parserError(`expected ending token @ ${this.scanner.getTokenOffset()}`, this.scanner.getTokenOffset());
+    if (t != endsWith)
+      throw this.parserError(
+        `expected ending token @ ${this.scanner.getTokenOffset()}`,
+        this.scanner.getTokenOffset()
+      );
 
     nd.closed = true;
 
@@ -2619,7 +2625,7 @@ export class LPCParser {
 
     nd.body = this.scanner.getTokenText();
     // remove the ending marker
-    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length - 1); // subtract 1 to account for newline before marker 
+    nd.body = nd.body.substring(0, nd.body.length - nd.marker.length - 1); // subtract 1 to account for newline before marker
     nd.end = this.scanner.getTokenEnd();
 
     this.eatWhitespace();
