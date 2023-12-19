@@ -445,6 +445,7 @@ export class LPCParser {
         continue;
       }
 
+      
       let newNode: LPCNode | undefined;
 
       if (this.isBinaryOp(t)) {
@@ -600,10 +601,7 @@ export class LPCParser {
         break;
     }
 
-    nd.body = this.scanner.getTokenText().trim();
-
-    parent.children.push(nd);
-
+    nd.body = this.scanner.getTokenText().trim();    
     this.eatWhitespace();
     this.tryParseComment(nd);
 

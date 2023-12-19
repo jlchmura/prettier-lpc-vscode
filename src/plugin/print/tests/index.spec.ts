@@ -224,6 +224,13 @@ describe("prettier-lpc plugin", () => {
 
     formatted = format(textFormatCallExpInStringBinaryExp);
     expect(formatted).toMatchSnapshot("call-exp-inside-binary-string-exp");
+
+    formatted = format(
+      `int rounded = (((cnt + 5) / 10) * 10); // cheap rounding to nearest 10`
+    );
+    expect(formatted).toMatchInlineSnapshot(
+      `"int rounded = (((cnt + 5) / 10) * 10); // cheap rounding to nearest 10"`
+    );
   });
 
   test("format logical expression", () => {
