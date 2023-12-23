@@ -307,5 +307,6 @@ const printRoot: PrintNodeFunction<LPCNode> = (
   options,
   printChildren
 ) => {
-  return markAsRoot(join(hardline, path.map(printChildren, "children")));
+  const arr:Doc[] = [join(hardline, path.map(printChildren, "children")),hardline];
+  return markAsRoot(arr);
 };

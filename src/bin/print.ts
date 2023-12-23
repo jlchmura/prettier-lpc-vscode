@@ -24,3 +24,4 @@ const options: Partial<LPCOptions> = {
 const formatted = format(code, options);
 //const ast = ParseLPC(formatted);
 console.log(formatted);
+console.log("--------");
