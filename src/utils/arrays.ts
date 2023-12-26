@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ArrayExpressionNode } from "../nodeTypes/arrayExpression";
+import { AstPath } from "prettier";
 import { LPCNode } from "../nodeTypes/lpcNode";
 import { LPCOptions } from "../plugin";
 
@@ -82,21 +82,5 @@ export function someReverse<T>(
     }
   }
 
-  return false;
-}
-
-export function shouldPrintPairs(
-  varName: string | undefined,
-  options: LPCOptions,
-  node: LPCNode
-) {
-  const pairVars = new Set(options.pairVariables);
-  if (node.type == "array") {
-    const arrNode = node as ArrayExpressionNode;
-    if (!!varName && pairVars.has(varName)) {
-      arrNode.printAsPairs = true;
-      return true;
-    }
-  }
   return false;
 }

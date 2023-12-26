@@ -6,7 +6,19 @@ import { lpcPrinters } from "./printer";
 export const AST_PARSER_NAME = "lpc";
 export const AST_FORMAT_NAME = "lpc";
 
-const DEFAULT_PAIR_VARS = ["dest_dir", "items"];
+const DEFAULT_PAIR_VARS = [
+  "dest_dir",
+  "items",
+  "search_items",
+  "take_items",
+  "actions",
+  "sounds",
+  "search_fail",
+  "smells",
+  "look_items",
+  "contents",
+  "map_offset",
+];
 
 export interface LPCOptions extends RequiredOptions, ParserOptions {
   //condenseSingleExpressionParams?: boolean;

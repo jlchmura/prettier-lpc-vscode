@@ -14,7 +14,7 @@ import { LPCNode } from "../../nodeTypes/lpcNode";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
 import { UnaryPrefixExpressionNode } from "../../nodeTypes/unaryPrefixExpression";
 import { VariableDeclarationNode } from "../../nodeTypes/variableDeclaration";
-import { pushIfVal, shouldPrintPairs } from "../../utils/arrays";
+import { pushIfVal } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
 import { isInParen, needsSemi, PrintNodeFunction } from "./shared";
 import { printArray } from "./array";
@@ -123,8 +123,6 @@ export const printAssignmentExpression: PrintNodeFunction<
   if (node.right) {
     const shouldIndent =
       node.right?.type != "array" && node.right?.type != "mapping";
-
-    shouldPrintPairs(node.left?.name, options, node.right);
 
     const rightPrinted = path.call(printChildren, "right");
 
