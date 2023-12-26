@@ -1,5 +1,5 @@
-import * as prettierPlugin from "../..";
 import * as prettier from "prettier";
+import * as prettierPlugin from "../..";
 import { ParseLPC } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
@@ -22,12 +22,16 @@ describe("prettier-lpc plugin", () => {
     input: string,
     options?: Partial<prettierPlugin.LPCOptions>
   ) => {
-    const formatted = prettier.format(input, {
-      parser: prettierPlugin.AST_PARSER_NAME,
-      plugins: [prettierPlugin],
+    const opt = {
       printWidth: 80,
       tabWidth: 2,
       useTabs: false,
+    } as Partial<prettierPlugin.LPCOptions>;
+
+    const formatted = prettier.format(input, {
+      parser: prettierPlugin.AST_PARSER_NAME,
+      plugins: [prettierPlugin],
+      ...opt,
       ...options,
     });
 
@@ -38,34 +42,41 @@ describe("prettier-lpc plugin", () => {
 
   test("formats short functions", () => {
     let formatted = format(`string set_s(string s){return foo=s;}`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string set_s(string s) { return foo = s; }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string set_s(string s) { return foo = s; }
+      "
+    `);
 
     formatted = format(`query_s ( ) {return s;}`);
-    expect(formatted).toMatchInlineSnapshot(`"query_s() { return s; }"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "query_s() { return s; }
+      "
+    `);
 
     formatted = format(`test() { int i=0; return 1; }`);
     expect(formatted).toMatchInlineSnapshot(`
       "test() {
         int i = 0;
         return 1;
-      }"
+      }
+      "
     `);
   });
 
   test("format array typecasts", () => {
     let formatted = format(`string *dirs = (string *) env->query_dest_dir();`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string *dirs = (string*)env->query_dest_dir();"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string *dirs = (string*)env->query_dest_dir();
+      "
+    `);
 
     formatted = format(
       `string * dirs = obj->fn( (string *) env->query_dest_dir() );`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"string *dirs = obj->fn((string*)env->query_dest_dir());"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string *dirs = obj->fn((string*)env->query_dest_dir());
+      "
+    `);
   });
 
   test("format arrays", () => {
@@ -116,6 +127,35 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("array-with-inline-directives");
   });
 
+  describe("pair arrays", () => {
+    test("format pair arrays based on var name", () => {
+      let formatted = format(
+        `test() { dest_dir = ({ "room1", "north", "room2", "south" }); }`
+      );
+      expect(formatted).toMatchSnapshot("array-pair-varname");
+    });
+
+    test("format pair arrays based on hint", () => {
+      let formatted = format(
+        `test() { 
+          // @prettier-pair
+          not_dest_dir = ({ "room1", "north", "room2", "south" }); }
+          `
+      );
+      expect(formatted).toMatchSnapshot("array-pair-varname");
+    });
+
+    test("pairs with odd number of items shouldnt be in pair mode", () => {
+      let formatted = format(
+        `test() { dest_dir = ({ "room1", "north", "room2" }); }`
+      );
+      expect(formatted).toMatchInlineSnapshot(`
+        "test() { dest_dir = ({"room1", "north", "room2"}); }
+        "
+      `);
+    });
+  });
+
   test("format call-exp inside arrays", () => {
     let formatted = format(textFormatCallExpInArray);
     expect(formatted).toMatchSnapshot("call-exp-in-array");
@@ -123,9 +163,10 @@ describe("prettier-lpc plugin", () => {
 
   test("format args passed byref", () => {
     let formatted = format(`test(string &d) { d[0] += 32; }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"test(string &d) { d[0] += 32; }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "test(string &d) { d[0] += 32; }
+      "
+    `);
   });
 
   test("format parens", () => {
@@ -133,9 +174,10 @@ describe("prettier-lpc plugin", () => {
     let formatted = format(
       `void test() { obj->set_weight(1 + random(avail_weight-1))     }`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"void test() { obj->set_weight(1 + random(avail_weight - 1)); }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "void test() { obj->set_weight(1 + random(avail_weight - 1)); }
+      "
+    `);
 
     formatted = format(textNestedParenBlocksWithLogicalExpr);
     expect(formatted).toMatchSnapshot("nested-parens-with-logical-exp");
@@ -146,25 +188,28 @@ describe("prettier-lpc plugin", () => {
     let formatted = format(
       `printf("Foo is %s\\n", test=="bar" ? "bar" : "notbar");`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"printf("Foo is %s\\n", test == "bar" ? "bar" : "notbar");"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "printf("Foo is %s\\n", test == "bar" ? "bar" : "notbar");
+      "
+    `);
 
     // with paren
     formatted = format(
       `printf("Foo is %s\\n", (test=="bar") ? "bar" : "notbar");`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"printf("Foo is %s\\n", (test == "bar") ? "bar" : "notbar");"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "printf("Foo is %s\\n", (test == "bar") ? "bar" : "notbar");
+      "
+    `);
 
     // arith op inside ternary
     formatted = format(
       `private int round(float n) { return (int)(n < 0 ? n - 0.5 : n + 0.5); }`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"private int round(float n) { return (int)(n < 0 ? n - 0.5 : n + 0.5); }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "private int round(float n) { return (int)(n < 0 ? n - 0.5 : n + 0.5); }
+      "
+    `);
 
     formatted = format(
       `private int round(float n) { int i=(int)(n < 0 ? n - 0.5 : n + 0.5); return i; }`
@@ -185,16 +230,17 @@ describe("prettier-lpc plugin", () => {
 `
     );
     expect(formatted).toMatchInlineSnapshot(`
-          "test() {
-            if (!a && !ob->b()) return "foo";
-            else
-              return
-                sprintf(
-                  "bar %s",
-                  ob->test() && ob2->test() ? "bar" : ob->bar() ? "baz" : "baz2"
-                );
-          }"
-        `);
+      "test() {
+        if (!a && !ob->b()) return "foo";
+        else
+          return
+            sprintf(
+              "bar %s",
+              ob->test() && ob2->test() ? "bar" : ob->bar() ? "baz" : "baz2"
+            );
+      }
+      "
+    `);
 
     formatted = format(mapping_with_ternary_value);
     expect(formatted).toMatchSnapshot("mapping_with_ternary_value");
@@ -219,7 +265,8 @@ describe("prettier-lpc plugin", () => {
         if (a != 0 && (b == 0 || c >= MIN)) {
           return 1;
         }
-      }"
+      }
+      "
     `);
 
     formatted = format(textFormatCallExpInStringBinaryExp);
@@ -228,16 +275,18 @@ describe("prettier-lpc plugin", () => {
     formatted = format(
       `int rounded = (((cnt + 5) / 10) * 10); // cheap rounding to nearest 10`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"int rounded = (((cnt + 5) / 10) * 10); // cheap rounding to nearest 10"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "int rounded = (((cnt + 5) / 10) * 10); // cheap rounding to nearest 10
+      "
+    `);
   });
 
   test("format logical expression", () => {
     let formatted = format(`test(str) {return str == "NO" || str == "TWO";}`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"test(str) { return str == "NO" || str == "TWO"; }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "test(str) { return str == "NO" || str == "TWO"; }
+      "
+    `);
 
     formatted = format(
       `test() { if (str == "a" && found2 & !taken) { write("You find nothing."); return 1; } }`
@@ -248,7 +297,8 @@ describe("prettier-lpc plugin", () => {
           write("You find nothing.");
           return 1;
         }
-      }"
+      }
+      "
     `);
   });
 
@@ -257,14 +307,15 @@ describe("prettier-lpc plugin", () => {
       list = filter_array(info(), lambda(({ 'test }), ({ #'!=, ({ #'[, 'isValid, NAME }), \"NONAME\" }) )); 
     }`);
     expect(formatted).toMatchInlineSnapshot(`
-          "test() {
-            list =
-              filter_array(
-                info(),
-                lambda(({'test}), ({#'!=, ({#'[, 'isValid, NAME}), "NONAME"}))
-              );
-          }"
-        `);
+      "test() {
+        list =
+          filter_array(
+            info(),
+            lambda(({'test}), ({#'!=, ({#'[, 'isValid, NAME}), "NONAME"}))
+          );
+      }
+      "
+    `);
   });
 
   test("format closures", () => {
@@ -276,20 +327,23 @@ describe("prettier-lpc plugin", () => {
     formatted = format(
       `object *a = filter(all_inventory(room), (: $1->id("something") :));`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"object *a = filter(all_inventory(room), (: $1->id("something") :));"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "object *a = filter(all_inventory(room), (: $1->id("something") :));
+      "
+    `);
 
     // whitespace between ( and :
     formatted = format(`int *arr=filter(arr2,( :($1==1&&$1<10):));`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));
+      "
+    `);
 
     formatted = format(`int *arr=filter(arr2,(:($1==1&&$1<10):));`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "int *arr = filter(arr2, (: ($1 == 1 && $1 < 10) :));
+      "
+    `);
   });
 
   test("format variable declarations", () => {
@@ -299,15 +353,17 @@ describe("prettier-lpc plugin", () => {
     `);
 
     expect(formatted).toMatchInlineSnapshot(`
-          "string *arr, /* OPTIONAL: Array of stuff */
-                 code; /* test comment */"
-        `);
+      "string *arr, /* OPTIONAL: Array of stuff */
+             code; /* test comment */
+      "
+    `);
 
     // multi-decl var
     formatted = format(`string *arr, code="", test=0, s;`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string *arr, code = "", test = 0, s;"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string *arr, code = "", test = 0, s;
+      "
+    `);
 
     // multilpe types of var decls
     formatted = format(`string s; mixed m; int i=0; mapping mp;`);
@@ -315,7 +371,8 @@ describe("prettier-lpc plugin", () => {
       "string s;
       mixed m;
       int i = 0;
-      mapping mp;"
+      mapping mp;
+      "
     `);
 
     // var decl inside function
@@ -324,7 +381,8 @@ describe("prettier-lpc plugin", () => {
       "test() {
         int i, j;
         string s = "";
-      }"
+      }
+      "
     `);
   });
 
@@ -333,18 +391,20 @@ describe("prettier-lpc plugin", () => {
     struct coords { int x; int y; };`);
 
     expect(formatted).toMatchInlineSnapshot(`
-          "// this struct should be on a single line
-          struct coords { int x; int y; };"
-        `);
+      "// this struct should be on a single line
+      struct coords { int x; int y; };
+      "
+    `);
   });
 
   test("format macros", () => {
     let formatted = format(
       `#define WRAP(str)  trim("test"->word_wrap(str), 2)`
     );
-    expect(formatted).toMatchInlineSnapshot(
-      `"#define WRAP(str) trim("test"->word_wrap(str), 2)"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "#define WRAP(str) trim("test"->word_wrap(str), 2)
+      "
+    `);
 
     formatted = format(
       `#define WRAP(str)  trim("really really really really long string"->word_wrap(str), 2)`,
@@ -375,35 +435,47 @@ describe("prettier-lpc plugin", () => {
 
     // arrow after obj
     formatted = format(`string s = obj->test();`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = obj->test();"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = obj->test();
+      "
+    `);
 
     // arrow after call-exp
     formatted = format(`string s=fn()->test();`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = fn()->test();"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = fn()->test();
+      "
+    `);
 
     // arrow after binary-exp in parens
     formatted = format(`string s=("obj"+"name")->test();`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string s = ("obj" + "name")->test();"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = ("obj" + "name")->test();
+      "
+    `);
 
     // arrow inside ternary after arrow
     formatted = format(`string s = obj->test()?obj->test2() : "";`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string s = obj->test() ? obj->test2() : "";"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = obj->test() ? obj->test2() : "";
+      "
+    `);
 
     // arrow with newlines
     formatted = format(`string s = obj
     ->
     test();`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = obj->test();"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = obj->test();
+      "
+    `);
 
     // arrow with suffix comment
     formatted = format(`string s = obj->fn(); // comment`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string s = obj->fn(); // comment"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = obj->fn(); // comment
+      "
+    `);
   });
 
   test("format foreach loops", () => {
@@ -453,9 +525,10 @@ describe("prettier-lpc plugin", () => {
 
     // functions with multiple parameters
     formatted = format(`test(int a, int b) { return a+b; }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"test(int a, int b) { return a + b; }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "test(int a, int b) { return a + b; }
+      "
+    `);
 
     // multiple params, declaration with multi variables
     formatted = format(
@@ -467,7 +540,8 @@ describe("prettier-lpc plugin", () => {
       test(string type, int b) {
         int foo, bar = 1;
         return type;
-      }"
+      }
+      "
     `);
   });
 
@@ -480,7 +554,8 @@ describe("prettier-lpc plugin", () => {
         string status;
         status = sprintf("Stutus number: %d
       ", status);
-      }"
+      }
+      "
     `);
   });
 
@@ -507,24 +582,28 @@ describe("prettier-lpc plugin", () => {
     expect(formatted).toMatchSnapshot("for_loop_various");
 
     formatted = format(`for (int i=0; i < 10; ++i) { }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"for (int i = 0; i < 10; ++i) {  }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "for (int i = 0; i < 10; ++i) {  }
+      "
+    `);
 
     formatted = format(`for (int i=0; i < 10; i++) { }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"for (int i = 0; i < 10; i++) {  }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "for (int i = 0; i < 10; i++) {  }
+      "
+    `);
 
     formatted = format(`for (int i=10; i > 0; --i) { }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"for (int i = 10; i > 0; --i) {  }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "for (int i = 10; i > 0; --i) {  }
+      "
+    `);
 
     formatted = format(`for (int i=10; i > 0; i--) { }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"for (int i = 10; i > 0; i--) {  }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "for (int i = 10; i > 0; i--) {  }
+      "
+    `);
 
     formatted = format(`void test() { while(true) {if (1==1)continue ;}}`);
     expect(formatted).toMatchSnapshot("loop-continue-shouldhave-semi");
@@ -549,41 +628,72 @@ describe("prettier-lpc plugin", () => {
 
   test("format literal characters", () => {
     let formatted = format(`test() { int i='j'; }`);
-    expect(formatted).toMatchInlineSnapshot(`"test() { int i = 'j'; }"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "test() { int i = 'j'; }
+      "
+    `);
 
     formatted = format(`test() { fn('a'); }`);
-    expect(formatted).toMatchInlineSnapshot(`"test() { fn('a'); }"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "test() { fn('a'); }
+      "
+    `);
 
     formatted = format(`test() { fn('\\n'); }`);
-    expect(formatted).toMatchInlineSnapshot(`"test() { fn('\\n'); }"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "test() { fn('\\n'); }
+      "
+    `);
 
     formatted = format(`test() { int i='\\n'; }`);
-    expect(formatted).toMatchInlineSnapshot(`"test() { int i = '\\n'; }"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "test() { int i = '\\n'; }
+      "
+    `);
 
     formatted = format(`test() { int i='\\n'+'a'; }`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"test() { int i = '\\n' + 'a'; }"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "test() { int i = '\\n' + 'a'; }
+      "
+    `);
   });
 
   test("format indexors", () => {
     let formatted = format(`string s = a[0..2]`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = a[0..2];"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = a[0..2];
+      "
+    `);
 
     formatted = format(`string s = a[ 0..]`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = a[0..];"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = a[0..];
+      "
+    `);
 
     formatted = format(`string s = a[0..<2]`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = a[0..<2];"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = a[0..<2];
+      "
+    `);
 
     formatted = format(`string s = a[<1..<2]`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = a[<1..<2];
+      "
+    `);
 
     formatted = format(`string s = a[<1]`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = a[<1];"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = a[<1];
+      "
+    `);
 
     formatted = format(`string s = a[ <1.. <2]`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = a[<1..<2];"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = a[<1..<2];
+      "
+    `);
 
     // deep mapping indexors
     formatted = format(
@@ -593,13 +703,17 @@ describe("prettier-lpc plugin", () => {
       "void test() {
         printf("%O
       ", animals["bird"]["age"]["born"]["date"]["time"]);
-      }"
+      }
+      "
     `);
   });
 
   test("handle string literals with escaped quotes", () => {
     let formatted = format(`string s = "testing\\" 123";`);
-    expect(formatted).toMatchInlineSnapshot(`"string s = "testing\\" 123";"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string s = "testing\\" 123";
+      "
+    `);
 
     formatted = format(`string s = "testing\\" 123\\\\";`);
     expect(formatted).toMatchSnapshot("literal_strings_multiple_escapes");
@@ -608,13 +722,17 @@ describe("prettier-lpc plugin", () => {
   test("function declarations", () => {
     // fluffos version with no variable name
     let formatted = format(`string evaluate_path(string);`);
-    expect(formatted).toMatchInlineSnapshot(`"string evaluate_path(string);"`);
+    expect(formatted).toMatchInlineSnapshot(`
+      "string evaluate_path(string);
+      "
+    `);
 
     // LD version
     formatted = format(`string evaluate_path(string s);`);
-    expect(formatted).toMatchInlineSnapshot(
-      `"string evaluate_path(string s);"`
-    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "string evaluate_path(string s);
+      "
+    `);
   });
 
   describe("inherit statements", () => {
@@ -647,10 +765,26 @@ describe("prettier-lpc plugin", () => {
   describe("function calls", () => {
     test("handles multiple arguments", () => {
       let formatted = format(`test() { fn("a","b"); }`);
-      expect(formatted).toMatchInlineSnapshot(`"test() { fn("a", "b"); }"`);
+      expect(formatted).toMatchInlineSnapshot(`
+        "test() { fn("a", "b"); }
+        "
+      `);
 
       formatted = format(`test() { fn("a", -1); }`);
-      expect(formatted).toMatchInlineSnapshot(`"test() { fn("a", -1); }"`);
+      expect(formatted).toMatchInlineSnapshot(`
+        "test() { fn("a", -1); }
+        "
+      `);
+    });
+  });
+
+  describe("root", () => {
+    test("should always end with newline", () => {
+      let formatted = format(`test() { fn("a"); }`);
+      expect(formatted).toMatchInlineSnapshot(`
+        "test() { fn("a"); }
+        "
+      `);
     });
   });
 
@@ -689,9 +823,10 @@ describe("prettier-lpc plugin", () => {
     test("Closures", () => {
       // fluffos $() syntax
       let formatted = format(`int *arr=filter(arr2,(:$(var):));`);
-      expect(formatted).toMatchInlineSnapshot(
-        `"int *arr = filter(arr2, (: $(var) :));"`
-      );
+      expect(formatted).toMatchInlineSnapshot(`
+        "int *arr = filter(arr2, (: $(var) :));
+        "
+      `);
     });
 
     // end FluffOS

@@ -15,7 +15,8 @@ another block with
 a suffix comment
 txt // '
   );
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin FluffOS String Literal Blocks Text formatting shortcuts with duplicate marker: textFormatStringBlockWithDuplicateMarker 1`] = `
@@ -28,7 +29,8 @@ the animal itself must have been even more majestic.
 
 text
   );
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatting shortcuts (@): textFormattingDouble 1`] = `
@@ -38,7 +40,8 @@ exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatti
   a tes
 TXT
   );
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatting shortcuts (@): textFormattingSingle 1`] = `
@@ -48,7 +51,8 @@ exports[`prettier-lpc plugin FluffOS String Literal Blocks fluffos text formatti
   a test
 TXT
   );
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spread-op-function-and-callexp 1`] = `
@@ -56,18 +60,22 @@ exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spre
   mixed number, result = 0;
   fn(1, numbers...);
   return result;
-}"
+}
+"
 `;
 
-exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `"test() { items = ({({"gates", "steel gates"}), "Strong metal gates."}); }"`;
+exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `
+"test() { items = ({({"gates", "steel gates"}), "Strong metal gates.",}); }
+"
+`;
 
 exports[`prettier-lpc plugin format arrays: array-inner-condensed 1`] = `
 "test() {
   items = ({
-    ({"gates", "steel gates"}),
-    "Strong metal gates.",
+    ({"gates", "steel gates"}), "Strong metal gates.",
   });
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format arrays: array-none-condensed 1`] = `
@@ -77,9 +85,10 @@ exports[`prettier-lpc plugin format arrays: array-none-condensed 1`] = `
       "gates",
       "steel gates",
     }),
-    "Strong metal gates.",
+      "Strong metal gates.",
   });
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format arrays: array-with-inline-directives 1`] = `
@@ -91,31 +100,34 @@ exports[`prettier-lpc plugin format arrays: array-with-inline-directives 1`] = `
     3,
 #endif
   });
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format arrays: array-with-multi-sfx-comments 1`] = `
 "
 test() {
   items = ({
-    ({"gates", "steel gates"}),
-    "Strong metal gates.", // inner sfx
+    ({"gates", "steel gates"}), "Strong metal gates.", // inner sfx
   }); // sfx
   // post
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format arrays: array-with-sfx-comment 1`] = `
 "
 test() {
-  items = ({({"gates", "steel gates"}), "Strong metal gates."}); // sfx
-}"
+  items = ({({"gates", "steel gates"}), "Strong metal gates.",}); // sfx
+}
+"
 `;
 
 exports[`prettier-lpc plugin format arrow operators: arrow-newline-after 1`] = `
 "test() {
   "/obj/master"->query_player_exists();
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format assignment expressions: assign_exp_suffix_comment 1`] = `
@@ -123,12 +135,14 @@ exports[`prettier-lpc plugin format assignment expressions: assign_exp_suffix_co
   exits = room->exits();
   if (exits == -1) arr = ([]); // erase all exits
   else if (stringp(exits)) arr -= ([exits]);
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format assignment expressions: assignment_inside_array 1`] = `
 "int i = 0;
-test() { indices = ({i, index++}); }"
+test() { indices = ({i, index++}); }
+"
 `;
 
 exports[`prettier-lpc plugin format binary expressions: call-exp-inside-binary-string-exp 1`] = `
@@ -136,7 +150,8 @@ exports[`prettier-lpc plugin format binary expressions: call-exp-inside-binary-s
   string name = query_name();
   return name + " was defeated by " + "/daemons/time_d"->query_time() + ".
 ";
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format call-exp inside arrays: call-exp-in-array 1`] = `
@@ -145,7 +160,8 @@ exports[`prettier-lpc plugin format call-exp inside arrays: call-exp-in-array 1`
 void somefunc() {
   string *words;
   words = ({SOME_DEFINE, lower_case(SOME_DEFINE), upper_case(SOME_DEFINE)});
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format closures: closure-greaterthan-this_player 1`] = `
@@ -153,19 +169,27 @@ exports[`prettier-lpc plugin format closures: closure-greaterthan-this_player 1`
   object *hash = ({});
   hash = sort_array(hash, #'>);
   hash = filter(hash, #'this_player);
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format foreach loops: foreach-collapsed 1`] = `
 "test() {
   string exitKey;
   foreach (exitKey : all_exits) { write(exitKey); }
-}"
+}
+"
 `;
 
-exports[`prettier-lpc plugin format foreach loops: foreach-multi-var 1`] = `"test() { foreach (x, y : a) { z = b[x]; } }"`;
+exports[`prettier-lpc plugin format foreach loops: foreach-multi-var 1`] = `
+"test() { foreach (x, y : a) { z = b[x]; } }
+"
+`;
 
-exports[`prettier-lpc plugin format foreach loops: foreach-multi-var-keep-in 1`] = `"test() { foreach (x, y in a) { z = b[x]; } }"`;
+exports[`prettier-lpc plugin format foreach loops: foreach-multi-var-keep-in 1`] = `
+"test() { foreach (x, y in a) { z = b[x]; } }
+"
+`;
 
 exports[`prettier-lpc plugin format foreach loops: foreach-multiline 1`] = `
 "test() {
@@ -174,12 +198,14 @@ exports[`prettier-lpc plugin format foreach loops: foreach-multiline 1`] = `
     write(exitKey);
     i++;
   }
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format foreach loops: foreach-range-collapsed 1`] = `
 "test() { foreach (i : 1 .. 6) printf("%d
-", i); }"
+", i); }
+"
 `;
 
 exports[`prettier-lpc plugin format foreach loops: foreach-range-multiline 1`] = `
@@ -189,14 +215,16 @@ exports[`prettier-lpc plugin format foreach loops: foreach-range-multiline 1`] =
 ", i);
     j++;
   }
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format functions: function-stub-with-newline-comments 1`] = `
 "int gmcp_send_map();
 int gmcp_send_map_config();
 
-/* Should not move the coment up after the semi */"
+/* Should not move the coment up after the semi */
+"
 `;
 
 exports[`prettier-lpc plugin format functions: function-stubs 1`] = `
@@ -204,7 +232,8 @@ exports[`prettier-lpc plugin format functions: function-stubs 1`] = `
 public int query_level();
 public void set_level(int level);
 public int query_next_level();
-public int query_level() { return level; }"
+public int query_level() { return level; }
+"
 `;
 
 exports[`prettier-lpc plugin format literal strings: literal_consecutive_strings 1`] = `
@@ -222,23 +251,27 @@ exports[`prettier-lpc plugin format literal strings: literal_consecutive_strings
     "this is line 2.
 " +
     "this is line 3.";
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format macros: define-macro-multieline-withslash 1`] = `
 "#define TXT \\
   "String here with embedded \\n slash that is pretty long and should wrap to the next"\\
-  + "line. Another line here. Don't combine this line because it is long too.""
+  + "line. Another line here. Don't combine this line because it is long too."
+"
 `;
 
 exports[`prettier-lpc plugin format macros: define-macro-multiline 1`] = `
 "#define W2(s) \\
-  trim("local/really really really long string really really really really long/util")->       wrap(({ a, s }))"
+  trim("local/really really really long string really really really really long/util")->       wrap(({ a, s }))
+"
 `;
 
 exports[`prettier-lpc plugin format macros: define-macro-with-wrap 1`] = `
 "#define WRAP(str) \\
-  trim("really really really really long string"->word_wrap(str), 2)"
+  trim("really really really really long string"->word_wrap(str), 2)
+"
 `;
 
 exports[`prettier-lpc plugin format parens: nested-parens-with-logical-exp 1`] = `
@@ -246,7 +279,8 @@ exports[`prettier-lpc plugin format parens: nested-parens-with-logical-exp 1`] =
   if ((ob = present("id", TP)) && (str == "to" || str == "from")) {
     write("hi");
   }
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format ternary expressions: mapping_with_ternary_value 1`] = `
@@ -276,20 +310,23 @@ public varargs int send_config(object player) {
 
   object p = player ? player : this_player();
   return p->send(PKG, pkg);
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format ternary expressions: ternary_arith_op_inside 1`] = `
 "private int round(float n) {
   int i = (int)(n < 0 ? n - 0.5 : n + 0.5);
   return i;
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format ternary expressions: ternary-after-binary 1`] = `
 "test() {
   str = (str[0] == '/' ? "/" + implode(path, "/") : implode(path, "/"));
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin format ternary expressions: ternary-with-lit-binary-op 1`] = `
@@ -299,7 +336,8 @@ exports[`prettier-lpc plugin format ternary expressions: ternary-with-lit-binary
     " looks at " + (gender == 1 ? "him" : "her") +
     "."
   );
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin formats for loops: for_loop_various 1`] = `
@@ -314,12 +352,19 @@ exports[`prettier-lpc plugin formats for loops: for_loop_various 1`] = `
 exports[`prettier-lpc plugin formats for loops: for-loop_multi_expression 1`] = `
 "test() {
   for (i = 0, j = sizeof(keys); i < j; i++, j--) { string key = keys[i]; }
-}"
+}
+"
 `;
 
-exports[`prettier-lpc plugin formats for loops: loop-break-shouldhave-semi 1`] = `"void test() { while (true) { if (1 == 1) break; } }"`;
+exports[`prettier-lpc plugin formats for loops: loop-break-shouldhave-semi 1`] = `
+"void test() { while (true) { if (1 == 1) break; } }
+"
+`;
 
-exports[`prettier-lpc plugin formats for loops: loop-continue-shouldhave-semi 1`] = `"void test() { while (true) { if (1 == 1) continue; } }"`;
+exports[`prettier-lpc plugin formats for loops: loop-continue-shouldhave-semi 1`] = `
+"void test() { while (true) { if (1 == 1) continue; } }
+"
+`;
 
 exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
 "test() {
@@ -333,14 +378,16 @@ exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
     move_player("sky");
     return 1;
   } else return 0;
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin formatter should handle missing semi's: missing_semi_comma_instead 1`] = `
 "test() {
   short = "short name";
   long = "long" + "desc";
-}"
+}
+"
 `;
 
 exports[`prettier-lpc plugin general formatting: spec_input_room 1`] = `
@@ -362,15 +409,12 @@ reset(arg) {
       "on for several lines
 ";
     items = ({
-      ({"table", "small table", "wood table"}),
-      "A table made of wood",
-      ({"bench", "wood bench"}),
-      "A bench made of wood",
+      ({"table", "small table", "wood table"}), "A table made of wood",
+      ({"bench", "wood bench"}), "A bench made of wood",
     });
 
     dest_dir = ({
-      BASE + "/northroom",
-      "north",
+      BASE + "/northroom", "north",
     });
   }
 
@@ -381,29 +425,58 @@ reset(arg) {
     monster->set_hp(200);
     move_object(monster, this_object());
   }
-}"
+}
+"
 `;
 
-exports[`prettier-lpc plugin handle string literals with escaped quotes: literal_strings_multiple_escapes 1`] = `"string s = "testing\\" 123\\\\";"`;
+exports[`prettier-lpc plugin handle string literals with escaped quotes: literal_strings_multiple_escapes 1`] = `
+"string s = "testing\\" 123\\\\";
+"
+`;
 
 exports[`prettier-lpc plugin inherit statements parse inherit statements with just a define: inherit-define 1`] = `
 "
 #define D "test"
 inherit DEFINE;
-test() {  }"
+test() {  }
+"
 `;
 
 exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-basic 1`] = `
 "inherit "/path/file";
-test() { write("test"); }"
+test() { write("test"); }
+"
 `;
 
 exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-implied-concat 1`] = `
 "inherit __DIR__ "file" ".c";
-test() { write("test"); }"
+test() { write("test"); }
+"
 `;
 
 exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-parenblock 1`] = `
 "inherit (__DIR__ + "file");
-test() { write("test"); }"
+test() { write("test"); }
+"
+`;
+
+exports[`prettier-lpc plugin pair arrays format pair arrays based on hint: array-pair-varname 1`] = `
+"test() {
+  // @prettier-pair
+  not_dest_dir = ({
+    "room1", "north",
+    "room2", "south",
+  });
+}
+"
+`;
+
+exports[`prettier-lpc plugin pair arrays format pair arrays based on var name: array-pair-varname 1`] = `
+"test() {
+  dest_dir = ({
+    "room1", "north",
+    "room2", "south",
+  });
+}
+"
 `;

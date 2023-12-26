@@ -1,8 +1,11 @@
-import { Doc } from "prettier";
+import { AstPath, Doc } from "prettier";
 import { builders } from "prettier/doc";
-import { InlineCommentNode, CommentBlockNode } from "../../nodeTypes/comment";
+import {
+  CommentBlockNode,
+  CommentNode,
+  InlineCommentNode,
+} from "../../nodeTypes/comment";
 import { LPCNode } from "../../nodeTypes/lpcNode";
-import { last } from "../../utils/arrays";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -103,3 +106,36 @@ export const printSuffixComments: PrintNodeFunction<LPCNode, LPCNode> = (
     ];
   else return [];
 };
+
+/**
+ * Gets the comment node directly before the current node, wherever that may be in the path.
+ * @param path current path
+ * @returns the comment node, or undefined if there is none
+ */
+export function getPreviousComment(
+  path: AstPath<LPCNode>
+): CommentNode | undefined {
+  let codeBlock = undefined;
+  let prevNode = undefined;
+
+  let n: LPCNode | null;
+  let i = 0;
+  while (!!(n = path.getParentNode(i++)) && !codeBlock) {
+    if (n.type == "codeblock" || n.type == "root") {
+      codeBlock = n;
+      prevNode = path.getParentNode(i - 2);
+    }
+  }
+
+  if (!!codeBlock) {
+    const possibleComment = codeBlock.findNodeBefore(prevNode?.start || 0);
+    switch (possibleComment?.type) {
+      case "comment":
+      case "comment-singleline":
+      case "comment-block":
+        return possibleComment as CommentNode;
+    }
+  }
+
+  return undefined;
+}

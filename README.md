@@ -14,16 +14,36 @@ This plugin, like Prettier, is
 can be set via a [`.prettierrc` file](https://prettier.io/docs/en/configuration.html). In particular, the following
 options may be of interest to LPC developers:
 
-| API Option           | Default | Description                                                                        |
-| -------------------- | ------- | ---------------------------------------------------------------------------------- |
-| `printWidth`         |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#print-width) |
-| `tabWidth`           |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tab-width)   |
-| `useTabs`            |         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tabs)        |
+| API Option           | Description                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------- |
+| `printWidth`         | [Same option as in Prettier](https://prettier.io/docs/en/options.html#print-width) |
+| `tabWidth`           | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tab-width)   |
+| `useTabs`            | [Same option as in Prettier](https://prettier.io/docs/en/options.html#tabs)        |
+| `pairVariables`      | See [Pair Arrays](#pair-arrays) |
 
 ## Multi-Line Objects
 
 For arrays and functions, this plugin follow's prettier's [multi-line objects rule](https://prettier.io/docs/en/rationale.html#multi-line-objects). For tips on how to control whether objects
 are collapsed to a single line, or not, see: https://prettier.io/docs/en/rationale.html#multi-line-objects
+
+## Pair Arrays
+In LDMud flavors of LPC there are often arrays that are treated as _pairs_. A common example of this is `dest_dir`. For example:
+```
+dest_dir = ({
+  "room/pub", "west",
+  "room/street1", "east",
+});
+```
+By default, this plugin is set to identify a list of common variable names for which arrays should be formatted in _pair_ mode as shown above. This list can be customized (or set to an empty array to completely disable this feature) by using the `pairVariables` setting.
+
+An array can also be forced into pair mode by utilizing the `@prettier-pair` hint:
+```
+// @prettier-pair
+string *pairs = ({
+  "key 1", "value 1",
+  "key 2", "value 2",
+});
+```
 
 ## Known Limitations
 The folowing languages features are not supported yet:

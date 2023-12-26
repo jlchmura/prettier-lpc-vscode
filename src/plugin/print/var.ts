@@ -8,6 +8,7 @@ import {
 import { printSuffixComments } from "./comment";
 import { needsSemi, PrintNodeFunction } from "./shared";
 
+
 const {
   group,
   indent,
@@ -80,6 +81,7 @@ export const printVar: PrintNodeFunction<
   if (init) {
     arr.push(" =");
     const shouldIndent = init.type != "array" && init.type != "mapping";
+        
     const printedInit = path.call(printChildren, "init");
     if (shouldIndent) {
       arr.push(group(indent([line, printedInit])));
