@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -103,7 +103,7 @@
       "properties": {  
         "Prettier-LPC.pairVariables": {
           "type": "array",          
-          "default": ["dest_dir","items","search_items","take_items","actions","sounds","search_fail","smells","look_items","contents","map_offset"],
+          "default": ["dest_dir","items","search_items","take_items","sounds","search_fail","smells","look_items","contents","map_offset"],
           "description": "Array variables that are treated as pairs"
         },
         "Prettier-LPC.ignoreTabSettings": {
