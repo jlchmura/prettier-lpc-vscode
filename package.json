@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -21,7 +21,8 @@
     "build": "npx tsc",
     "build:ext": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "vsce:package": "vsce package",
-    "vsce:publish": "vsce publish"
+    "vsce:publish": "vsce publish",
+    "watch": "tsc --watch --project ./"
   },
   "repository": {
     "type": "git",
@@ -44,7 +45,7 @@
     "onStartupFinished",
     "onCommand:prettier-lpc-vscode.format-document"
   ],
-  "main": "out/extension.js",
+  "main": "build/extension.js",
   "description": "",
   "devDependencies": {
     "@swc-node/jest": "1.5.3",
@@ -99,7 +100,17 @@
     ],
     "configuration": {
       "title": "Prettier LPC",
-      "properties": {                
+      "properties": {  
+        "Prettier-LPC.pairVariables": {
+          "type": "array",          
+          "default": [],
+          "description": "Array variables that are treated as pairs"
+        },
+        "Prettier-LPC.ignoreTabSettings": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Ignore user and workplace settings for `tabSize` and `insertSpaces` (uses `#Prettier-SQL.tabSizeOverride#` and `#Prettier-SQL.insertSpacesOverride#`)?"
+        }
       }
     }
   }

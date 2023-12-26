@@ -5,5 +5,5 @@
     }
   },
   "editor.tabSize": 2,
-  "cmake.configureOnOpen": false,
+  "cmake.configureOnOpen": false  
 }
