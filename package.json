@@ -19,7 +19,7 @@
     "start": "npx tsc && node --enable-source-maps ./build/bin/print.js test.c",
     "cli": "npx tsc && node --enable-source-maps ./build/cli.js",
     "build": "npx tsc",
-    "build:ext": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "build:ext": "esbuild ./src/extension.ts --bundle --outfile=build/extension.js --external:vscode --format=cjs --platform=node",
     "vsce:package": "vsce package",
     "vsce:publish": "vsce publish",
     "watch": "tsc --watch --project ./"

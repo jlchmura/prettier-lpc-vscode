@@ -11,4 +11,6 @@ test.c
 **/*.map
 
 build/**/*
+!build/extension.js
 test-files/**/*
+.github/**/*
