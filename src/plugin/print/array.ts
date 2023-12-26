@@ -211,7 +211,9 @@ function shouldPrintAsPair(path: AstPath<LPCNode>, options: LPCOptions) {
 
   // not a variable that is always treated as a pair,
   // check for a @prettier-pair hint
-  if (!isMatch) {
+  if (isMatch) {
+    return true;
+  } else if (!isMatch) {
     const comment = getPreviousComment(path);
     if (comment?.body?.includes("@prettier-pair")) {
       return true;

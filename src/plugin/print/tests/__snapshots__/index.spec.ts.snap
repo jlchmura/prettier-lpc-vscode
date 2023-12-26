@@ -65,15 +65,14 @@ exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spre
 `;
 
 exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `
-"test() { items = ({({"gates", "steel gates"}), "Strong metal gates."}); }
+"test() { items = ({({"gates", "steel gates"}), "Strong metal gates.",}); }
 "
 `;
 
 exports[`prettier-lpc plugin format arrays: array-inner-condensed 1`] = `
 "test() {
   items = ({
-    ({"gates", "steel gates"}),
-    "Strong metal gates.",
+    ({"gates", "steel gates"}), "Strong metal gates.",
   });
 }
 "
@@ -86,7 +85,7 @@ exports[`prettier-lpc plugin format arrays: array-none-condensed 1`] = `
       "gates",
       "steel gates",
     }),
-    "Strong metal gates.",
+      "Strong metal gates.",
   });
 }
 "
@@ -109,8 +108,7 @@ exports[`prettier-lpc plugin format arrays: array-with-multi-sfx-comments 1`] = 
 "
 test() {
   items = ({
-    ({"gates", "steel gates"}),
-    "Strong metal gates.", // inner sfx
+    ({"gates", "steel gates"}), "Strong metal gates.", // inner sfx
   }); // sfx
   // post
 }
@@ -120,7 +118,7 @@ test() {
 exports[`prettier-lpc plugin format arrays: array-with-sfx-comment 1`] = `
 "
 test() {
-  items = ({({"gates", "steel gates"}), "Strong metal gates."}); // sfx
+  items = ({({"gates", "steel gates"}), "Strong metal gates.",}); // sfx
 }
 "
 `;
@@ -411,15 +409,12 @@ reset(arg) {
       "on for several lines
 ";
     items = ({
-      ({"table", "small table", "wood table"}),
-      "A table made of wood",
-      ({"bench", "wood bench"}),
-      "A bench made of wood",
+      ({"table", "small table", "wood table"}), "A table made of wood",
+      ({"bench", "wood bench"}), "A bench made of wood",
     });
 
     dest_dir = ({
-      BASE + "/northroom",
-      "north",
+      BASE + "/northroom", "north",
     });
   }
 
@@ -462,5 +457,26 @@ test() { write("test"); }
 exports[`prettier-lpc plugin inherit statements print inherit statements: inherit-parenblock 1`] = `
 "inherit (__DIR__ + "file");
 test() { write("test"); }
+"
+`;
+
+exports[`prettier-lpc plugin pair arrays format pair arrays based on hint: array-pair-varname 1`] = `
+"test() {
+  // @prettier-pair
+  not_dest_dir = ({
+    "room1", "north",
+    "room2", "south",
+  });
+}
+"
+`;
+
+exports[`prettier-lpc plugin pair arrays format pair arrays based on var name: array-pair-varname 1`] = `
+"test() {
+  dest_dir = ({
+    "room1", "north",
+    "room2", "south",
+  });
+}
 "
 `;

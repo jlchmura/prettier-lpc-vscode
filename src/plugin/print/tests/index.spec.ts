@@ -1,5 +1,5 @@
-import * as prettierPlugin from "../..";
 import * as prettier from "prettier";
+import * as prettierPlugin from "../..";
 import { ParseLPC } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
@@ -22,12 +22,16 @@ describe("prettier-lpc plugin", () => {
     input: string,
     options?: Partial<prettierPlugin.LPCOptions>
   ) => {
-    const formatted = prettier.format(input, {
-      parser: prettierPlugin.AST_PARSER_NAME,
-      plugins: [prettierPlugin],
+    const opt = {
       printWidth: 80,
       tabWidth: 2,
       useTabs: false,
+    } as Partial<prettierPlugin.LPCOptions>;
+
+    const formatted = prettier.format(input, {
+      parser: prettierPlugin.AST_PARSER_NAME,
+      plugins: [prettierPlugin],
+      ...opt,
       ...options,
     });
 
@@ -121,6 +125,35 @@ describe("prettier-lpc plugin", () => {
       });
     }`);
     expect(formatted).toMatchSnapshot("array-with-inline-directives");
+  });
+
+  describe("pair arrays", () => {
+    test("format pair arrays based on var name", () => {
+      let formatted = format(
+        `test() { dest_dir = ({ "room1", "north", "room2", "south" }); }`
+      );
+      expect(formatted).toMatchSnapshot("array-pair-varname");
+    });
+
+    test("format pair arrays based on hint", () => {
+      let formatted = format(
+        `test() { 
+          // @prettier-pair
+          not_dest_dir = ({ "room1", "north", "room2", "south" }); }
+          `
+      );
+      expect(formatted).toMatchSnapshot("array-pair-varname");
+    });
+
+    test("pairs with odd number of items shouldnt be in pair mode", () => {
+      let formatted = format(
+        `test() { dest_dir = ({ "room1", "north", "room2" }); }`
+      );
+      expect(formatted).toMatchInlineSnapshot(`
+        "test() { dest_dir = ({"room1", "north", "room2"}); }
+        "
+      `);
+    });
   });
 
   test("format call-exp inside arrays", () => {
