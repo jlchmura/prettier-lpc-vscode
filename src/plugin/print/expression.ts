@@ -14,9 +14,11 @@ import { LPCNode } from "../../nodeTypes/lpcNode";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
 import { UnaryPrefixExpressionNode } from "../../nodeTypes/unaryPrefixExpression";
 import { VariableDeclarationNode } from "../../nodeTypes/variableDeclaration";
-import { pushIfVal } from "../../utils/arrays";
+import { pushIfVal, shouldPrintPairs } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
 import { isInParen, needsSemi, PrintNodeFunction } from "./shared";
+import { printArray } from "./array";
+import { ArrayExpressionNode } from "../../nodeTypes/arrayExpression";
 
 const {
   group,
@@ -32,7 +34,7 @@ const {
   fill,
   indentIfBreak,
   ifBreak,
-  
+
   lineSuffix,
 } = builders;
 
@@ -74,7 +76,8 @@ export const printCallExpression: PrintNodeFunction<
     );
 
     const grouped = group([indent([softline, argPrinted])], { id: sym });
-    if (tryCondense) { //} && node.arguments.length == 1) {
+    if (tryCondense) {
+      //} && node.arguments.length == 1) {
       // don't indent these
       printed.push(ifBreak(grouped, argPrinted));
     } else {
@@ -109,9 +112,20 @@ export const printAssignmentExpression: PrintNodeFunction<
   if (node.operator != "++" && node.operator != "--") printed.push(" ");
   printed.push(node.operator || "");
 
+  let printPairs = false;
+  switch (node.left?.name) {
+    case "dest_dir":
+    case "items":
+      printPairs = true;
+      break;
+  }
+
   if (node.right) {
     const shouldIndent =
       node.right?.type != "array" && node.right?.type != "mapping";
+
+    shouldPrintPairs(node.left?.name, options, node.right);
+
     const rightPrinted = path.call(printChildren, "right");
 
     if (shouldIndent) {

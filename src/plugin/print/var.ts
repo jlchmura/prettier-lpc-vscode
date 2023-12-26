@@ -7,6 +7,8 @@ import {
 } from "../../nodeTypes/variableDeclaration";
 import { printSuffixComments } from "./comment";
 import { needsSemi, PrintNodeFunction } from "./shared";
+import { shouldPrintPairs } from "../../utils/arrays";
+import { IdentifierNode } from "../../nodeTypes/identifier";
 
 const {
   group,
@@ -80,6 +82,13 @@ export const printVar: PrintNodeFunction<
   if (init) {
     arr.push(" =");
     const shouldIndent = init.type != "array" && init.type != "mapping";
+    
+    // figure out if init is array and should be printed in pairs
+    let nm:string|undefined = "";
+    if (id?.type == "identifier") nm = (id as IdentifierNode).name;
+    else if (id?.type == "assignment") nm = (id as any).left.name;
+    shouldPrintPairs(nm, options, init);
+
     const printedInit = path.call(printChildren, "init");
     if (shouldIndent) {
       arr.push(group(indent([line, printedInit])));

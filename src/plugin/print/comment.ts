@@ -1,9 +1,10 @@
-import { Doc } from "prettier";
+import { AstPath, Doc } from "prettier";
 import { builders } from "prettier/doc";
-import { InlineCommentNode, CommentBlockNode } from "../../nodeTypes/comment";
+import { InlineCommentNode, CommentBlockNode, CommentNode } from "../../nodeTypes/comment";
 import { LPCNode } from "../../nodeTypes/lpcNode";
 import { last } from "../../utils/arrays";
 import { PrintNodeFunction } from "./shared";
+import { Comment } from "vscode";
 
 const {
   group,
@@ -103,3 +104,18 @@ export const printSuffixComments: PrintNodeFunction<LPCNode, LPCNode> = (
     ];
   else return [];
 };
+
+export function getPreviousComment(path: AstPath<LPCNode>): CommentNode|undefined {
+  
+  const m = path.match((nd,nm,num)=>{
+    if (nd.type=="commentblock" || (!!num && num==0)) return false;
+    else if (!!num && num > 0) {
+      debugger;
+    }
+    return true;    
+  }, (nd,nm,num)=>{
+    return (nd.type=="codeblock");
+  });
+ 
+  return undefined;
+}

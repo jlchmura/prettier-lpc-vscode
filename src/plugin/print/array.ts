@@ -10,7 +10,7 @@ import {
   MappingPair,
 } from "../../nodeTypes/mappingExpression";
 import { findFirst, last } from "../../utils/arrays";
-import { printSuffixComments } from "./comment";
+import { getPreviousComment, printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
 const {
@@ -39,6 +39,9 @@ export const printArray: PrintNodeFunction<
 
   printed.push("({");
 
+  const printPairs = node.printAsPairs && node.elements.length % 2 == 0;
+  const prefixComment = getPreviousComment(path);
+
   if (node.elements.length > 0) {
     const elsPrinted: Doc = [];
     let sepParts: Doc = [];
@@ -50,14 +53,38 @@ export const printArray: PrintNodeFunction<
       elsPrinted.push(breakParent);
     }
 
+    let pair: Doc[] = [];
+    let idx=0;
+    let groupId=Symbol("array pair");
     path.each((childPath) => {
       const nd = childPath.getValue();
 
-      elsPrinted.push(sepParts, fill([printChildren()]));
+      if (printPairs) {
+        let child = childPath.call(printChildren);
+        if (pair.length==1) child = indentIfBreak([softline,child],{groupId: groupId});
+        pair.push([sepParts,child]);
 
-      sepParts = [",", line];
+        if (pair.length==2) {
+          const terminal = idx < node.elements.length-2 ? hardline : "";
+          elsPrinted.push(group([fill([(pair), ",",terminal])],{id: groupId}));
+          
+          pair=[];
+          sepParts=[];
+          groupId = Symbol("array pair" + idx.toString());
+        } else {
+          sepParts = [", "];
+        } 
+
+        //pair.push([sepParts,childPath.call(printChildren)]);
+        //sepParts = [",", line];
+      } else {
+        elsPrinted.push(sepParts, fill([printChildren()]));
+
+        sepParts = [",", line];
+      }
       if (nd.type == "blankline" || nd.type == "directive") sepParts = softline;
       if (nd.type?.startsWith("comment")) sepParts = softline;
+      idx++;
     }, "elements");
 
     // massage the final sep.  If we ended w/ a softline, set that to empty
@@ -71,14 +98,14 @@ export const printArray: PrintNodeFunction<
           softline,
           // elements are joined by a comma
           group(elsPrinted, { id: groupId }),
-          options.trailingComma ? ifBreak(sepParts) : "",
+          options.trailingComma && !printPairs ? ifBreak(sepParts) : "",
         ]),
         softline,
       ])
     );
   }
 
-  printed.push(ifBreak("", ""), dedent("})"));
+  printed.push(dedent("})"));
 
   // fill will cause nested arrays to inline if possible
   //return fill(printed);

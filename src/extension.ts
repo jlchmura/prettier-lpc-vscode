@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import path from "node:path";
 import plugin, { LPCOptions } from "./plugin";
-import prettier, { Config, Options, resolveConfig } from "prettier";
+import prettier, { Config, Options, RequiredOptions, resolveConfig } from "prettier";
 import { Position, Range, TextDocument, TextEdit, window } from "vscode";
 
 const getConfigs = async (
@@ -15,13 +15,34 @@ const getConfigs = async (
       useCache: false,
     })) ?? {};
 
+    const pairVar = extensionSettings.get<string[]>("pairVariables");
   return {
-    ...formattingOptions,
+    ...formattingOptions,    
+    ...getIndentationConfig(extensionSettings, formattingOptions),
     ...prettierConfig,
+    pairVariables: pairVar,
     filepath: cmd(document.fileName),
     parser: "lpc",
     plugins: [plugin],
   };
+};
+
+const getIndentationConfig = (
+  extensionSettings: vscode.WorkspaceConfiguration,
+  formattingOptions: vscode.FormattingOptions
+): Partial<RequiredOptions> => {
+  // override tab settings if ignoreTabSettings is true
+  if (extensionSettings.get<boolean>('ignoreTabSettings')) {
+    return {
+      tabWidth: extensionSettings.get<number>('tabSizeOverride'),
+      useTabs: !extensionSettings.get<boolean>('insertSpacesOverride'),
+    };
+  } else {
+    return {
+      tabWidth: formattingOptions.tabSize,
+      useTabs: !formattingOptions.insertSpaces,
+    };
+  }
 };
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -31,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
       formattingOptions: vscode.FormattingOptions
     ): Promise<vscode.TextEdit[]> {
       const extensionSettings =
-        vscode.workspace.getConfiguration("Prettier-lpc");
+        vscode.workspace.getConfiguration("Prettier-LPC");
       const formatConfigs = await getConfigs(
         extensionSettings,
         formattingOptions,
