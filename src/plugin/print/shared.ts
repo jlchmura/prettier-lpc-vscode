@@ -24,16 +24,27 @@ export const isInParen = (path: AstPath<LPCNode>) => {
   return false;
 };
 export const needsSemi = (path: AstPath<LPCNode>) => {
+  // this isn't common, but if we're in a ternary, and the ternary is
+  // within a codeblock (i.e. not an), we need a semi
+  if (
+    path.match(
+      (n) => n.type === "ternary",
+      (n) => n.type === "codeblock"
+    )
+  ) {
+    return true;
+  }
+
   // if we're within certain nodes, we know for sure
   // a semi is not needed
   let n: LPCNode | null;
   let i = 0;
   while (!!(n = path.getParentNode(i++))) {
     if (path.getName() == "codeblock" || path.getName() == "consequent") break;
-    if (n.type == "ternary") return false;
     if (n.type == "parenblock") return false;
-    if (n.type == "for") return false;  
-    if (n.type == "foreach-range-exp") return false;      
+    if (n.type == "ternary") return false;
+    if (n.type == "for") return false;
+    if (n.type == "foreach-range-exp") return false;
     if (n.type == "call-exp") return false;
     if (n.type == "mapping-pair") return false;
     if (n.type == "indexor-exp") return false;
@@ -67,8 +78,8 @@ export const needsSemi = (path: AstPath<LPCNode>) => {
         n.type !== "return" &&
         n.type !== "type-cast" &&
         n.type !== "assignment-exp" &&
-        n.type !== "foreach" &&         
-        (n.type !== "binary-exp") &&
+        n.type !== "foreach" &&
+        n.type !== "binary-exp" &&
         (n.type !== "for" || nm == "codeblock"), // for will print its own semis, but the for's codeblock is ok to have semi
       (n) =>
         n.type !== "parenblock" &&

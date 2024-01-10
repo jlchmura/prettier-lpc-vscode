@@ -254,6 +254,20 @@ describe("prettier-lpc plugin", () => {
       `test() { set_long("The " + race_arr[race] + " looks at " + (gender == 1 ? "him" : "her") + "."); }`
     );
     expect(formatted).toMatchSnapshot("ternary-with-lit-binary-op");
+
+    // ternary expression used outside an assignment
+    formatted = format(
+      `int test() { gener == 1 ? firstName = males[random(sizeof(males))] : firstName = females[random(sizeof(females))]; return 1; }    `
+    );
+    expect(formatted).toMatchInlineSnapshot(`
+      "int test() {
+        gener == 1
+          ? firstName = males[random(sizeof(males))]
+          : firstName = females[random(sizeof(females))];
+        return 1;
+      }
+      "
+    `);
   });
 
   test("format binary expressions", () => {

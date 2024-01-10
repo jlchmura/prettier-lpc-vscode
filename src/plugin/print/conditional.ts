@@ -1,12 +1,12 @@
-import { Doc } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { IfNode } from "../../nodeTypes/if";
 import { ParenBlockNode } from "../../nodeTypes/parenBlock";
 import { SwitchNode } from "../../nodeTypes/switch";
 import { TernaryExpressionNode } from "../../nodeTypes/ternaryExpression";
 import { last } from "../../utils/arrays";
-import { printCommentBlock, printSuffixComments } from "./comment";
-import { PrintNodeFunction } from "./shared";
+import { printSuffixComments } from "./comment";
+import { PrintNodeFunction, needsSemi } from "./shared";
 
 const {
   group,
@@ -145,6 +145,15 @@ export const printTernary: PrintNodeFunction<
   if (node.alternate) {
     printed.push(line, ": ");
     printed.push(path.call(printChildren, "alternate"));
+  }
+
+  const shouldPrintSemi = needsSemi(path);
+  if (shouldPrintSemi) {
+    printed.push(";");
+
+    if (util.isNextLineEmpty(options.originalText, node, (n) => n.end)) {
+      printed.push(hardline);
+    }
   }
 
   return [
