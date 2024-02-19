@@ -1,8 +1,9 @@
-import * as vscode from "vscode";
 import path from "node:path";
+import prettier, { Config, RequiredOptions, resolveConfig } from "prettier";
+import * as vscode from "vscode";
+import { Range, TextDocument, TextEdit, window } from "vscode";
+import { ParserError } from "./parser/lpcParser";
 import plugin, { LPCOptions } from "./plugin";
-import prettier, { Config, Options, RequiredOptions, resolveConfig } from "prettier";
-import { Position, Range, TextDocument, TextEdit, window } from "vscode";
 
 const getConfigs = async (
   extensionSettings: vscode.WorkspaceConfiguration,
@@ -15,9 +16,9 @@ const getConfigs = async (
       useCache: false,
     })) ?? {};
 
-    const pairVar = extensionSettings.get<string[]>("pairVariables");
+  const pairVar = extensionSettings.get<string[]>("pairVariables");
   return {
-    ...formattingOptions,    
+    ...formattingOptions,
     ...getIndentationConfig(extensionSettings, formattingOptions),
     ...prettierConfig,
     pairVariables: pairVar,
@@ -32,10 +33,10 @@ const getIndentationConfig = (
   formattingOptions: vscode.FormattingOptions
 ): Partial<RequiredOptions> => {
   // override tab settings if ignoreTabSettings is true
-  if (extensionSettings.get<boolean>('ignoreTabSettings')) {
+  if (extensionSettings.get<boolean>("ignoreTabSettings")) {
     return {
-      tabWidth: extensionSettings.get<number>('tabSizeOverride'),
-      useTabs: !extensionSettings.get<boolean>('insertSpacesOverride'),
+      tabWidth: extensionSettings.get<number>("tabSizeOverride"),
+      useTabs: !extensionSettings.get<boolean>("insertSpacesOverride"),
     };
   } else {
     return {
@@ -109,7 +110,20 @@ const formatSelectionCommand = vscode.commands.registerCommand(
         }
       });
     } catch (e) {
-      vscode.window.showErrorMessage("Unable to format LPC:\n" + e);
+      if (e instanceof ParserError) {
+        vscode.window.showErrorMessage("Unable to format LPC:\n" + e.message);
+
+        if (!!e.loc) {
+          let target = editor.document.positionAt(e.loc);
+          target = editor.document.validatePosition(target);
+
+          editor.revealRange(new vscode.Range(target, target));
+          editor.selection = new vscode.Selection(target, target);
+        }
+        console.error(e);
+      } else {
+        vscode.window.showErrorMessage("Unable to format LPC:\n" + e);
+      }
     }
   }
 );
