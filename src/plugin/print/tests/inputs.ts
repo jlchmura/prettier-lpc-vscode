@@ -184,3 +184,16 @@ the animal itself must have been even more majestic.
 text
  );
 }`;
+
+export const ifWithExtraCurlyBrackets = `
+void test() {
+  if(str != "string")
+  return 0;
+  {
+    if(str == "string")
+    {
+      return 1;
+    }
+  }
+}
+`;

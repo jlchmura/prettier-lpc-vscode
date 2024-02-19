@@ -64,6 +64,36 @@ exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spre
 "
 `;
 
+exports[`prettier-lpc plugin If statements Ifs with extra curly brackets: ifWithExtraCurlyBrackets 1`] = `
+"
+void test() {
+  if (str != "string") return 0;
+  {
+    if (str == "string") {
+      return 1;
+    }
+  }
+
+}
+"
+`;
+
+exports[`prettier-lpc plugin If statements formats if statements: if_condense_test 1`] = `
+"test() {
+  // this should be fairly condensed
+  if (
+    str != "down" && str != "up" && str != "hole" && str != "hill" &&
+    str != "mountain"
+  ) return 0;
+  else if (str == "sky") {
+    // send them
+    move_player("sky");
+    return 1;
+  } else return 0;
+}
+"
+`;
+
 exports[`prettier-lpc plugin format arrays: array-condensed 1`] = `
 "test() { items = ({({"gates", "steel gates"}), "Strong metal gates.",}); }
 "
@@ -363,22 +393,6 @@ exports[`prettier-lpc plugin formats for loops: loop-break-shouldhave-semi 1`] =
 
 exports[`prettier-lpc plugin formats for loops: loop-continue-shouldhave-semi 1`] = `
 "void test() { while (true) { if (1 == 1) continue; } }
-"
-`;
-
-exports[`prettier-lpc plugin formats if statements: if_condense_test 1`] = `
-"test() {
-  // this should be fairly condensed
-  if (
-    str != "down" && str != "up" && str != "hole" && str != "hill" &&
-    str != "mountain"
-  ) return 0;
-  else if (str == "sky") {
-    // send them
-    move_player("sky");
-    return 1;
-  } else return 0;
-}
 "
 `;
 

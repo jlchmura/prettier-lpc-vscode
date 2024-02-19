@@ -4,6 +4,7 @@ import { ParseLPC } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
   for_loop_various,
+  ifWithExtraCurlyBrackets,
   if_condense_test,
   literal_consecutive_strings,
   mapping_with_ternary_value,
@@ -580,10 +581,17 @@ describe("prettier-lpc plugin", () => {
     formatted = format(`int i=0; test() { indices = ({i, index++}); }`);
     expect(formatted).toMatchSnapshot("assignment_inside_array");
   });
+  
+  describe("If statements", () => {
+    test("formats if statements", () => {
+      let formatted = format(if_condense_test);
+      expect(formatted).toMatchSnapshot("if_condense_test");
+    });
 
-  test("formats if statements", () => {
-    let formatted = format(if_condense_test);
-    expect(formatted).toMatchSnapshot("if_condense_test");
+    test("Ifs with extra curly brackets", () => {
+      let formatted = format(ifWithExtraCurlyBrackets);
+      expect(formatted).toMatchSnapshot("ifWithExtraCurlyBrackets");
+    });
   });
 
   test("formats for loops", () => {

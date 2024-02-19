@@ -3,6 +3,7 @@ import { LPCNode } from "../nodeTypes/lpcNode";
 import { last, pushIfVal } from "../utils/arrays";
 import { TokenType } from "./lpcLanguageTypes";
 
+import { util } from "prettier";
 import {
   ArrayExpressionNode,
   IndexorExpressionNode,
@@ -63,15 +64,13 @@ import {
 } from "../nodeTypes/variableDeclaration";
 import { WhileStatementNode } from "../nodeTypes/whileStatement";
 import {
-  binary_ops,
   binary_ops_set,
   logical_ops_set,
   op_precedence,
   typesAllowAsVarNamesSet,
-  unary_ops_set,
+  unary_ops_set
 } from "./defs";
 import { Scanner } from "./lpcScanner";
-import { util } from "prettier";
 
 export interface LPCDocument {
   roots: LPCNode[];
@@ -741,6 +740,13 @@ export class LPCParser {
           this.scanner.scan();
           break;
         case TokenType.CodeBlockStart:
+          // if we see a curly bracket after the consequent has been assign
+          // its a new codeblock and not part of the current if
+          if (!!nd.consequent) {
+            nd.closed=true;
+            break;
+          }
+          
           this.scanner.scan();
           nd.consequent = this.parseCodeBlock(nd);
           this.scanner.eat(TokenType.BlankLines);
