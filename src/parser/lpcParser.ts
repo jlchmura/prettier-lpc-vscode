@@ -79,10 +79,11 @@ export interface LPCDocument {
 }
 
 export const enum ParseExpressionFlag {
-  StatementOnly = 0b0000,
+  StatementOnly    = 0b0000,
   AllowDeclaration = 0b0001,
-  AllowFunction = 0b0010,
-  AllowMultiDecl = 0b0100,
+  AllowFunction    = 0b0010,
+  AllowMultiDecl   = 0b0100,
+  NoCommas         = 0b1000,
 }
 
 export class ParserError extends Error {
@@ -424,6 +425,8 @@ export class LPCParser {
     );
     const children: LPCNode[] = [];
 
+    const allowCommaSeparator = !(flags & ParseExpressionFlag.NoCommas);
+
     let t: TokenType,
       lastToken: TokenType = 0;
     // scan until we get a paren block end
@@ -432,7 +435,7 @@ export class LPCParser {
     let possibleImpliedBinary = false;
     while ((t = this.scanner.peek()) && t != endsWith && t != TokenType.EOS) {
       if (
-        t == TokenType.Comma ||
+        (allowCommaSeparator && t == TokenType.Comma) ||
         t == TokenType.BlankLines ||
         t == TokenType.Whitespace
       ) {
@@ -780,7 +783,7 @@ export class LPCParser {
           if (!nd.consequent) {
             nd.test = this.parseParenBlock(
               nd,
-              ParseExpressionFlag.StatementOnly
+              ParseExpressionFlag.StatementOnly | ParseExpressionFlag.NoCommas
             );
             this.eatWhitespaceAndNewlines();
             break;

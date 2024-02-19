@@ -1,6 +1,6 @@
 import * as prettier from "prettier";
 import * as prettierPlugin from "../..";
-import { ParseLPC } from "../../../parser/lpcParser";
+import { ParseLPC, ParserError } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
   for_loop_various,
@@ -38,6 +38,7 @@ describe("prettier-lpc plugin", () => {
 
     // always validating that the result of formatting is backward compatible with JSONata
     expect(() => ParseLPC(formatted)).not.toThrow();
+
     return formatted;
   };
 
@@ -581,7 +582,7 @@ describe("prettier-lpc plugin", () => {
     formatted = format(`int i=0; test() { indices = ({i, index++}); }`);
     expect(formatted).toMatchSnapshot("assignment_inside_array");
   });
-  
+
   describe("If statements", () => {
     test("formats if statements", () => {
       let formatted = format(if_condense_test);
@@ -591,6 +592,15 @@ describe("prettier-lpc plugin", () => {
     test("Ifs with extra curly brackets", () => {
       let formatted = format(ifWithExtraCurlyBrackets);
       expect(formatted).toMatchSnapshot("ifWithExtraCurlyBrackets");
+    });
+
+    test("Ifs with invalid commas", () => {
+      // this should throw an error because of the comma after present()
+      expect(() =>
+        format(
+          `void test() { if(present("string"), this_object()) { return 1; } }`
+        )
+      ).toThrow(ParserError);
     });
   });
 
