@@ -1,4 +1,4 @@
-import { AstPath, Doc, util } from "prettier";
+import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
 import { AssignmentExpressionNode } from "../../nodeTypes/assignmentExpression";
 import {
@@ -10,15 +10,12 @@ import {
   SpreadOperatorNode,
 } from "../../nodeTypes/callExpression";
 import { LogicalExpressionNode } from "../../nodeTypes/logicalExpression";
-import { LPCNode } from "../../nodeTypes/lpcNode";
 import { MemberExpressionNode } from "../../nodeTypes/memberExpression";
 import { UnaryPrefixExpressionNode } from "../../nodeTypes/unaryPrefixExpression";
-import { VariableDeclarationNode } from "../../nodeTypes/variableDeclaration";
+import { TokenType } from "../../parser/lpcLanguageTypes";
 import { pushIfVal } from "../../utils/arrays";
 import { printSuffixComments } from "./comment";
 import { isInParen, needsSemi, PrintNodeFunction } from "./shared";
-import { printArray } from "./array";
-import { ArrayExpressionNode } from "../../nodeTypes/arrayExpression";
 
 const {
   group,
@@ -189,7 +186,7 @@ export const printMemberExpression: PrintNodeFunction<
   MemberExpressionNode,
   MemberExpressionNode
 > = (node, path, options, printChildren) => {
-  const { object, property } = node;
+  const { object, property, arrow } = node;
   const printed: Doc = [];
 
   if (object) printed.push(path.call(printChildren, "object"));
@@ -201,10 +198,10 @@ export const printMemberExpression: PrintNodeFunction<
       "]"
     );
   } else {
-    if (object) printed.push("->");
+    if (object) printed.push(arrow == TokenType.Arrow ? "->" : ".");
     if (property) {
       const propPrinted = path.call(printChildren, "property");
-      if (property.type == "identifier" || property.type == "indexor-exp")
+      if (property.type == "identifier" || property.type == "indexor-exp" || property.type == "spread")
         printed.push(propPrinted);
       else printed.push("(", propPrinted, ")"); // struct member expression
     }

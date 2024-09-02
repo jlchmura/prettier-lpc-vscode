@@ -1102,7 +1102,8 @@ export class LPCParser {
       | LiteralNode
       | CallExpressionNode
       | ParenBlockNode
-      | InlineClosureArgumentNode
+      | InlineClosureArgumentNode,
+    arrowToken: TokenType.Arrow | TokenType.Dot = TokenType.Arrow
   ): CallExpressionNode | MemberExpressionNode {
     // an arrow is a member expression inside a call expression
     const nd = new MemberExpressionNode(
@@ -1112,6 +1113,7 @@ export class LPCParser {
       parent
     );
 
+    nd.arrow = arrowToken;
     nd.object = id;
 
     this.eatWhitespaceAndNewlines();
@@ -1149,6 +1151,12 @@ export class LPCParser {
     // if next token is not a paren block, then this is a member expression from a struct
     if (this.scanner.peek() != TokenType.ParenBlock) {
       nd.isStruct = true;
+      
+      if (this.scanner.peek() == TokenType.Spread && nd.property instanceof IdentifierNode) {
+        this.scanner.scan();
+        nd.property.spread = this.parseSpreadOperator(nd.property);
+      }
+
       return nd;
     }
 
@@ -1496,6 +1504,7 @@ export class LPCParser {
       identNode.name = varName;
 
       this.eatWhitespace();
+
       return identNode;
     }
   }
@@ -1578,10 +1587,11 @@ export class LPCParser {
         const tern = this.parseTernary(lh);
         parent.children.push(tern);
         return tern;
+      case TokenType.Dot:
       case TokenType.Arrow:
         this.scanner.scan();
         if (!lh) throw "unexpected arrow w/o lh expression";
-        return this.parseArrow(parent, lh as InlineClosureArgumentNode);
+        return this.parseArrow(parent, lh as InlineClosureArgumentNode, t);
       case TokenType.Operator:
       case TokenType.LogicalOperator:
       case TokenType.Star: // if star shows up here, treat it as an operator
@@ -1735,6 +1745,11 @@ export class LPCParser {
 
     const tt = this.scanner.getTokenText();
     let t: TokenType = this.scanner.peek();
+
+    if (t == TokenType.Dot && identNode) {      
+      this.scanner.scan(); // eat the dot
+      return this.parseArrow(parent, identNode, TokenType.Dot);
+    }
 
     // parse fluffos spread operator and attach to ident node being spread
     if (t == TokenType.Spread && identNode) {

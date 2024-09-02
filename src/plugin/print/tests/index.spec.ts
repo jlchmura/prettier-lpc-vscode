@@ -750,6 +750,9 @@ move_wanderer()
       }
       "
     `);
+
+    formatted = format(`void test() { printf("%O\n", animals["bird"].name);  }`);
+    expect(formatted).toMatchSnapshot("indexor-member-exp");
   });
 
   test("handle string literals with escaped quotes", () => {
@@ -862,6 +865,9 @@ move_wanderer()
         `mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`
       );
       expect(formatted).toMatchSnapshot("spread-op-function-and-callexp");
+
+      formatted = format(`debugf(sprintf("Alarm %O: %O called at %s", alarm.args..., ctime())) ;`);
+      expect(formatted).toMatchSnapshot("spread-on-member-exp");
     });
 
     test("Closures", () => {

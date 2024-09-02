@@ -8,6 +8,7 @@ export enum TokenType {
   Semicolon,
   Colon,
   Comma,
+  Dot,
 
   Directive,
   DirectiveArgument,

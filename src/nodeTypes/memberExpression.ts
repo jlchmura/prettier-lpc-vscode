@@ -1,3 +1,4 @@
+import { TokenType } from "../parser/lpcLanguageTypes";
 import { IndexorExpressionNode } from "./arrayExpression";
 import { CallExpressionNode } from "./callExpression";
 import { IdentifierNode } from "./identifier";
@@ -8,6 +9,7 @@ import { VariableDeclarationNode } from "./variableDeclaration";
 export class MemberExpressionNode extends LPCNode {
   public type = "member-exp";
 
+  public arrow: TokenType.Arrow | TokenType.Dot = TokenType.Arrow;
   public object: LPCNode | CallExpressionNode | undefined;
   public property: IdentifierNode|IndexorExpressionNode|LPCNode|undefined;
   public arguments: (VariableDeclarationNode | LiteralNode)[] = [];

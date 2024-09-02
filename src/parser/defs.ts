@@ -156,7 +156,8 @@ export const typesSet = new Set(types);
 
 export const typesAllowAsVarNames = [
   "status",
-  "symbol"
+  "symbol",
+  "null"
 ];
 export const typesAllowAsVarNamesSet = new Set(typesAllowAsVarNames);
 
