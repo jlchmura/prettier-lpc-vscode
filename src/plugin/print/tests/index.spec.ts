@@ -642,6 +642,15 @@ describe("prettier-lpc plugin", () => {
 
     formatted = format(`void test() { while(true) {if (1==1)break ;}}`);
     expect(formatted).toMatchSnapshot("loop-break-shouldhave-semi");
+
+    formatted = format(`
+move_wanderer()
+{
+   while(remove_call_out("move_wanderer") >= 0);
+        call_out("move_wanderer", 100);
+}
+`);
+    expect(formatted).toMatchSnapshot("loop-while-no-body");
   });
 
   test("formatter should handle missing semi's", () => {

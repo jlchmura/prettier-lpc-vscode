@@ -396,6 +396,15 @@ exports[`prettier-lpc plugin formats for loops: loop-continue-shouldhave-semi 1`
 "
 `;
 
+exports[`prettier-lpc plugin formats for loops: loop-while-no-body 1`] = `
+"
+move_wanderer() {
+  while (remove_call_out("move_wanderer") >= 0);
+  call_out("move_wanderer", 100);
+}
+"
+`;
+
 exports[`prettier-lpc plugin formatter should handle missing semi's: missing_semi_comma_instead 1`] = `
 "test() {
   short = "short name";

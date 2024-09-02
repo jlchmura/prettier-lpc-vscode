@@ -2299,6 +2299,9 @@ export class LPCParser {
     if (t == TokenType.CodeBlockStart) {
       nd.codeblock = this.parseCodeBlock(nd);
       this.eatWhitespaceAndNewlines();
+    } else if (t == TokenType.Semicolon) {
+      nd.end = this.scanner.getTokenEnd();
+      this.eatWhitespaceAndNewlines();
     } else {
       nd.codeblock = this.parseToken(
         t,
@@ -2307,7 +2310,7 @@ export class LPCParser {
       );
     }
 
-    nd.end = nd.codeblock!.end;
+    nd.end ??= nd.codeblock!.end;
     return nd;
   }
 

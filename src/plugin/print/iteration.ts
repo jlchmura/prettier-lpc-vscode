@@ -42,6 +42,8 @@ export const printWhileStatement: PrintNodeFunction<
     if (node.codeblock.type != "codeblock")
       printed.push(group(indent([line, printedCodeblock])));
     else printed.push([" ", printedCodeblock]);
+  } else {
+    printed.push(";");
   }
 
   if (util.isNextLineEmpty(options.originalText, node, (n) => n.end)) {
