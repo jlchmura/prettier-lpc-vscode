@@ -546,6 +546,10 @@ export class Scanner implements IScanner {
         if (this.stream.advanceIfChars([tt._DOT, tt._DOT])) {
           return this.finishToken(offset, TokenType.IndexorPosSep);
         }
+        if (this.stream.advanceIfChar(tt._DOT)) {
+          this.stream.skipWhitespace();
+          return this.finishToken(offset, TokenType.Dot);
+        }
 
         if (this.stream.advanceIfChars([tt._COL, tt._COL])) {
           // :: (inheritance)

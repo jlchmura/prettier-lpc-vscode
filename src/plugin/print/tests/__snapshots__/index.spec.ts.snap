@@ -55,6 +55,11 @@ TXT
 "
 `;
 
+exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spread-on-member-exp 1`] = `
+"debugf(sprintf("Alarm %O: %O called at %s", alarm.args..., ctime()));
+"
+`;
+
 exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spread-op-function-and-callexp 1`] = `
 "mixed sum(mixed *numbers...) {
   mixed number, result = 0;
@@ -263,6 +268,14 @@ public int query_level();
 public void set_level(int level);
 public int query_next_level();
 public int query_level() { return level; }
+"
+`;
+
+exports[`prettier-lpc plugin format indexors: indexor-member-exp 1`] = `
+"void test() {
+  printf("%O
+", animals["bird"].name);
+}
 "
 `;
 
