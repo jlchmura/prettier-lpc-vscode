@@ -1063,8 +1063,6 @@ export class LPCParser {
     nd.closed = true;
     this.tryParseComment(nd);
 
-    parent.children.push(nd);
-
     return nd;
   }
 
