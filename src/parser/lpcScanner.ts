@@ -594,7 +594,7 @@ export class Scanner implements IScanner {
         }
 
         if (this.isNumber(this.stream.peekChar())) {
-          if (this.stream.advanceIfRegExp(/^\d[\d\.]*/)) {
+          if (this.stream.advanceIfRegExp(/^\d[\d_\.]*/)) {
             return this.finishToken(offset, TokenType.LiteralNumber);
           }
         }
