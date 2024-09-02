@@ -60,3 +60,7 @@ The folowing languages features are not supported yet:
 - Split AST parsing into separate package
 - Split prettier plugin portion into separate package
 - Add more options for customization
+
+## Other useful LPC tools
+
+Also check out the [LPC Language Services](https://marketplace.visualstudio.com/items?itemName=jlchmura.lpc) extension.
