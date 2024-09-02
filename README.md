@@ -1,5 +1,5 @@
 # prettier-lpc-vscode
-VSCode extension to format LPC (Lars Pensjö C) files with [Prettier](https://prettier.io/). It is written mainly for the [LDMud](http://www.ldmud.eu/) flavor of LPC, but includes preliminary support for FluffOS as well.
+VSCode extension to format LPC (Lars Pensjö C) files with [Prettier](https://prettier.io/). It is written mainly for the [LDMud](http://www.ldmud.eu/) flavor of LPC, but includes support for most FluffOS syntax as well.
 
 ### WARNING 
 This extension is a very early release. **It may break your code**. Use at your own risk.
@@ -44,16 +44,19 @@ string *pairs = ({
   "key 2", "value 2",
 });
 ```
+## If you love this extension, you could
+
+[<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >](https://www.buymeacoffee.com/jlchmura)
 
 ## Known Limitations
 The folowing languages features are not supported yet:
 - Lambda parsing works, but is untested. Use extra caution.
 - Union types
 - Coroutines 
+- LWobjects
 
 ## To-Do
 - Support for remaining language features/syntax
 - Split AST parsing into separate package
 - Split prettier plugin portion into separate package
 - Add more options for customization
-- Add unit tests
