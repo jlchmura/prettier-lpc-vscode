@@ -313,6 +313,15 @@ exports[`prettier-lpc plugin format parens: nested-parens-with-logical-exp 1`] =
 "
 `;
 
+exports[`prettier-lpc plugin format parens: nested-parens-with-logical-exp 2`] = `
+"test() {
+  if ((obj = present("armour", TP)) && obj->query_worn()) {
+
+  }
+}
+"
+`;
+
 exports[`prettier-lpc plugin format ternary expressions: mapping_with_ternary_value 1`] = `
 "/**
 * send data */

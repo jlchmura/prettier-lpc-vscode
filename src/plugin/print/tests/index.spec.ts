@@ -183,6 +183,9 @@ describe("prettier-lpc plugin", () => {
 
     formatted = format(textNestedParenBlocksWithLogicalExpr);
     expect(formatted).toMatchSnapshot("nested-parens-with-logical-exp");
+
+    formatted = format(`test() { if((obj = present("armour", TP)) && obj->query_worn()) {} }`);
+    expect(formatted).toMatchSnapshot("nested-parens-with-logical-exp");
   });
 
   test("format ternary expressions", () => {
