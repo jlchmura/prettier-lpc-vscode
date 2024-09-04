@@ -20,6 +20,7 @@
     "cli": "npx tsc && node --enable-source-maps ./build/cli.js",
     "build": "npx tsc",
     "build:ext": "esbuild ./src/extension.ts --bundle --outfile=build/extension.js --external:vscode --format=cjs --platform=node",
+    "vscode:prepublish": "npm run build:ext",
     "vsce:package": "vsce package",
     "vsce:publish": "vsce publish",
     "watch": "tsc --watch --project ./"
