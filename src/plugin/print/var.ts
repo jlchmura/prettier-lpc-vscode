@@ -1,5 +1,6 @@
 import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
+import { ParameterDefaultValueNode } from "../../nodeTypes/functionDeclaration";
 import { TypeCastExpressionNode } from "../../nodeTypes/typeCast";
 import {
   VariableDeclarationNode,
@@ -79,10 +80,16 @@ export const printVar: PrintNodeFunction<
     arr.push(lineSuffix([" ", path.call(printChildren, "suffixComments")]));
   }
   if (init) {
-    arr.push(" =");
-    const shouldIndent = init.type != "array" && init.type != "mapping";
-        
     const printedInit = path.call(printChildren, "init");
+
+    if (init instanceof ParameterDefaultValueNode) {
+      arr.push(":", group(indent([line, printedInit])));
+      return arr;
+    } else {
+      arr.push(" =");
+    }
+
+    const shouldIndent = init.type != "array" && init.type != "mapping";            
     if (shouldIndent) {
       arr.push(group(indent([line, printedInit])));
     } else {

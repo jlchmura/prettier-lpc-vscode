@@ -1,10 +1,8 @@
 import { Doc, util } from "prettier";
 import { builders } from "prettier/doc";
-import { CodeBlockNode } from "../../nodeTypes/codeBlock";
-import { FunctionDeclarationNode } from "../../nodeTypes/functionDeclaration";
+import { FunctionDeclarationNode, ParameterDefaultValueNode } from "../../nodeTypes/functionDeclaration";
 import { ParentExpressionNode } from "../../nodeTypes/memberExpression";
 import { ReturnNode } from "../../nodeTypes/returnNode";
-import { VariableDeclarationNode } from "../../nodeTypes/variableDeclaration";
 import { printSuffixComments } from "./comment";
 import { PrintNodeFunction } from "./shared";
 
@@ -60,6 +58,15 @@ export const printFunction: PrintNodeFunction<FunctionDeclarationNode> = (
 
   return arr;
 };
+
+export const printParamDefaultValue: PrintNodeFunction<ParameterDefaultValueNode> = (
+  node,
+  path,
+  options,
+  printChildren
+) => {
+  return path.call(printChildren, "value");
+}
 
 export const printReturn: PrintNodeFunction<ReturnNode, ReturnNode> = (
   node,

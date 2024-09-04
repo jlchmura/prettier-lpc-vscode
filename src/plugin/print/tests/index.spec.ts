@@ -184,7 +184,9 @@ describe("prettier-lpc plugin", () => {
     formatted = format(textNestedParenBlocksWithLogicalExpr);
     expect(formatted).toMatchSnapshot("nested-parens-with-logical-exp");
 
-    formatted = format(`test() { if((obj = present("armour", TP)) && obj->query_worn()) {} }`);
+    formatted = format(
+      `test() { if((obj = present("armour", TP)) && obj->query_worn()) {} }`
+    );
     expect(formatted).toMatchSnapshot("nested-parens-with-logical-exp");
   });
 
@@ -751,7 +753,9 @@ move_wanderer()
       "
     `);
 
-    formatted = format(`void test() { printf("%O\n", animals["bird"].name);  }`);
+    formatted = format(
+      `void test() { printf("%O\n", animals["bird"].name);  }`
+    );
     expect(formatted).toMatchSnapshot("indexor-member-exp");
   });
 
@@ -860,13 +864,25 @@ move_wanderer()
       });
     });
 
+    describe("Default Arguments", () => {
+      test("Format functions with default closure arguments", () => {
+        let formatted = format(`test(int j, string s: (: 0 :)) { int i = j; }`);
+        expect(formatted).toMatchInlineSnapshot(`
+          "test(int j, string s: (: 0 :)) { int i = j; }
+          "
+        `);
+      });
+    });
+
     test("handles the spread operator (FluffOS)", () => {
       let formatted = format(
         `mixed sum(mixed *numbers...) { mixed number, result = 0; fn(1, numbers...); return result; }`
       );
       expect(formatted).toMatchSnapshot("spread-op-function-and-callexp");
 
-      formatted = format(`debugf(sprintf("Alarm %O: %O called at %s", alarm.args..., ctime())) ;`);
+      formatted = format(
+        `debugf(sprintf("Alarm %O: %O called at %s", alarm.args..., ctime())) ;`
+      );
       expect(formatted).toMatchSnapshot("spread-on-member-exp");
     });
 

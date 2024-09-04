@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "name": "prettier-lpc-vscode",
-  "version": "0.0.75",
+  "version": "0.0.76",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -20,6 +20,7 @@
     "cli": "npx tsc && node --enable-source-maps ./build/cli.js",
     "build": "npx tsc",
     "build:ext": "esbuild ./src/extension.ts --bundle --outfile=build/extension.js --external:vscode --format=cjs --platform=node",
+    "vscode:prepublish": "npm run build:ext",
     "vsce:package": "vsce package",
     "vsce:publish": "vsce publish",
     "watch": "tsc --watch --project ./"
