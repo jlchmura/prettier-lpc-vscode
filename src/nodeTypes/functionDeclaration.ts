@@ -12,3 +12,8 @@ export class FunctionDeclarationNode extends BaseDeclarationNode {
   /** When true indicates that this is a function stub instead of an actual function declaration */
   public isStub = false;
 }
+
+export class ParameterDefaultValueNode extends LPCNode {
+  public override type: string | undefined = "parameterDefaultValue";
+  public value: LPCNode | undefined;
+}

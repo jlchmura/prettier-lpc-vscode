@@ -23,7 +23,7 @@ import {
   ForStatementNode,
   MultiExpressionNode,
 } from "../nodeTypes/forStatement";
-import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
+import { FunctionDeclarationNode, ParameterDefaultValueNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
 import { IfNode } from "../nodeTypes/if";
 import { InheritNode } from "../nodeTypes/inherit";
@@ -81,6 +81,7 @@ import {
 } from "./print/expression";
 import {
   printFunction,
+  printParamDefaultValue,
   printParentExpression,
   printReturn,
 } from "./print/function";
@@ -296,6 +297,8 @@ const printNode: PrintNodeFunction = (node, ...commonPrintArgs) => {
       );
     case "struct-literal":
       return printStructLiteral(node as StructLiteralNode, ...commonPrintArgs);
+    case "parameterDefaultValue":
+      return printParamDefaultValue(node as ParameterDefaultValueNode, ...commonPrintArgs);
   }
 
   return ["###Printer Unknown Node Type: " + node.type];

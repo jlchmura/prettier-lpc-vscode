@@ -33,7 +33,7 @@ import {
   ForStatementNode,
   MultiExpressionNode,
 } from "../nodeTypes/forStatement";
-import { FunctionDeclarationNode } from "../nodeTypes/functionDeclaration";
+import { FunctionDeclarationNode, ParameterDefaultValueNode } from "../nodeTypes/functionDeclaration";
 import { IdentifierNode } from "../nodeTypes/identifier";
 import { InheritNode } from "../nodeTypes/inherit";
 import {
@@ -1804,8 +1804,9 @@ export class LPCParser {
       return this.parseStructDefinition(structTypeNode, parent);
     }
 
-    if (t == TokenType.AssignmentOperator) {
+    if (t == TokenType.AssignmentOperator || t == TokenType.Colon) {
       if (allowDecl && (typeNode || modNodes.length > 0)) {
+        const assignmentToken = t;
         this.scanner.scan();
         // this is definitely a declaration
         // which means the assignment is an init
@@ -1824,12 +1825,19 @@ export class LPCParser {
 
         // get next token & parse the init expression
         t = this.scanner.scan();
-        const initExp = this.parseToken(
+        let initExp = this.parseToken(
           t,
           varDecl,
           ParseExpressionFlag.StatementOnly
         );
 
+        if (assignmentToken == TokenType.Colon && initExp) {          
+          const defVal = initExp;
+          initExp = new ParameterDefaultValueNode(initExp.start, initExp.end, [], varDecl);
+          (initExp as ParameterDefaultValueNode).value = defVal;
+          defVal.parent = initExp;
+        }
+       
         return this.parseVariableDeclaration(
           varDecl,
           parent,
