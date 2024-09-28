@@ -262,7 +262,7 @@ export class LPCParser {
           ParseExpressionFlag.StatementOnly
         );
       case TokenType.Return:
-        return this.parseReturn(curr);
+        return this.parseReturn(curr, flags);
       case TokenType.AssignmentOperator:
         return this.parseMaybeUnaryPrefixOperator(token, curr);
       case TokenType.Switch:
@@ -893,7 +893,9 @@ export class LPCParser {
     return nd;
   }
 
-  private parseReturn(parent: LPCNode) {
+  private parseReturn(parent: LPCNode, flags: ParseExpressionFlag = ParseExpressionFlag.AllowDeclaration |
+    ParseExpressionFlag.AllowFunction |
+    ParseExpressionFlag.AllowMultiDecl) {
     const nd = new ReturnNode(
       this.scanner.getTokenOffset(),
       this.scanner.getTokenEnd(),
@@ -904,12 +906,14 @@ export class LPCParser {
 
     this.eatWhitespaceAndNewlines();
 
-    const t = this.scanner.scan();
-    if (t != TokenType.Semicolon) {
+    const statementOnly = !!((flags & ParseExpressionFlag.StatementOnly) === 0);
+    const t = this.scanner.peek();
+    if (t != TokenType.Semicolon || !statementOnly) {      
+      this.scanner.scan();
       nd.argument = this.parseToken(t, nd, ParseExpressionFlag.StatementOnly);
       this.eatWhitespace();
 
-      if (this.scanner.peek() == TokenType.Semicolon) {
+      if (this.scanner.peek() == TokenType.Semicolon && !statementOnly) {
         // eat the semicolon if one was left over
         this.scanner.scan();
       }

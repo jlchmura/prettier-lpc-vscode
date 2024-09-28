@@ -25,7 +25,7 @@ export interface IScanner {
 
 export const skipWhiteSpace = /(?:\s|\/\/.*|\/\*[^]*?\*\/)*/g;
 export const word = /[a-zA-Z][\w]*/g;
-export const typeCastWord = /[a-zA-Z][\w]*\s*\*?\s*\)/g;
+export const typeCastWord = /(?:[a-zA-Z][\w]*\s*\*?\s*\)|(?:class\s+[a-zA-Z][\w]*\s*\)))/g;
 
 export class Scanner implements IScanner {
   readonly stateStack: ScannerState[] = [];

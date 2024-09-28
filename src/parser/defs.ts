@@ -151,6 +151,7 @@ export const types = [
   "union",
   "null",
   "void",
+  "class"
 ];
 export const typesSet = new Set(types);
 

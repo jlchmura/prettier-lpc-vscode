@@ -3,6 +3,7 @@ import * as prettierPlugin from "../..";
 import { ParseLPC, ParserError } from "../../../parser/lpcParser";
 import {
   assign_exp_suffix_comment,
+  fluffClassTypeCast,
   for_loop_various,
   ifWithExtraCurlyBrackets,
   if_condense_test,
@@ -840,6 +841,14 @@ move_wanderer()
   });
 
   describe("FluffOS", () => {
+
+    describe("class access", ()=>{
+      test("class typecast", ()=>{
+        let formatted = format(fluffClassTypeCast);
+        expect(formatted).toMatchSnapshot("fluff-class-typecast");
+      });
+    });
+
     describe("String Literal Blocks", () => {
       test("fluffos text formatting shortcuts (@)", () => {
         let formatted = format(textFormattingSingle);

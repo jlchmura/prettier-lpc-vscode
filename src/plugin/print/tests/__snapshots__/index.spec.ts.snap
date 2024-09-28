@@ -55,6 +55,15 @@ TXT
 "
 `;
 
+exports[`prettier-lpc plugin FluffOS class access class typecast: fluff-class-typecast 1`] = `
+"
+void test(string a) {
+  if (foo[a].stat == -1) return;
+  (class bar)foo[a]->stat = 0
+}
+"
+`;
+
 exports[`prettier-lpc plugin FluffOS handles the spread operator (FluffOS): spread-on-member-exp 1`] = `
 "debugf(sprintf("Alarm %O: %O called at %s", alarm.args..., ctime()));
 "

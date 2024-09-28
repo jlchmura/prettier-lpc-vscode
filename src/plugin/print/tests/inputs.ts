@@ -197,3 +197,13 @@ void test() {
   }
 }
 `;
+
+export const fluffClassTypeCast = `
+void test(string a)
+{
+   if (foo[a].stat == -1) 
+      return;
+
+   (class bar)foo[a]->stat = 0;
+}
+`;
